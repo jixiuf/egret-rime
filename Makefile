@@ -38,7 +38,7 @@ PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
 
 GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram
 
-.PHONY: setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths
+.PHONY: setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -109,6 +109,18 @@ deploy: $(GRAM)
 	ln -sf "$(REPO)/"*.yaml "$(TARGET)"
 	ln -sf "$(GRAM)" "$(TARGET)"
 	@echo "已部署到 $(TARGET) (重新部署/重启输入法后生效)"
+
+# --- 语料管线（阶段 A~E）----------------------------------------------------
+# 投放：把语料丢进 data/input/（epub/md/html/纯文本混放均可）
+# 抽取：按文件类型自动分派处理器（见 scripts/corpus/formats.py）
+corpus-extract:   ## 增量抽取 input -> extract/（按类型自动识别）
+	$(PYTHON) scripts/corpus/extract.py --jobs 3 --nice 15
+
+corpus-dry-run:   ## 只看待处理清单（不改动任何文件）
+	$(PYTHON) scripts/corpus/extract.py --dry-run --unknown-list
+
+corpus-status:    ## 语料账本（篇数/字符/汉字/占用）
+	$(PYTHON) scripts/corpus/status.py
 
 # --- 其它 -------------------------------------------------------------------
 paths:            ## 打印路径自检

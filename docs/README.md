@@ -21,6 +21,7 @@
 | [reference-projects.md](reference-projects.md) | 参考项目分析（雾凇/万象/RIME-LMDG/墨奇/白霜）及词库构建、优化、评测工作流 |
 | [patch方法论.md](patch方法论.md) | YAML __include/__patch 语法速查 |
 | [design-weights-jianma-grammar.md](design-weights-jianma-grammar.md) | 本方案词库权重/gram 配合/简码/成语/简拼的调研与取舍（实测数据） |
+| [corpus-pipeline.md](corpus-pipeline.md) | **语料管线（阶段 A~E）**：input 投放→抽取→清洗→词频→词库→gram→评测，含增量设计与限流 |
 
 ## 本机环境速查（跨机注意事项）
 
