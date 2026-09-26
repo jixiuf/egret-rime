@@ -34,7 +34,7 @@ jintiandetianqizenmeyang→今天的天气怎么样
 - librime 实验补丁 translator/always_make_sentences 已在本仓库
   librime 工作区（默认关，config 门控）。
 
-## 已知陷阱（完整清单见 ~/vmacs/rime/docs/deployment-debugging.md）
+## 已知陷阱（完整清单见 docs/deployment-debugging.md，知识库索引见 docs/README.md）
 
 - console 运行会改写 user.yaml 的 previously_selected_schema，
   测前重置（regression_test.py 已自动处理）。
@@ -46,7 +46,14 @@ jintiandetianqizenmeyang→今天的天气怎么样
   （传统库不过滤靠权重，混合库过滤为 LM 分段保洁），
   改 gen 脚本时不要混同。
 
-## 设计文档
+## 知识库（docs/）
 
-docs/design-weights-jianma-grammar.md：词库权重/gram 配合/简码/
-成语/简拼的调研与取舍（基于本方案词库实测数据）。
+自 ~/vmacs/rime/docs 移植的 Rime 知识库，索引见 docs/README.md。
+自建词库/自训 gram 的工作流重点看：
+
+- docs/dict-reference.md：词库格式/编译/造词/用户词典
+- docs/lm-grammar.md：octagram/poet/gram 训练管线与调优
+- docs/reference-projects.md：LMDG/墨奇/万象等词库构建、清洗、评测工具链
+- docs/deployment-debugging.md：部署与调试、踩坑决策树
+- docs/design-weights-jianma-grammar.md：本方案词库权重/gram 配合/
+  简码/成语/简拼的调研与取舍（基于本方案词库实测数据）

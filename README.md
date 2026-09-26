@@ -65,3 +65,4 @@ python3 scripts/regression_test.py --dir /tmp/xxx      # 测指定用户目录
 新增修复时把用例加进 CASES 表。
 
 设计调研与取舍分析见 `docs/design-weights-jianma-grammar.md`。
+Rime 知识库（引擎/词库/gram/lua/调试）见 `docs/README.md` 索引。
