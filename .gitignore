@@ -7,3 +7,5 @@ rime.log
 *.gram
 third-party/
 data/
+__pycache__/
+*.pyc

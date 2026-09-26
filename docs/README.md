@@ -4,7 +4,7 @@
 > 维护与扩展（自建词库、自训 gram 等）。原仓库保留同名副本，两边目前
 > 不同步，以本仓库为准。
 
-本目录是对 librime 源码（`~/repos/librime`，fork 自 rime/librime 1.17.0）与 Rime
+本目录是对 librime 源码（本仓库 `third-party/librime`，pin rime/librime 1.17.0）与 Rime
 输入法体系的系统性总结，供 AI agent 在修改 schema / 词库 / 语言模型时快速定位。
 
 ## 文档索引
@@ -24,31 +24,43 @@
 
 ## 本机环境速查（跨机注意事项）
 
-> 本文档可能在多台机器上使用（macOS / Linux 混用）。所有 `~/repos/...` 路径
-> 按「先查、没有则 clone」约定处理（见下方索引）；Rime 用户目录**各平台不同**
-> （macOS `~/Library/Rime`、Linux ibus `~/.config/ibus/rime`、
-> fcitx5 `~/.local/share/fcitx5/rime`，详见 deployment-debugging.md §2 平台表）。
+> 本文档可能在多台机器上使用（macOS / Linux 混用）。**本仓库已自包含**：
+> 所有外部依赖源码落在仓库内 `third-party/`，语料/数据落在 `data/`
+> （两者均不入 git，可用 `make setup` 或 `scripts/setup_env.sh` 重建）。
+> 下文历史段落里的 `~/repos/...` 是 macOS 旧环境写法，脚本已兼容两者：
+> 路径统一由 `scripts/rime_paths.py` 解析（以仓库根为基准，可用环境变量覆盖）。
+> Rime 用户目录**各平台不同**（macOS `~/Library/Rime`、Linux ibus
+> `~/.config/ibus/rime`、fcitx5 `~/.local/share/fcitx5/rime`，
+> 详见 deployment-debugging.md §2 平台表）。
 
-- librime 源码: `~/repos/librime`（自编译 fork；**build/ 产物目录不在 git 里，
-  用前先 `make deps && make merged-plugins`**；含 Sort patch 未提交改动）
-- octagram 插件源码: `~/repos/librime/plugins/librime-octagram`（已并入 plugins 构建体系）
+- librime 源码: `third-party/librime`（自包含；pin 1.17.0 + octagram + lua
+  插件；构建脚本 `scripts/setup_env.sh build`）
+- octagram 插件源码: `third-party/librime-octagram`（软链进 `librime/plugins/`）
+- lua 插件源码: `third-party/librime-lua`（同上；**方案核心组件，缺它整方案不可用**）
+- 训练/统计工具: `third-party/kenlm`、`third-party/rime-corpus-processing`、
+  `third-party/rime-build-grammar`
 - liberime (Emacs): `~/repos/liberime`
 - rimel: `~/repos/rimel`
-- 本方案仓库: `~/repos/egret-rime`（本仓库；词库/gram 工作基点。
-  完整个人配置在 `~/vmacs/rime`，含兄弟方案 egret_py/egret_wubi 等）
-- Rime 用户目录/测试目录：macOS 下为 `~/Library/Rime`（正式）与 `~/rime-test`
-  （调试）；Linux 下按平台表查找对应目录，方案仓库同理软链过去
-- 调试工具: `~/repos/librime/build/bin/rime_api_console`（构建后才有，见
+- 本方案仓库: `<本仓库>`（词库/gram 工作基点。
+  原完整个人配置在 macOS `~/vmacs/rime`，含兄弟方案 egret_py/egret_wubi 等）
+- Rime 用户目录/测试目录：本仓库测试环境为 `data/rime-test`
+  （`make env-test` 生成）；macOS 正式环境为 `~/Library/Rime`
+- 调试工具: `third-party/librime/build/bin/rime_api_console`（构建后才有，见
   deployment-debugging.md §2/§6）
-- 其它仓库查找约定：见下方“相关仓库索引”——先查 `~/repos/`，没有则 clone。
+- 其它仓库查找约定：见下方“相关仓库索引”——本仓库先查 `third-party/`，
+  没有则用 `scripts/setup_env.sh clone` 按锁定 commit 克隆。
 
-## 相关仓库索引（先查 ~/repos，没有则 clone 到 ~/repos）
+## 相关仓库索引（先查 third-party/，没有则 clone）
 
-**约定**：所有相关源码/数据仓库统一放在 `~/repos/`。下表“本地路径”是首选查找
-位置；本机没有时，从“远程”栏 clone 到该路径再研究：
+**约定**：本仓库自包含运行时，相关源码统一放在**仓库内 `third-party/`**（不入
+git，pin 在 `scripts/setup_env.sh` 的 REPOS 表里，clone 后逐一比对 commit）。
+下表“本地路径”为 macOS 旧环境写法，仅供对照；在本仓库一律映射到
+`third-party/<名字>`：
 
 ```bash
-git clone --depth 1 <远程URL> ~/repos/<名字>
+bash scripts/setup_env.sh clone          # 按锁定 commit 克隆全部依赖
+# 单个补充仓库：
+git clone --depth 1 <远程URL> third-party/<名字>
 ```
 
 | 仓库 | 远程 | 本地路径（查找顺序第一） | 用途 |

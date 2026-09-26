@@ -3,19 +3,31 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"scripts/rime"
 	"strings"
 )
 
 // 只保留源dict中权重大于 minWeight 的词条
 
+// repoRoot 返回仓库根目录(scripts/ 的上一级), 不依赖当前工作目录。
+func repoRoot() string {
+	_, file, _, _ := runtime.Caller(0)
+	return filepath.Dir(filepath.Dir(file))
+}
+
+// dictsPath 拼接仓库内 dicts/ 下的路径(参数为逐级目录/文件名)。
+func dictsPath(parts ...string) string {
+	return filepath.Join(append([]string{repoRoot(), "dicts"}, parts...)...)
+}
+
 var dicts = map[string]float64{ // value=min_weight
-	"../dicts/wangxiang_cn_dicts/base.dict.yaml":        450,
-	"../dicts/wangxiang_cn_dicts/correlation.dict.yaml": 300,
-	"../dicts/wb86_cn_dicts/base.dict.yaml":             300,
-	"../dicts/wb86_cn_dicts/ext.dict.yaml":              30,
-	// "../dicts/wubi86/wubi86.dict.yaml":      0,
-	// "../dicts/wubi86/wubi86.base.dict.yaml": 0,
+	dictsPath("wangxiang_cn_dicts", "base.dict.yaml"):        450,
+	dictsPath("wangxiang_cn_dicts", "correlation.dict.yaml"): 300,
+	dictsPath("wb86_cn_dicts", "base.dict.yaml"):             300,
+	dictsPath("wb86_cn_dicts", "ext.dict.yaml"):              30,
+	// dictsPath("wubi86", "wubi86.dict.yaml"):      0,
+	// dictsPath("wubi86", "wubi86.base.dict.yaml"): 0,
 }
 
 func main() {

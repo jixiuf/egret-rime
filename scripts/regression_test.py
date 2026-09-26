@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 """egret_wubi_py 回归测试。
 
-对真实环境(~/Library/Rime)逐条跑 rime_api_console, 校验首候选。
+对真实环境逐条跑 rime_api_console, 校验首候选。
+
+路径统一由 scripts/rime_paths.py 解析(以仓库根为基准, 不依赖 cwd,
+可用环境变量覆盖)。
 
 用法:
-  python3 scripts/regression_test.py            # 只跑用例
+  python3 scripts/regression_test.py            # 默认测 <仓库>/data/rime-test
   python3 scripts/regression_test.py --rebuild  # 先 rm -rf build 重新部署再跑
   python3 scripts/regression_test.py --clean    # 先清用户词典(userdb)再跑
-  python3 scripts/regression_test.py --dir /tmp/rime_final   # 测其他环境
+  python3 scripts/regression_test.py --dir ~/Library/Rime   # 测其他环境(macOS)
 
 注意(见 AGENTS.md 陷阱清单):
 - user.yaml 的 previously_selected_schema 会被 console 运行改写, 每次运行前重置
@@ -23,23 +26,11 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-def _find_librime_bin(name):
-    """定位 librime 工具, 按优先级:
-    LIBRIME_BIN 环境变量 > ~/repos/librime (macOS 开发环境) >
-    本仓库 third-party/librime (Linux 自包含环境)。"""
-    candidates = []
-    if os.environ.get("LIBRIME_BIN"):
-        candidates.append(os.environ["LIBRIME_BIN"])
-    candidates.append(os.path.expanduser("~/repos/librime/build/bin"))
-    candidates.append(os.path.join(REPO, "third-party/librime/build/bin"))
-    for d in candidates:
-        if os.path.exists(os.path.join(d, name)):
-            return os.path.join(d, name)
-    return os.path.join(candidates[-1], name)  # 均缺失时返回末选, 便于报错
+sys.path.insert(0, HERE)
+import rime_paths  # noqa: E402  (同目录共享路径模块)
 
-
-LIBRIME_CONSOLE = _find_librime_bin("rime_api_console")
-LIBRIME_DEPLOYER = _find_librime_bin("rime_deployer")
+LIBRIME_CONSOLE = rime_paths.librime_tool("rime_api_console")
+LIBRIME_DEPLOYER = rime_paths.librime_tool("rime_deployer")
 
 # 共享数据目录按平台探测: macOS=Squirrel SharedSupport;
 # Linux=ibus-rime 的 /usr/share/rime-data 或 fcitx5 的数据目录。
@@ -47,7 +38,7 @@ LIBRIME_DEPLOYER = _find_librime_bin("rime_deployer")
 # import_preset: symbols/default 需要 symbols.yaml/default.yaml 源文件)。
 SQUIRREL_SHARED = "/Library/Input Methods/Squirrel.app/Contents/SharedSupport"
 LINUX_SHARED_CANDIDATES = [
-    os.path.join(REPO, "data/rime-shared"),
+    rime_paths.RIME_SHARED_DIR,
     "/usr/share/rime-data",
     "/usr/share/fcitx5/rime-data",
 ]
@@ -149,9 +140,9 @@ def deploy(user_dir, shared_dir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dir", default=os.path.expanduser("~/Library/Rime"),
-                    help="被测用户目录 (macOS 默认 ~/Library/Rime; "
-                         "Linux 如 ~/.config/ibus/rime 或调试目录)")
+    ap.add_argument("--dir", default=rime_paths.RIME_TEST_DIR,
+                    help="被测用户目录 (默认 <仓库>/data/rime-test; "
+                         "macOS 正式环境为 ~/Library/Rime)")
     ap.add_argument("--rebuild", action="store_true",
                     help="先删除 build 并重新部署")
     ap.add_argument("--clean", action="store_true",

@@ -1,6 +1,14 @@
 import os
-frost_path="~/repos/rime-frost/"
-dicts_src_dir=os.path.join(frost_path, "cn_dicts")
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rime_paths
+
+# 路径以仓库根为基准(见 scripts/rime_paths.py), 不依赖 cwd;
+# 外部仓库 rime-frost 默认 third-party/rime-frost, 可用 RIME_FROST_DIR 覆盖。
+frost_path = rime_paths.RIME_FROST_DIR
+dicts_src_dir = os.path.join(frost_path, "cn_dicts")
+OUT_DIR = os.path.join(rime_paths.DICTS, "wb86_cn_dicts_common")
 
 file_list = ['tencent.dict.yaml']
 
@@ -168,12 +176,12 @@ dict_data = {}
 
 
 
+os.makedirs(OUT_DIR, exist_ok=True)
+
 for file_name in file_list:
     # File paths
-    cn_dicts_path = os.path.expanduser(dicts_src_dir)
-    yaml_file_path = os.path.join(cn_dicts_path, file_name)
-    # yaml_file_path = os.path.join('cn_dicts', file_name)
-    write_file_path = os.path.join('../dicts/wb86_cn_dicts_common', file_name)
+    yaml_file_path = os.path.join(dicts_src_dir, file_name)
+    write_file_path = os.path.join(OUT_DIR, file_name)
 
     print(yaml_file_path)
     # Update missing encodings in the file

@@ -1,19 +1,35 @@
 #!/usr/bin/env python3
 """用语料重扫的词频, 对数归一化后同步重写 拼音词库 与 五笔词库 的词组权重.
-单字权重不动(知频权威). 用法: python3 reweight_words.py"""
-import math, os, re, sys
+单字权重不动(知频权威).
 
-DICTS = "$HOME/vmacs/rime/dicts"
-ROOT = "$HOME/vmacs/rime"
-REWEIGHTED = "/tmp/corpus/pinyin_reweighted.txt"      # rime-frequency 输出(含头)
-PINYIN_DICT = os.path.join(DICTS, "wubi_py_pinyin_base_small.dict.yaml")
-WUBI_DICT = os.path.join(ROOT, "dicts", "egret_wubi_py", "egret_wubi_py_wubi_words.dict.yaml")
+路径以仓库根为基准(见 scripts/rime_paths.py), 不依赖当前工作目录。
+重扫结果默认读 data/freq/pinyin_reweighted.txt, 可用环境变量 EGRET_REWEIGHTED
+或命令行第一个参数覆盖。
 
-def main():
+用法:
+  python3 scripts/reweight_words.py [重扫结果文件]
+"""
+import math
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rime_paths  # noqa: E402  (同目录共享路径模块)
+
+DICTS = rime_paths.DICTS
+REWEIGHTED = (os.environ.get("EGRET_REWEIGHTED")
+              or os.path.join(rime_paths.DATA, "freq", "pinyin_reweighted.txt"))
+PINYIN_DICT = os.path.join(DICTS, "egret_wubi_py",
+                           "egret_wubi_py_pinyin_base_small.dict.yaml")
+WUBI_DICT = os.path.join(DICTS, "egret_wubi_py",
+                         "egret_wubi_py_wubi_words.dict.yaml")
+
+
+def main(reweighted=REWEIGHTED):
     # 1) 读重扫结果: word -> new_raw_count
     new = {}
     started = False
-    for line in open(REWEIGHTED, encoding="utf-8"):
+    for line in open(reweighted, encoding="utf-8"):
         if line.startswith("..."):
             started = True
             continue
@@ -54,5 +70,6 @@ def main():
     # 五笔库: 只动多字词条(单字权重=知频膝点, 不动)
     reweight(WUBI_DICT, lambda w: len(w) >= 2)
 
+
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else REWEIGHTED)

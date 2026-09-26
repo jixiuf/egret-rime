@@ -1,21 +1,30 @@
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rime_paths
+
 use_origin_frq=False             # 使用原始词库的词频 （否则用知频.txt进行更新）
 
-frost_path="~/repos/rime-frost/"
-word_freq_path = frost_path+"others/知频.txt"
+# 路径以仓库根为基准(见 scripts/rime_paths.py), 不依赖 cwd;
+# 外部仓库 rime-frost 默认 third-party/rime-frost, 可用 RIME_FROST_DIR 覆盖。
+frost_path = rime_paths.RIME_FROST_DIR
+word_freq_path = os.path.join(frost_path, "others", "知频.txt")
 
-dicts_src_dir=os.path.join(frost_path, "cn_dicts")
+dicts_src_dir = os.path.join(frost_path, "cn_dicts")
 file_list = ['8105.dict.yaml', '41448.dict.yaml', 'base.dict.yaml', 'ext.dict.yaml', 'others.dict.yaml']
-output='../dicts/wb86_cn_dicts'
+output = os.path.join(rime_paths.DICTS, "wb86_cn_dicts")
 
-# dicts_src_dir=os.path.join("../dicts/wangxiang_cn_dicts")
+# dicts_src_dir=os.path.join(rime_paths.DICTS, "wangxiang_cn_dicts")
 # file_list = ['base.dict.yaml', 'associational.dict.yaml', 'corrections.dict.yaml',
 #              'poetry.dict.yaml','place.dict.yaml','compatible.dict.yaml',
 #              'chars.dict.yaml', 'correlation.dict.yaml']
-# output='../dicts/wb86_wangxiang_cn_dicts'
+# output=os.path.join(rime_paths.DICTS, "wb86_wangxiang_cn_dicts")
 
 
-wb_86_dict_list = ['../dicts/wubi86/wubi.dict.yaml']
+WUBI_YAML = os.path.join(rime_paths.DICTS, "wubi86", "wubi.dict.yaml")
+WUBI86_YAML = os.path.join(rime_paths.DICTS, "wubi86", "wubi86.dict.yaml")
+wb_86_dict_list = [WUBI_YAML]
 os.makedirs(output, exist_ok=True)
 # Function to read a file
 def read_file(file_path):
@@ -83,7 +92,7 @@ def update_missing_encodings(file_path, write_file_path, dict_data):
     write_file(write_file_path, updated_content)
 
 # 载入频率
-freq_file = open(os.path.expanduser(word_freq_path), 'r', encoding='utf-8')
+freq_file = open(word_freq_path, 'r', encoding='utf-8')
 word_freq = {}
 for line in freq_file:
     line = line.strip()
@@ -98,18 +107,18 @@ for line in freq_file:
 
 dict_data = {}
 for wb_86_dict in wb_86_dict_list:
-    with open('./'+wb_86_dict, 'r', encoding='utf-8') as dict_file:
+    with open(wb_86_dict, 'r', encoding='utf-8') as dict_file:
         for line in dict_file:
             if "\t" in line and not line.startswith("#"):
 
                 params = line.strip().split('\t')
-                if wb_86_dict == '../dicts/wubi86/wubi.dict.yaml' and len(params) != 4:
+                if wb_86_dict == WUBI_YAML and len(params) != 4:
                     continue
                 character = params[0]
                 if len(character) !=1:
                     continue
 
-                if wb_86_dict == '../dicts/wubi86/wubi.dict.yaml':
+                if wb_86_dict == WUBI_YAML:
                     encoding = params[3]
 
                 encode_left = encoding[0:2]
@@ -125,7 +134,7 @@ for wb_86_dict in wb_86_dict_list:
                     if encoding not in dict_data[character]:
                         dict_data[character].append(encoding)
 
-with open('../dicts/wubi86/wubi86.dict.yaml', 'r', encoding='utf-8') as dict_file:
+with open(WUBI86_YAML, 'r', encoding='utf-8') as dict_file:
     for line in dict_file:
         if "\t" in line and not line.startswith("#"):
 
@@ -152,7 +161,7 @@ with open('../dicts/wubi86/wubi86.dict.yaml', 'r', encoding='utf-8') as dict_fil
                 if add_flag:
                     dict_data[character].append(encoding)
 
-with open('../dicts/wubi86/wubi86.dict.yaml', 'r', encoding='utf-8') as dict_file:
+with open(WUBI86_YAML, 'r', encoding='utf-8') as dict_file:
     for line in dict_file:
         if "\t" in line and not line.startswith("#"):
 
@@ -180,7 +189,7 @@ print(dict_data['𩽾'])
 
 for file_name in file_list:
     # File paths
-    cn_dicts_path = os.path.expanduser(dicts_src_dir)
+    cn_dicts_path = dicts_src_dir
     yaml_file_path = os.path.join(cn_dicts_path, file_name)
     write_file_path = os.path.join(output, file_name)
 

@@ -2,14 +2,27 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+	"runtime"
 	"scripts/rime"
 )
+
+// repoRoot 返回仓库根目录(scripts/ 的上一级), 不依赖当前工作目录。
+func repoRoot() string {
+	_, file, _, _ := runtime.Caller(0)
+	return filepath.Dir(filepath.Dir(file))
+}
+
+// dictsPath 拼接仓库内 dicts/ 下的路径(参数为逐级目录/文件名)。
+func dictsPath(parts ...string) string {
+	return filepath.Join(append([]string{repoRoot(), "dicts"}, parts...)...)
+}
 
 func main() {
 	// wubi86CharDict := loadWubiChars()
 }
 func loadWubiChars() (wubi86CharDict *rime.Dict) {
-	wubi86CharDict, err := rime.ParseDict("../dicts/wubi86/wubi86.chars.dict.yaml")
+	wubi86CharDict, err := rime.ParseDict(dictsPath("wubi86", "wubi86.chars.dict.yaml"))
 	if err != nil {
 		fmt.Println("Error parsing dictionary:", err)
 		return
@@ -19,7 +32,7 @@ func loadWubiChars() (wubi86CharDict *rime.Dict) {
 
 // 提取wubi 单字
 func saveWubiChar() {
-	wubi86, err := rime.ParseDict("../dicts/wubi86/wubi86.dict.yaml")
+	wubi86, err := rime.ParseDict(dictsPath("wubi86", "wubi86.dict.yaml"))
 	if err != nil {
 		fmt.Println("Error parsing dictionary:", err)
 		return
@@ -31,16 +44,16 @@ func saveWubiChar() {
 		}
 		destDict.Entries.Add(e.Clone())
 	}
-	destDict.Write("../dicts/wubi86/wubi86.chars.dict.yaml")
+	destDict.Write(dictsPath("wubi86", "wubi86.chars.dict.yaml"))
 
 }
 func loadWubi() {
-	wubi86, err := rime.ParseDict("../dicts/wubi86/wubi86.dict.yaml")
+	wubi86, err := rime.ParseDict(dictsPath("wubi86", "wubi86.dict.yaml"))
 	if err != nil {
 		fmt.Println("Error parsing dictionary:", err)
 		return
 	}
-	wubi, err := rime.ParseDict("../dicts/wubi86/wubi.dict.yaml")
+	wubi, err := rime.ParseDict(dictsPath("wubi86", "wubi.dict.yaml"))
 	if err != nil {
 		fmt.Println("Error parsing dictionary:", err)
 		return

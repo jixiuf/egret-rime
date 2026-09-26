@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+	"runtime"
 	"scripts/rime"
 )
 
@@ -10,13 +12,13 @@ import (
 func main() {
 
 	// 无声调版的 (白霜字库)
-	dict8105NoTone, err := rime.ParseDict("../dicts/frost_cn_dicts/8105.dict.yaml")
+	dict8105NoTone, err := rime.ParseDict(dictsPath("frost_cn_dicts", "8105.dict.yaml"))
 	if err != nil {
 		fmt.Println("Error parsing dictionary:", err)
 		return
 	}
 	// 有声调版的 万象拼音大 “字”库
-	charsDictTone, err := rime.ParseDict("../dicts/wangxiang_cn_dicts/chars.dict.yaml")
+	charsDictTone, err := rime.ParseDict(dictsPath("wangxiang_cn_dicts", "chars.dict.yaml"))
 	if err != nil {
 		fmt.Println("Error parsing dictionary:", err)
 		return
@@ -38,10 +40,21 @@ func main() {
 	// dict.SortByWeight() // 按权重排序
 
 	// 写回文件
-	err = dict8105Tone.Write("../dicts/wangxiang_cn_dicts/8105.dict.yaml")
+	err = dict8105Tone.Write(dictsPath("wangxiang_cn_dicts", "8105.dict.yaml"))
 	if err != nil {
 		fmt.Println("Error serializing dictionary:", err)
 		return
 	}
 
+}
+
+// repoRoot 返回仓库根目录(scripts/ 的上一级), 不依赖当前工作目录。
+func repoRoot() string {
+	_, file, _, _ := runtime.Caller(0)
+	return filepath.Dir(filepath.Dir(file))
+}
+
+// dictsPath 拼接仓库内 dicts/ 下的路径(参数为逐级目录/文件名)。
+func dictsPath(parts ...string) string {
+	return filepath.Join(append([]string{repoRoot(), "dicts"}, parts...)...)
 }

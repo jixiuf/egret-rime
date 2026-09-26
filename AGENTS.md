@@ -3,6 +3,36 @@
 本仓库是 egret_wubi_py（五笔拼音混流）方案的独立验证仓库，从
 ~/vmacs/rime 拆出（原仓库保留迁移时的副本，两边目前不同步）。
 
+## 目录与路径约定
+
+一切路径以**仓库根为基准**，不依赖 cwd（统一入口 `scripts/rime_paths.py`）：
+
+```
+egret-rime/
+├─ dicts/          词库源与产物（入 git）
+├─ scripts/        生成/测试/环境脚本（入 git）
+├─ docs/           Rime 知识库（入 git）
+├─ third-party/    外部依赖源码与构建（不入 git，make setup 可重建）
+│  ├─ librime/           pin 1.17.0 + plugins/{librime-octagram,librime-lua}
+│  ├─ glog/ kenlm/ rime-corpus-processing/ rime-build-grammar/
+│  ├─ prefix/            glog 等自建库安装前缀
+│  └─ venv/              python 虚拟环境
+└─ data/           语料/词频/测试环境（不入 git）
+   ├─ ebook -> /export/ebook/ebook   （2754 本 epub，软链，持续增长）
+   ├─ dedao -> /export/ebook/dedao   （听书+课程文稿，软链）
+   ├─ corpus/      抽取/清洗/计数中间产物
+   ├─ gram/        gram 模型文件
+   ├─ rime-test/   测试用 Rime 用户目录（make env-test 生成）
+   └─ rime-shared/ 共享数据（软链到 librime build/bin 的 default/symbols/essay）
+```
+
+环境变量可覆盖（`scripts/rime_paths.py`）：LIBRIME_BIN / RIME_TEST_DIR /
+RIME_SHARED_DIR / RIME_FROST_DIR / RIME_WANXIANG_DIR / EGRET_GRAM_DIR。
+
+一键环境：`make setup`（克隆锁定 commit 的依赖 + 编译 + venv + gram）。
+第三方仓库 commit 均经**三通道交叉校验**（直连 API / socks 代理 / gh-proxy
+三方一致）并写在 `scripts/setup_env.sh` 的 REPOS 表；clone 后逐一比对。
+
 ## 与原仓库的差异
 
 - 只保留混流方案链：egret.common.yaml + egret_wubi_py*.yaml。
@@ -24,13 +54,23 @@ jintiandetianqizenmeyang→今天的天气怎么样
 注意: 全新目录首跑(清 userdb + 重建)可能出 wan→蛙嗯(万排第2)，
 这是陷阱#9 prism 非确定性: 同输入不同目录的 prism.bin md5 不同，
 贴脸的 LM 裁决会被翻转(2026-09-26 实测证实，非回归缺陷)。
-判 failure 前先与黄金环境(~/rime-test)交叉验证。
+判 failure 前先与黄金环境(`data/rime-test`)交叉验证。
+本机复现：`make test`（默认测 data/rime-test，20/20 全过）；
+`make test-rebuild` 清 build+用户词典后重跑。
 jintiandetianqizenmeyang→今天的天气怎么样
 
 ## 工具依赖
 
-- ~/repos/librime (fork 1.17.0, build/librime-octagram 插件):
-  build/bin/rime_api_console 与 rime_deployer。
+- `third-party/librime`（pin 1.17.0，插件 octagram + lua 已并入构建）：
+  `build/bin/{rime_api_console, rime_deployer, build_grammar}`。
+  旧 macOS 环境的 `~/repos/librime` 仍可识别（脚本按优先级回退）。
+- `third-party/librime-lua` 是**必需**组件：方案 engine 里的
+  dynamic_translator/date_translator/select_character 等全是 lua 组件，
+  缺它整方案不可用（报错 `error creating translator: 'lua_translator'`）。
+- **RHEL8/ Rocky8 构建注意**：自带 glog 0.3.5 过旧（缺
+  `IsGoogleLoggingInitialized`）、boost 1.66 < 要求 1.74、gcc 8 缺
+  `std::filesystem`。解：自建 glog 0.6.0 到 `third-party/prefix` +
+  boost1.78（EPEL）+ gcc-toolset-12（见 scripts/setup_env.sh）。
 - librime 实验补丁 translator/always_make_sentences 已在本仓库
   librime 工作区（默认关，config 门控）。
 

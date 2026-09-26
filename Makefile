@@ -1,44 +1,122 @@
-# 独立仓库部署: 把本仓库软链进 Rime 用户目录
-# (macOS=Squirrel ~/Library/Rime; Linux fcitx5 见下方 TARGET)
+# egret-rime —— 白鹭五笔·拼音混流输入方案
+#
+# 路径约定：一切以本仓库根为基准（$(CURDIR)），不依赖 cwd。
+#   third-party/   外部依赖源码与构建（不入 git，可 scripts/setup_env.sh 重建）
+#   data/          语料/词频/测试环境/gram（不入 git）
+#   dicts/         词库源与产物（入 git）
+#
+# 常用：
+#   make setup          一键搭环境（克隆+编译+venv+gram）
+#   make env-test       建仓库内测试用 Rime 用户目录 data/rime-test
+#   make test           跑回归（17+ 黄金用例）
+#   make test-rebuild   清 build/用户词典后重新部署再跑
+#   make gen            由 scripts/gen_wubi_py_unified_dicts.py 重生成词库
+#   make deploy         软链到输入法用户目录（TARGET=... 可覆盖）
+
+REPO       := $(CURDIR)
+THIRD      := $(REPO)/third-party
+DATA       := $(REPO)/data
+DICTS      := $(REPO)/dicts
+
+# --- 部署目标（输入法用户目录）---------------------------------------------
 UNAME := $(shell uname)
-
 ifeq ($(UNAME), Linux)
-    TARGET := $(HOME)/.local/share/fcitx5/rime/
+    DEFAULT_TARGET := $(HOME)/.local/share/fcitx5/rime/
 else
-    TARGET := $(HOME)/Library/Rime/
+    DEFAULT_TARGET := $(HOME)/Library/Rime/
 endif
+TARGET ?= $(DEFAULT_TARGET)
 
-.PHONY: deploy
-deploy:
-	mkdir -p $(TARGET)
-	ln -sfn "$(CURDIR)/dicts" "$(TARGET)dicts"
-	ln -sfn "$(CURDIR)/lua" "$(TARGET)lua"
-	ln -sfn "$(CURDIR)/opencc" "$(TARGET)opencc"
-	ln -sf "$(CURDIR)/"*.yaml "$(TARGET)"
-# @if [ ! -f wanxiang-lts-zh-hans.gram  ]; then \
-# 	wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram;\
-# fi
-# https://github.com/rimeinn/octagram-data/
-#https://github.com/lotem/rime-octagram-data/releases/tag/20260712
-# hant 为繁体字，hans 为简体字
-# bg 表示 bigram，tg 表示 trigram
-# c 表示字级，w 表示词级
-# 如 wqhao 五笔wq: 你，+hao:好 -> 你好 就需要 char 级的才能实现
-	@if [ ! -f zh-hans-t-essay-bgc.gram  ]; then \
-		wget -c https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram;\
+# --- 关键路径 ---------------------------------------------------------------
+LIBRIME_BIN := $(THIRD)/librime/build/bin
+GRAM_DIR    := $(DATA)/gram
+GRAM        := $(GRAM_DIR)/zh-hans-t-essay-bgc.gram
+TEST_DIR    := $(REPO)/data/rime-test
+SHARED_DIR  := $(REPO)/data/rime-shared
+PY          := $(THIRD)/venv/bin/python
+PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
+
+GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram
+
+.PHONY: setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths
+
+# --- 环境搭建 ---------------------------------------------------------------
+setup:            ## 一键：克隆第三方 + 编译 + venv + gram
+	bash scripts/setup_env.sh all
+
+setup-clone:
+	bash scripts/setup_env.sh clone
+
+setup-build:
+	bash scripts/setup_env.sh build
+
+setup-gram: $(GRAM)
+
+$(GRAM):
+	mkdir -p $(GRAM_DIR)
+	@if command -v proxychains4 >/dev/null 2>&1; then \
+		proxychains4 -q curl -sL -o $@ $(GRAM_URL); \
+	else \
+		curl -sL -o $@ $(GRAM_URL); \
 	fi
-	ln -sf "$(CURDIR)/"*.gram "$(TARGET)"
+	@ls -la $@
 
+# --- 测试环境（仓库内自包含，等价于 macOS 的 ~/rime-test）-------------------
+env-test:
+	@mkdir -p $(TEST_DIR)/build
+	@for f in $(REPO)/*.yaml; do \
+		case "$$(basename $$f)" in \
+			user.yaml|default.custom.yaml) ;; \
+			*) ln -sf "$$f" $(TEST_DIR)/ ;; \
+		esac \
+	done
+	@# 用户态配置用复制而非软链: console/deployer 会回写这两个文件,
+	@# 软链会把改动写到仓库里(见 AGENTS.md 陷阱 #1)
+	@cp -f $(REPO)/user.yaml $(REPO)/default.custom.yaml $(TEST_DIR)/
+	@for d in dicts lua opencc; do ln -sfn $(REPO)/$$d $(TEST_DIR)/$$d; done
+	@mkdir -p $(SHARED_DIR)
+	@for f in default.yaml symbols.yaml essay.txt; do \
+		ln -sf $(LIBRIME_BIN)/$$f $(SHARED_DIR)/ 2>/dev/null || true; \
+	done
+	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
+	@# 先部署出 build/ 产物: 空 build/ 下首次 console 会撞维护竞态(陷阱 #2)
+	@$(LIBRIME_BIN)/rime_deployer --build $(TEST_DIR) $(SHARED_DIR) \
+		$(TEST_DIR)/build >/dev/null 2>&1 || true
+	@echo "测试用户目录: $(TEST_DIR)"
+	@echo "共享数据目录: $(SHARED_DIR)"
+
+# --- 回归测试 ---------------------------------------------------------------
+test: env-test
+	$(PYTHON) scripts/regression_test.py
+	test -z "$$(git -C $(REPO) status --porcelain user.yaml)" || \
+		echo "⚠ 仓库 user.yaml 被回写污染, 请检查 (陷阱 #1)"
+
+test-rebuild: env-test
+	$(PYTHON) scripts/regression_test.py --rebuild --clean
+	test -z "$$(git -C $(REPO) status --porcelain user.yaml)" || \
+		echo "⚠ 仓库 user.yaml 被回写污染, 请检查 (陷阱 #1)"
+
+# --- 词库生成 ---------------------------------------------------------------
+gen:
+	$(PYTHON) scripts/gen_wubi_py_unified_dicts.py
+
+# --- 部署到输入法 -----------------------------------------------------------
+deploy: $(GRAM)
+	mkdir -p $(TARGET)
+	ln -sfn "$(DICTS)" "$(TARGET)dicts"
+	ln -sfn "$(REPO)/lua" "$(TARGET)lua"
+	ln -sfn "$(REPO)/opencc" "$(TARGET)opencc"
+	ln -sf "$(REPO)/"*.yaml "$(TARGET)"
+	ln -sf "$(GRAM)" "$(TARGET)"
 	@echo "已部署到 $(TARGET) (重新部署/重启输入法后生效)"
 
-.PHONY: test
-test:
-	python3 scripts/regression_test.py
+# --- 其它 -------------------------------------------------------------------
+paths:            ## 打印路径自检
+	$(PYTHON) scripts/rime_paths.py
 
-.PHONY: test-rebuild
-test-rebuild:
-	python3 scripts/regression_test.py --rebuild --clean
+check:
+	bash scripts/setup_env.sh check
 
-.PHONY: gen
-gen:
-	python3 scripts/gen_wubi_py_unified_dicts.py
+clean-test:
+	rm -rf $(TEST_DIR)/build $(TEST_DIR)/*.userdb
+	@echo "已清理 $(TEST_DIR) 的 build 与用户词典"

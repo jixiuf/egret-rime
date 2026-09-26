@@ -27,6 +27,29 @@ wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
 以上恢复真值。gram 用字级 `zh-hans-t-essay-bgc.gram`（已入库）；
 wanxiang-lts 词级 gram 可切换，见 README 下文下载说明。
 
+## 环境搭建（Linux 自包含）
+
+所有外部依赖与数据都在仓库内（`third-party/`、`data/`），均不入 git，
+一条命令重建：
+
+```
+make setup            # 克隆锁定 commit 的依赖 + 编译 librime/kenlm + venv + gram
+make env-test         # 建仓库内测试环境 data/rime-test
+make test             # 跑回归（默认测 data/rime-test）
+```
+
+第三方仓库 commit 经**三通道交叉校验**（直连 GitHub API / socks 代理 /
+gh-proxy 三方 SHA 一致），pin 在 `scripts/setup_env.sh`，clone 后逐一比对。
+RHEL/Rocky 8 需要 gcc-toolset-12、boost1.78（EPEL）与自建 glog 0.6.0
+（原因见脚本内注释与 AGENTS.md）。
+
+路径统一由 `scripts/rime_paths.py` 解析（以仓库根为基准，不依赖 cwd）：
+
+```
+third-party/  外部依赖源码与构建产物      data/  语料/词频/测试环境/gram
+dicts/        词库源与产物（入 git）      scripts/  生成与测试脚本
+```
+
 ## 部署
 
 macOS（Squirrel）:
@@ -35,7 +58,11 @@ macOS（Squirrel）:
 make deploy        # 软链 yaml/lua/opencc/dicts/gram 到 ~/Library/Rime
 ```
 
-Linux 按输入法改 Makefile 里的 TARGET（fcitx5: ~/.local/share/fcitx5/rime）。
+Linux 按输入法覆盖 TARGET（默认 fcitx5 的 `~/.local/share/fcitx5/rime`）：
+
+```
+make deploy TARGET=~/.config/ibus/rime/
+```
 
 首次部署后需要 wanxiang-lts 词级 gram 时（默认不需要，当前用 essay-bgc）:
 
@@ -43,7 +70,8 @@ Linux 按输入法改 Makefile 里的 TARGET（fcitx5: ~/.local/share/fcitx5/rim
 wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/wanxiang-lts-zh-hans.gram
 ```
 
-gram 放 Rime 用户目录或 build/ 下均可（部署不复制 gram，软链即可）。
+gram 默认存放在 `data/gram/`（`make setup-gram` 下载），部署时软链到
+Rime 用户目录（部署不复制 gram）。
 
 ## 词库再生成
 
@@ -57,11 +85,14 @@ base/base.small/chars 三个文件）。
 ## 回归测试
 
 ```
-python3 scripts/regression_test.py --rebuild --clean   # 重新部署+清用户词典+跑用例
-python3 scripts/regression_test.py --dir /tmp/xxx      # 测指定用户目录
+make test              # 回归（默认测 <仓库>/data/rime-test）
+make test-rebuild      # 清 build + 用户词典后重新部署再跑
+python3 scripts/regression_test.py --dir ~/Library/Rime   # 测其他环境（macOS）
 ```
 
-默认测 ~/Library/Rime（macOS）。改词库/gen 脚本/schema 后必跑；
+默认测仓库内 `data/rime-test`（由 `make env-test` 生成，等价于旧 macOS 的
+`~/rime-test`）。librime 工具按 `LIBRIME_BIN` > `third-party/librime` >
+`~/repos/librime` 依次查找。改词库/gen 脚本/schema 后必跑；
 新增修复时把用例加进 CASES 表。
 
 设计调研与取舍分析见 `docs/design-weights-jianma-grammar.md`。

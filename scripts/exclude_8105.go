@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"scripts/rime"
 	"strings"
 )
@@ -18,22 +19,33 @@ type Config struct {
 // 仅保留不在 8105字库中的词条
 var dicts = []Config{
 	{
-		Src:         "../dicts/wubi86/wubi86.dict.yaml",
-		Dest:        "../dicts/wubi86/wubi86.ext.dict.yaml",
+		Src:         dictsPath("wubi86", "wubi86.dict.yaml"),
+		Dest:        dictsPath("wubi86", "wubi86.ext.dict.yaml"),
 		MinChars:    2,
 		MaxChars:    30,
 		FileComment: "  >=2 字的 词条(仅保留 非 8105.dict.yaml中)",
 	},
 	{
-		Src:         "../dicts/wubi86/wubi86.chars.dict.yaml",
-		Dest:        "../dicts/wubi86/wubi.chars.ext.dict.yaml",
+		Src:         dictsPath("wubi86", "wubi86.chars.dict.yaml"),
+		Dest:        dictsPath("wubi86", "wubi.chars.ext.dict.yaml"),
 		MinChars:    1,
 		MaxChars:    1,
 		FileComment: " 1字的 词条(仅保留 非 8105.dict.yaml中)",
 	},
 }
 
-const dictFile8105 = "../dicts/frost_cn_dicts/8105.dict.yaml"
+// repoRoot 返回仓库根目录(scripts/ 的上一级), 不依赖当前工作目录。
+func repoRoot() string {
+	_, file, _, _ := runtime.Caller(0)
+	return filepath.Dir(filepath.Dir(file))
+}
+
+// dictsPath 拼接仓库内 dicts/ 下的路径(参数为逐级目录/文件名)。
+func dictsPath(parts ...string) string {
+	return filepath.Join(append([]string{repoRoot(), "dicts"}, parts...)...)
+}
+
+var dictFile8105 = dictsPath("frost_cn_dicts", "8105.dict.yaml")
 
 func main() {
 	dict8105, err := rime.ParseDict(dictFile8105)
