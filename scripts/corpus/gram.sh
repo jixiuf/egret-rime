@@ -30,7 +30,9 @@ LANGUAGE="${LANGUAGE:-zh-hans-egret}"
 THREADS="${THREADS:-8}"
 SAMPLE=""
 RESTART=""
-MINCOUNTS="${MINCOUNTS:-750:500:200:100:50}"
+# 默认阈值经实测调优: 平阈值 30 得到 ~59MB/1000 万条 n-gram,
+# 与 237MB 版本效果持平(句子还原 16/100)，见 docs/PROGRESS.md
+MINCOUNTS="${MINCOUNTS:-30:30:30:30:30}"
 
 while [ $# -gt 0 ]; do
   case "$1" in

@@ -88,7 +88,43 @@ make test                           # 黄金用例（20 条），确认引擎仍
 - `scripts/corpus/gram.sh`：clean/short → 字符 2-6gram 计数 → build_grammar →
   `data/gram/<language>.gram`；指纹驱动、支持 `--sample` 冒烟与 `--restart`。
 
-### 4.7 开源语料接入（可持续扩展）
+### 4.9 环境严重 bug 修复：LM 之前一直没生效（❗）
+**现象**：切换 `grammar/language` 到不存在的名字，结果与真 gram **完全一致**。
+**根因**：librime 运行时 `user_data_dir` 与 `shared_data_dir` 默认都是 `.`，
+而 `make env-test` 把 `default.yaml/symbols.yaml/essay.txt` 放在了 `data/rime-shared/`，
+用户目录里没有 → `default:key_binder` 解析失败 →
+`error building config: egret_wubi_py.schema` → **grammar 段整体未加载**。
+**修复**：env-test 同时把这 3 个文件链进用户目录（`data/rime-test/`）。
+**验证**：`ckwan` 无 gram→台万、essay-bgc/自训→台湾；无 key_binder 报错。
+**影响**：此前所有回归都是"无 LM"跑的（20/20 仍成立，但 LM 类结论不可信）。
+
+### 4.10 LM 评测（新工具 + 首批数据）
+新增 `scripts/eval_gram.py`：黄金用例 + 混合拼写 + **句子级（全拼还原）**。
+
+**关键发现：混合拼写用例测不出 LM 差异**——它们被词库决定（传统词组置顶），
+实测"不存在的 gram"与真 gram 结果逐条相同。真正能判别 LM 的是
+**全拼长句还原**（必须组句）。
+
+句子级对比（同词库，100 条语料句转全拼，首候选==原句）:
+
+| gram | 体积 | 黄金 | 句子还原 |
+|---|---:|---:|---:|
+| essay-bgc（现役） | 27.7 MB | 20/20 | 13/100 |
+| 自训 t100 | 18.3 MB | 20/20 | 14/100 |
+| 自训 t30 | 58.8 MB | 20/20 | **16/100** |
+| 自训 full | 236.9 MB | 20/20 | 16/100 |
+
+结论：
+1. **t30（59MB）与 full（237MB）效果持平** → 237MB 是无谓的，已重出为 59MB。
+2. 自训 gram 均优于 essay-bgc（+2~3 条）。
+3. 两套 gram 在 **42/100** 条上结果不同 → LM 确实在影响输出。
+4. 绝对准确率低（16%）→ **全拼路径本身弱**（词库以五笔为主），
+   这是下一阶段（词典权重/拼音覆盖 C2–C6）要攻的主目标。
+
+新增 `scripts/corpus/gram_retune.sh`：聚合 TSV → 阈值过滤 → build_grammar，
+**秒级切换体积**（不必重算计数 85G）；`--stats` 给阈值→体积映射表。
+
+### 4.11 开源语料接入（可持续扩展）
 - 参考 **RIME-LMDG**（万象 gram 工厂）：维基链路 `gensim extract_pages +
   filter_wiki + OpenCC t2s`（145 万篇）；短句化 = **标点断句 + 只留汉字**。
 - 清单位于 `scripts/corpus/open_sources.tsv`（TAB 分隔：name/dataset/glob/体积/许可/用途），
@@ -130,9 +166,10 @@ make test                           # 黄金用例（20 条），确认引擎仍
 | C4 | 成语 top-N 显式入库（语料频次 ≥3/百万） | C1 | 待 |
 | C5 | 语料新词入库（现词库没有但语料高频的词） | C1 | 待 |
 | C6 | 拼音 full 档补全（当前拼音词只到 6.3 万；可 pypinyin 生成长尾） | C1 | 待 |
-| D1 | 字符 2-6gram 全量训练 | 运行中 | 🔄 |
-| D2 | 与 essay-bgc / wanxiang-lts 做 21 例混流批 AB | D1 | 待 |
-| E1 | 评测：黄金用例 + 21 例混流批 + rime-schema-compare | C/D | 待 |
+| D1 | 字符 2-6gram 全量训练 | 已完成（59MB，见 §4.10） | ✅ |
+| D2 | gram 配比 AB（自有 : 维基 : 新闻） | 开源语料抽取后 | 待 |
+| E1 | 评测：`eval_gram.py` 句子级 + rime-schema-compare | 首批已完成 §4.10 | 🔄 |
+| **F1** | **提升全拼路径**（当前 16%）：词典权重/拼音覆盖/短语——主战场 | C2–C6 | 待 |
 
 ## 6. 关键命令速查
 
@@ -170,6 +207,13 @@ python3 scripts/rime_paths.py                                           # 路径
 | **两个 OpenCC 包共用 `opencc` 命名空间** | 同时装/卸载会互相删文件致 `ImportError`；只保留 C++ 版 |
 | 去重用 `crc32`（32 位） | 5000 万行时生日碰撞误删数十万行 → 换 **blake2b 64 位** |
 | 单进程清洗 8 小时 | 改分片并行 + merge 全局去重 → 1 小时 |
+| **切换 gram 无效果、结果逐条相同** | **LM 静默失效**：console 运行时 shared_data_dir="."，
+`default.yaml` 不在用户目录 → `default:key_binder` 失败 → schema 构建中止。已修（见 §4.9） |
+| 混合拼写用例"测不出 LM 差异" | 那类用例被词库决定（传统词组置顶）；判 LM 要用**全拼长句** |
+| 237MB gram 个别句子 console 卡 180s+ | 体积过大；实测 t30(59MB) 效果持平 → 用小的 |
+| 改 min-count 重跑体积不变 | min-count 在**计数阶段**生效且被 checkpoint 固化；
+事后调阈值用 `gram_retune.sh`（过滤聚合 TSV 重建） |
+| 后台任务没死但工具报 "Command aborted" | 工具超时不会杀子进程 → 遗留进程白吃 CPU/IO（bz2 校验那次）。事后 `ps` 核一遗 |
 
 ## 8. 产物与路径
 
@@ -204,3 +248,5 @@ egret-rime/
 | 09-27 | 清洗白名单默认放宽到 **CJK 基本区+扩展A** | 不丢人名/地名/生僻字 |
 | 09-27 | **短句转简（LM 统计集中），整段保留原字形（词库收简繁词条）** | 简繁策略 |
 | 09-27 | 简繁由运行时 OpenCC + 词库阶段双向补全 | 方案已有 s2t 开关 |
+| 09-27 | **gram 默认用平阈值 30（≈59MB）** | 实测与 237MB 效果持平，体积小 4 倍 |
+| 09-27 | LM 评测以**全拼句子还原**为准，混合拼写用例仅作参考 | 后者被词库决定 |

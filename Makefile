@@ -78,6 +78,12 @@ env-test:
 	@for f in default.yaml symbols.yaml essay.txt; do \
 		ln -sf $(LIBRIME_BIN)/$$f $(SHARED_DIR)/ 2>/dev/null || true; \
 	done
+	@# 关键: console 运行时 user_data_dir 与 shared_data_dir 均为 "."（librime 默认），
+	@# 所以 default.yaml/symbols.yaml 必须同时存在于用户目录，否则
+	@# `default:key_binder` 解析失败 → schema config 构建失败 → **grammar(LM) 静默失效**。
+	@for f in default.yaml symbols.yaml essay.txt; do \
+		ln -sf $(LIBRIME_BIN)/$$f $(TEST_DIR)/ 2>/dev/null || true; \
+	done
 	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
 	@# 先部署出 build/ 产物: 空 build/ 下首次 console 会撞维护竞态(陷阱 #2)
 	@$(LIBRIME_BIN)/rime_deployer --build $(TEST_DIR) $(SHARED_DIR) \
