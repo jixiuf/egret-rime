@@ -9,7 +9,9 @@ extract.py 扫描 input 目录，对每个文件调用 detect() 判定格式，
 输出统一落到 extract/<格式名>/ 下。
 """
 
+import gzip
 import html
+import json
 import posixpath
 import re
 import zipfile
@@ -51,6 +53,10 @@ class Handler:
 
     def paragraphs(self, path):
         raise NotImplementedError
+
+    def stream(self, path):
+        """流式产出段落行。大文件（dump/语料包）务必覆写，避免整篇进内存。"""
+        yield from self.paragraphs(path)
 
 
 def detect_handler(path, head, ext):
@@ -194,6 +200,69 @@ class HtmlHandler(Handler):
         s = BRK.sub("\n", s)
         s = TAG.sub("", s)
         return clean_lines(html.unescape(s))
+
+
+# --- JSONL / NDJSON（可 gzip）------------------------------------------------
+# 常见字段名，按优先级取第一个命中的：正文 / 标题
+TEXT_FIELDS = ("text", "content", "body", "article", "document", "raw",
+               "sentence", "passage", "abstract")
+TITLE_FIELDS = ("title", "headline", "name", "subject")
+
+
+def is_gzip(path):
+    try:
+        with open(path, "rb") as f:
+            return f.read(2) == b"\x1f\x8b"
+    except OSError:
+        return False
+
+
+@register
+class JsonLinesHandler(Handler):
+    """每行一个 JSON 对象的语料。
+
+    典型来源：wikiextractor --json 输出、THUCNews、人民日报 jsonl.gz。
+    正文取 TEXT_FIELDS，标题（如 title）作为独立一行产出（短句对 LM 有用）。
+    gzip 自动识别（.jsonl.gz / .gz）。
+    """
+
+    name = "jsonl"
+
+    def detect(self, path, head=b"", ext=""):
+        if ext in (".jsonl", ".ndjson", ".jsonlines"):
+            return True
+        if ext == ".gz" or head.startswith(b"\x1f\x8b"):
+            try:
+                with gzip.open(path, "rt", encoding="utf-8",
+                               errors="ignore") as f:
+                    s = f.read(256).lstrip()
+                return s.startswith("{")
+            except Exception:                         # noqa: BLE001
+                return False
+        return head.lstrip()[:1] == b"{" and b'"' in head[:128]
+
+    def stream(self, path):
+        op = gzip.open if is_gzip(path) else open
+        with op(path, "rt", encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    d = json.loads(line)
+                except ValueError:
+                    continue
+                if not isinstance(d, dict):
+                    continue
+                for keys in (TITLE_FIELDS, TEXT_FIELDS):
+                    v = next((d[k] for k in keys
+                              if isinstance(d.get(k), str) and d[k].strip()),
+                             None)
+                    if v:
+                        yield from clean_lines(v)
+
+    def paragraphs(self, path):
+        return list(self.stream(path))
 
 
 # --- 纯文本 -----------------------------------------------------------------

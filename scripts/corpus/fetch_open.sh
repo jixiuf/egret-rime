@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# 开源语料下载器：按 scripts/corpus/open_sources.tsv 拉取到 data/input/open/<name>/
+#
+# 特性:
+#   - 断点续传(curl -C -)，可反复重跑；已完整下载的文件跳过
+#   - HuggingFace 在部分网络下需走代理: 有 proxychains4 时默认经它（USE_PROXY=off 关闭）
+#   - 低优先级(nice) + 单并发，避免抢占带宽/IO
+#
+# 用法:
+#   bash scripts/corpus/fetch_open.sh                 # 拉全部
+#   bash scripts/corpus/fetch_open.sh thucnews        # 只拉指定 name
+#   bash scripts/corpus/fetch_open.sh --list          # 列出清单与状态
+#   USE_PROXY=off bash scripts/corpus/fetch_open.sh   # 不走代理
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+LIST="$ROOT/scripts/corpus/open_sources.tsv"
+OUT="$ROOT/data/input/open"
+LOG="$ROOT/data/corpus/log"
+mkdir -p "$OUT" "$LOG"
+
+USE_PROXY="${USE_PROXY:-auto}"
+if [ "$USE_PROXY" = "off" ] || ! command -v proxychains4 >/dev/null 2>&1; then
+  NET=()
+else
+  NET=(proxychains4 -q)
+fi
+
+# HF 文件树展开: dataset + glob -> 每行一个相对路径
+hf_files() {
+  local ds="$1" glob="$2"
+  "${NET[@]}" curl -s "https://huggingface.co/api/datasets/$ds/tree/main?recursive=true" \
+    | python3 -c "
+import sys, json, fnmatch
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+if isinstance(d, dict):
+    sys.exit(0)
+pats = [p.strip() for p in sys.argv[1].split(',') if p.strip()]
+for f in d:
+    if f.get('type') != 'file':
+        continue
+    p = f['path']
+    if p.startswith('.'):
+        continue
+    if any(fnmatch.fnmatch(p, pat) for pat in pats):
+        print(p, f.get('size', 0))
+" "$glob"
+}
+
+url_for() {   # dataset, path -> 下载 URL
+  python3 -c "
+import sys, urllib.parse
+print('https://huggingface.co/datasets/%s/resolve/main/%s' % (sys.argv[1], urllib.parse.quote(sys.argv[2])))" "$1" "$2"
+}
+
+list_only=0
+[ "${1:-}" = "--list" ] && list_only=1 && shift
+want=("$@")
+
+printf '%-14s %-10s %-8s %s\n' NAME FILES SIZE NOTE
+while IFS=$'\t' read -r name ds glob size lic note; do
+  case "$name" in \#*|""|name) continue ;; esac
+  if [ ${#want[@]} -gt 0 ]; then
+    hit=0; for w in "${want[@]}"; do [ "$w" = "$name" ] && hit=1; done
+    [ $hit -eq 1 ] || continue
+  fi
+  mapfile -t files < <(hf_files "$ds" "$glob")
+  total=0; got=0
+  for row in "${files[@]}"; do
+    ok=1
+    sz=$(echo "$row" | awk '{print $2}')
+    p=$(echo "$row" | awk '{print $1}')
+    total=$((total + sz))
+    if [ -s "$OUT/$name/$p" ] && [ "$(stat -c%s "$OUT/$name/$p" 2>/dev/null || echo 0)" = "$sz" ]; then
+      got=$((got + 1))
+    fi
+  done
+  printf '%-14s %-10s %-8s %s\n' "$name" "$got/${#files[@]}" "$size" "$note"
+  [ $list_only -eq 1 ] && continue
+
+  mkdir -p "$OUT/$name"
+  for row in "${files[@]}"; do
+    p=$(echo "$row" | awk '{print $1}'); sz=$(echo "$row" | awk '{print $2}')
+    dest="$OUT/$name/$p"
+    mkdir -p "$(dirname "$dest")"
+    if [ -s "$dest" ] && [ "$(stat -c%s "$dest")" = "$sz" ]; then continue; fi
+    echo "  ↓ $name/$p"
+    # 先写 .part 再改名: 抽取器只认完整文件, 避免半成品内容进入增量索引
+    # (extract.py 会跳过 *.part)
+    nice -n 15 "${NET[@]}" curl -L -C - --retry 3 --retry-delay 5 -sS \
+      -o "$dest.part" "$(url_for "$ds" "$p")" && \
+      [ "$(stat -c%s "$dest.part")" = "$sz" ] && mv -f "$dest.part" "$dest" \
+      || echo "    ! 未完成/大小不符: $p"
+  done
+done < "$LIST"
+echo "完成（产物: $OUT）"

@@ -66,16 +66,21 @@ def extract_one(task):
     path, key, rel, fmt = task
     try:
         handler = next(h for h in F.HANDLERS if h.name == fmt)
-        lines = handler.paragraphs(path)
-        text = "\n".join(lines)
         out = C.out_path(fmt, key)
         tmp = f"{out}.{os.getpid()}.part"
+        chars = cjk = lines = 0
+        # 流式落盘：大语料包(dump/百科)不会整篇进内存
         with open(tmp, "w", encoding="utf-8") as f:
-            f.write(text)
+            for line in handler.stream(path):
+                f.write(line)
+                f.write("\n")
+                lines += 1
+                chars += len(line)
+                cjk += sum(1 for ch in line if 0x4E00 <= ord(ch) <= 0x9FFF)
         os.replace(tmp, out)
         return dict(key=key, name=rel, fmt=fmt, status="ok",
-                    out=os.path.relpath(out, C.CORPUS), chars=len(text),
-                    cjk=C.cjk_count(text), lines=len(lines))
+                    out=os.path.relpath(out, C.CORPUS), chars=chars,
+                    cjk=cjk, lines=lines)
     except Exception as e:                            # noqa: BLE001
         return dict(key=key, name=rel, fmt=fmt, status="error",
                     err=f"{type(e).__name__}: {e}", chars=0)

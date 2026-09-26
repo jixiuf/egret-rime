@@ -5,7 +5,9 @@
 路径一律以仓库根为基准（见 scripts/rime_paths.py），不依赖 cwd。
 
 目录约定（均在 data/ 下，不入 git）：
-    data/input/            语料投放目录（epub/md/html/纯文本 混放，按类型自动识别）
+    data/input/            语料投放目录（epub/md/html/纯文本/jsonl 混放，按类型自动识别）
+    data/input/open/       开源语料下载目标（由 scripts/corpus/fetch_open.sh 维护）
+    data/corpus/raw/       不适合直接抽取的原始包（如 wiki dump，先经专用工具预处理）
     data/corpus/extract/   抽取产物（extract/<格式>/<key 前两位>/<key>.txt）
     data/corpus/meta/      增量索引（extract_index.jsonl，append-only）
     data/corpus/log/       运行日志
@@ -34,6 +36,7 @@ sys.path.insert(0, os.path.join(REPO, "scripts"))
 import rime_paths  # noqa: E402
 
 CORPUS = os.path.join(rime_paths.DATA, "corpus")
+RAW = os.path.join(CORPUS, "raw")
 EXTRACT = os.path.join(CORPUS, "extract")
 CLEAN = os.path.join(CORPUS, "clean")
 FREQ = os.path.join(CORPUS, "freq")
@@ -46,7 +49,7 @@ INPUT = rime_paths._env_dir("EGRET_INPUT_DIR", os.path.join(rime_paths.DATA, "in
 SYNC_MANIFEST = os.path.join(os.path.dirname(rime_paths.REPO), "_epms_state",
                              "manifest.jsonl")
 
-for d in (INPUT, EXTRACT, CLEAN, FREQ, META, LOG):
+for d in (INPUT, RAW, EXTRACT, CLEAN, FREQ, META, LOG):
     os.makedirs(d, exist_ok=True)
 
 

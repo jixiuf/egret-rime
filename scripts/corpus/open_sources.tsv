@@ -1,0 +1,18 @@
+# 开源语料清单（阶段A 输入源）
+#
+# 字段（TAB 分隔）: name  dataset  glob  体积  许可  用途
+#   dataset  HuggingFace 数据集 id；dumps: 前缀表示直连 URL
+#   glob     该数据集内要拉的文件（按 HF 文件树展开，支持 * 通配）
+#
+# 参考：RIME-LMDG（万象 gram 工厂）用 中文维基 + 多领域语料；
+#       本项目取舍见 docs/corpus-pipeline.md 与 design-weights-jianma-grammar.md。
+# 注意：网文/社交媒体语料会强化特殊搭配（docs 已记录「才最」类口味问题），故不纳入。
+#
+# 体积为清单校对时的实测值，仅供容量规划。
+name	dataset	glob	size	license	note
+thucnews	Tongjilibo/THUCNews	*.jsonl	2.09G	apache-2.0	新闻 15 类，74 万篇，短句节奏好
+people-daily	shenxs/people_daily_news	*.jsonl.gz	2.04G	cc0-1.0	人民日报 1946-，时政社论语体
+classical	gujilab/chinese-classical-corpus	corpus.jsonl,punctuate.jsonl	0.11G	未知(学术)	古文语料，补成语与书面语（小量）
+poetry	MatrixStudio/ChinesePoetry	data/*.parquet	1.64G	未知	诗词，五言七言（可选，需 parquet 支持）
+baidubaike	xuqinyang/BaiduBaike-5.63M	563w_baidubaike.json	15.7G	未知(学术)	百度百科 563 万条，实体/术语丰富（流式解析）
+cwt2-hq	Morton-Li/ChineseWebText2.0-HighQuality	data/CASIA-LM_ChineseWebText2.0_partial-00000*.parquet	~7G	未知	中文网页文本高质量子集（抽样 20/999 片）
