@@ -89,7 +89,7 @@ EOF
   PIP_CONFIG_FILE="$VENV/pip.conf" "$VENV/bin/pip" install -q --upgrade pip
   PIP_CONFIG_FILE="$VENV/pip.conf" "$VENV/bin/pip" install -q \
     ebooklib beautifulsoup4 lxml jieba pypinyin tqdm regex numpy \
-    opencc-python-reimplemented 2>&1 | tail -2
+    OpenCC 2>&1 | tail -2
   ok "venv 就绪: $VENV/bin/python"
 }
 
