@@ -1,0 +1,21 @@
+patch:
+  schema_list:
+    - schema: egret_wubi_py
+
+  menu/page_size: 6
+
+  switcher:
+    abbreviate_options: true
+    caption: "〔方案選單〕"
+    fold_options: true
+    hotkeys:
+      - "Control+grave"
+      - "Control+Shift+grave"
+      - F4
+    option_list_separator: "／"
+    save_options:
+      - ascii_mode
+      - full_shape
+      - ascii_punct
+      - traditionalization
+      - emoji

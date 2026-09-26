@@ -1,0 +1,163 @@
+#   -*- coding: utf-8 -*-
+# Rime schema settings
+# 各字段含义
+# https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md
+#  关于lua 开发相关白内容: https://github.com/hchunhui/librime-lua/wiki/Scripting
+# 五笔支持长句，单字全码不足4码时 可以","结尾
+
+# 2026-09 v5 架构（双词库双翻译器，编码空间彻底分离）:
+#   - first_translator: egret_wubi_py_wubi 传统结构五笔库（显式简码/全码/词组码，无派生
+#     短码 → 每码唯一条目 → 简码/全码首候选绝对确定，码表=wubi86.dict.yaml 传统表）
+#   - 混合库 egret_wubi_py（五笔字词+拼音音节）: script_translator 混合分词 + LM
+#     组句 → 句中五笔/拼音混合连续输入；custom_phrase 出字词候选
+#   词库由 scripts/gen_wubi_py_unified_dicts.py 生成
+
+schema:
+  schema_id: egret_wubi_py
+  name: "白鹭五笔·拼音流"
+  version: "1.0"
+  author:
+    - 發明人 jixiuf
+  description: |
+    白鹭五笔流·拼音流  可以在一句中即打五笔又打拼音的输入法
+  dependencies:
+    # 独立仓库版: 已剥离 egret_py/egret_wubi 反查依赖(原仓库另有这两方案),
+    # stroke 为共享数据内置
+    - stroke # builtin: hspnz(一丨丿丶乙)
+    - egret_wubi_py_wubi    # 传统五笔库(first_translator 置顶用)
+__include: egret.common.yaml:editor
+__include: egret.common.yaml:switches
+__include: egret.common.yaml:opencc
+__include: egret.common.yaml:guide
+__include: egret.common.yaml:lua_config
+speller:
+  __include: egret.common.yaml:wubi_sentence_speller
+  # 混流方案关闭自动上屏: auto_select_pattern 为纯五笔4码设计,
+  # 拼音音节(如 guan)也会命中导致中途自动跳字
+  auto_select: false
+  auto_select_pattern: {}
+  algebra:
+    __patch:
+      # 混合库五笔词条仍为逗号 token，需派生 2/3/全码拼写（勿删！）
+      - egret.common.yaml:algebra_wubi_py_sentence
+      - egret.common.yaml:algebra_remove_pinyin_tone
+grammar:
+  # https://github.com/amzxyz/RIME-LMDG
+  # 语言模型作用于 script_translator@pinyin 的组句
+    __patch:
+      - egret.common.yaml:grammar
+
+engine:
+  processors:
+    # 彻底地移除英文状态，似乎注掉ascii_composer更有效
+    - lua_processor@*select_character # "C-h" 或 "C-l" 以词定字 serch: select_first_character
+    - ascii_composer #處理西文模式及中西文切換 我把此移除验证禁用其英文输入态
+    - recognizer #與 matcher 搭配，處理符合特定規則的輸入碼，如網址、反查等
+    # - lua_processor@*sbxlm.key_binder # 绑定按键
+    - key_binder # 在特定條件下將按鍵綁定到其他按鍵，如重定義逗號、句號爲候選翻頁鍵
+    - speller                   # 將字母鍵加入輸入碼序列
+    - punctuator #句讀處理器，將單個字符按鍵直接映射爲文字符號
+    - selector                  #  選字、換頁  選字處理器，處理數字選字鍵、上、下候選定位、換頁鍵
+    - navigator                 #   # 移動插入點  處理輸入欄內的光標移動鍵
+    - express_editor  #編輯器，處理空格、回車上屏、回退鍵等
+  segmentors:                   # 這批組件識別不同內容類型，將輸入碼分段並加上tag
+    # - ascii_segmentor           # 標識西文段落〔譬如在西文模式下〕字母直接上屛
+    - matcher                   # 配合recognizer標識符合特定規則的段落，如網址、反查等，加上特定tag
+    - abc_segmentor             # 標識常規的文字段落，加上abc這個tag
+    - punct_segmentor           #  標識句讀段落〔鍵入標點符號用〕加上punct這個tag
+    - fallback_segmentor
+  translators:
+    - punct_translator    # 对应下面的punctuator，用来输入标点
+    - lua_translator@*date_translator      # 时间、日期、星期
+    - lua_translator@*lunar                # 农历
+    - lua_translator@*number_translator  # R 输入大写数字
+    - lua_translator@*unicode              # Unicode
+    # 顶层调度翻译器（lua 只做转发排序）：
+    #   first: egret_wubi_py_wubi 传统五笔库（简码/全码/词组显式码，唯一候选置顶）
+    #   then:  custom_phrase(混合库 table) + translator(混合库 script+LM 组句)
+    #   混合库同时含五笔码与拼音音节 → 句中五笔/拼音混合输入
+    - lua_translator@*dynamic_translator
+  filters:
+  # 长词优先 (即wq 后 第4个词的长度必然大于第1个候选,即提升部分长词到第4，5个选项)
+  # 见下面 long_word_filter 相关配置
+    - simplifier@emoji                              # Emoji 彩色or 黑白
+    - lua_filter@*long_word_filter
+    - lua_filter@*reduce_emoji_filter   # 按需启用，作用是降低Emoji在候选项中的位置排序(顺序要求：Emoji > 降低排序)
+    - charset_filter                   # 默认隐藏CJK扩展区生僻字(2026-09实测: 否则混合库权重1的
+                                       # 𠳙/𨾱等会占拼音输入首屏; 切 extended_charset 选项可显示)
+    - simplifier@traditionalize                     # 简繁切换
+    - uniquifier                # 去重，比如多个繁体字对应一个简体字，此时可能需要去重
+
+# ---- 顶层调度：first=传统五笔库，先于混合库，保证简码/全码首候选确定 ----
+dynamic_translator:
+  first_translator: table_translator@egret_wubi_py_wubi
+  table_translator: table_translator@custom_phrase
+  script_translator: script_translator@translator
+
+# ---- 传统五笔库（简码表+全码+词组显式码，每码唯一条目）----
+# 注意: 配置块键必须与 first_translator 的 @tag 一致;
+# dictionary 不支持子目录路径, 指向用户目录根的 egret_wubi_py_wubi.dict.yaml
+egret_wubi_py_wubi:
+  dictionary: egret_wubi_py_wubi
+  prism: egret_wubi_py_wubi
+  enable_user_dict: true       # 造词（历史码=传统规则，兼容）
+  enable_encoder: true
+  encode_commit_history: true
+  enable_sentence: false       # 纯精确码匹配，候选完全确定
+  # 补全能力必须保留(如输入 y 需列出 y 开头的字)。拼音被 wan* 补全污染的
+  # 问题改由 dynamic_translator 对 type=completion 的候选降权解决(见 lua)。
+  enable_completion: true
+  initial_quality: 1000        # 置顶（词典内同码词组按权重排序）
+  db_class: userdb             # 用户词典必须 userdb(LevelDB) 才能造词/调频; tabledb 只读!
+  user_dict: egret_wubi_py_wubi.user.dict
+  # 造词取码规则(与词库生成规则一致): 2字=2+2, 3字=2+1+1, 4字=1x4, 5字+=2+1+1
+  encoder:
+    rules:
+      - length_equal: 2
+        formula: "AaAbBaBb"
+      - length_equal: 3
+        formula: "AaAbBaCa"
+      - length_equal: 4
+        formula: "AaBaCaDa"
+      - length_in_range: [5, 10]
+        formula: "AaAbYaZa"
+  spelling_hints: 2
+
+# ---- 混合库 table：字词候选（造词/调频）----
+custom_phrase:
+  dictionary: egret_wubi_py
+  prism: egret_wubi_py
+  enable_user_dict: true
+  enable_encoder: false        # 造词由 egret_wubi_py_wubi 的编码器负责
+  encode_commit_history: false
+  enable_sentence: false
+  enable_completion: false
+  initial_quality: 1
+  db_class: tabledb
+  user_dict: egret_wubi_py.user.dict   # 手工维护的 custom phrase 文本库
+  # 2026-09-25 实测注记: 本块与下方 translator 的 user_dict 同名, librime
+  # db_pool 按名共享同一 db 实例 → 实际后端由创建顺序决定(先创建的 tabledb 胜出)。
+  # 效果: 混流学习(如选台→选湾→上屏)写入本 txt, 且 script 组句能看到
+  # 「湾 wan」user phrase, 从而 ckwan 能出「台湾」——这是当前刻意的共享行为,
+  # 代价是学习条目会写入本手工库(用 rime_dict_manager 清理)。若改为分离名,
+  # script 看不到学习结果, ckwan 永远台万(已实测)。
+  spelling_hints: 2
+
+# ---- 混合库 script：五笔+拼音混合分词 + LM 组句（混流核心）----
+translator:
+  always_make_sentences: true    # 实验: 精确词匹配也让 grammar 参与裁决
+  dictionary: egret_wubi_py
+  prism: egret_wubi_py
+  enable_user_dict: true
+  db_class: tabledb     # 拼音侧自学习调频
+  # 注: user_dict 与 custom_phrase 同名 → db_pool 共享(实际 tabledb), 见上块说明
+  user_dict: egret_wubi_py.user.dict
+  contextual_suggestions: true
+  max_homophones: 7
+  max_homographs: 7
+  initial_quality: 1
+
+abc_segmentor:
+  extra_tags:
+    - reverse_lookup
+    # wubi_comment

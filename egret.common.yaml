@@ -1,0 +1,509 @@
+#   -*- coding: utf-8 -*-
+# editor 用来定制操作键的行为，以下是默认行为 https://github.com/rime/librime/blob/master/src/rime/gear/editor.cc
+editor:
+  editor:
+    bindings:
+      space: confirm                        # 空格键：上屏候选项
+      Return: commit_raw_input              # 回车键：上屏原始输入
+      Control+Return: commit_script_text    # Ctrl+回车键：上屏变换后输入（经过 preedit_format 转换的）
+      Control+j: commit_script_text         # Ctrl+j：上屏变换后输入（经过 preedit_format 转换的）
+      # Control+w: commit_composition
+      Control+Shift+Return: commit_comment  # Ctrl+Shift+回车键：上屏 comment
+      BackSpace: revert                     # 退格键：向前删除（撤消上次输入）
+      Delete: delete                        # Delete 键：向后删除
+      Control+BackSpace: back_syllable      # Ctrl+退格键：删除一个音节
+      Control+Delete: delete_candidate      # Ctrl+Delete键：删除或降权候选项
+      Escape: cancel                        # Esc 键：取消输入
+switches:
+  switches:
+    - name: ascii_mode
+      states: [ 中, A ]
+    - name: full_shape
+      states: [ 半角, 全角 ]
+    - name: traditionalization
+      states: [ 简, 繁 ]
+    - name: ascii_punct
+      states: [ 。, ． ]
+    - name: emoji
+      states: [ 💀, 😄 ]
+      reset: 1
+
+opencc:
+  traditionalize:
+    option_name: traditionalization  # 对应 switches 中的 name
+    opencc_config: s2t.json          # s2t.json | s2hk.json | s2tw.json | s2twp.json （Rime 内置配置，在程序目录可找到）
+    tips: none                       # 转换提示: all 都显示 | char 仅单字显示 | none 不显示。
+    tags: [ abc, number, gregorian_to_lunar ]  # 限制在对应 tag，不对其他如反查的内容做简繁转换
+    # Emoji
+  emoji:
+    option_name: emoji
+    opencc_config: emoji.json
+    inherit_comment: false  # 在 corrector.lua 及反查中，emoji 返回空注释
+
+
+
+
+guide:
+  # punctuator为标点的意思。下面import为导入，preset为预设，两词连起来就
+  # 是导入预设的意思。从哪里导入呢？就是后面的default.yaml文件。
+  punctuator:
+    # import_preset: default
+    # 引入symbols.yaml文件坦德标点的处理,比如/xl，则列出αβ
+    import_preset: symbols
+
+  # 从default.yaml 导入keybind
+  key_binder:
+    import_preset: default
+
+  recognizer:
+    import_preset: default
+    patterns:
+      reverse_lookup: "`[a-z]*'?$"
+      reverse_lookup_stroke: "u[a-z]*'?$"
+      #造词
+      add_user_dict: "^AC[A-Za-z]*$"
+      # 加了这句之后与import_preset: symbols 结合使用，当输入/开头时，输入特殊符号，如/xl输出αβ等，詳細见symbals.ymal
+      # 比如 /2 输入二貳等
+      punct: "^/([0-9]+[a-z]*|[a-z]+)$"
+      number: "^R[0-9]+[.]?[0-9]*"        # 脚本将自动获取第 2 个字符 R 作为触发前缀，响应 lua_translator@*number_translator，数字金额大写
+      calculator: "^cC.+"                 # 响应 lua_translator@*calc_translator，计算器。前缀设定项 calculator/prefix
+      gregorian_to_lunar: "^N[0-9]{1,8}"  # 脚本将自动获取第 2 个字符 N 作为触发前缀，响应 lua_translator@*lunar，公历转农历，输入 N20240115 得到「二〇二三年腊月初五」
+      unicode: "^U[a-f0-9]+"            # 响应 Unicode
+      # emojis: "^AE[a-z]*'?$" # "^ae.*$"
+
+lua_config:
+# Lua 配置: 日期、时间、星期、ISO 8601、时间戳的触发关键字
+  date_translator:
+    date: /date       # 日期： 2022-11-29
+    time: /time       # 时间： 18:13
+    week: /week       # 星期： 星期二
+    datetime: /dt   # ISO 8601： 2022-11-29T18:13:11+08:00
+    timestamp: /ts  # 时间戳： 1669716794
+  # Lua 配置: 长词优先，提升 count 个词语，插入到第 idx 个位置。
+  # 示例：将 2 个词插入到第 4、5 个候选项，输入 jie 得到「1接 2 解 3 姐 4 饥饿 5 极恶」
+  # 配合     - lua_filter@*long_word_filter
+  long_word_filter:
+    count: 2
+    idx: 4
+    # Lua 配置：农历的触发关键字
+  lunar: nl  # 农历： 二〇二三年冬月二十 癸卯年（兔）冬月二十
+
+# 全拼 (万象词库为带声调的，此去将声调去除)
+algebra_remove_pinyin_tone:   # 去声调
+  __append:
+    - derive/^([a-z]+)$/$1④/
+    - derive/^(.*)ā(.*)$/$1a$2①/
+    - derive/^(.*)á(.*)$/$1a$2②/
+    - derive/^(.*)ǎ(.*)$/$1a$2③/
+    - derive/^(.*)à(.*)$/$1a$2④/
+    - derive/^(.*)ō(.*)$/$1o$2①/
+    - derive/^(.*)ó(.*)$/$1o$2②/
+    - derive/^(.*)ǒ(.*)$/$1o$2③/
+    - derive/^(.*)ò(.*)$/$1o$2④/
+    - derive/^(.*)ē(.*)$/$1e$2①/
+    - derive/^(.*)é(.*)$/$1e$2②/
+    - derive/^(.*)ě(.*)$/$1e$2③/
+    - derive/^(.*)è(.*)$/$1e$2④/
+    - derive/^(.*)ī(.*)$/$1i$2①/
+    - derive/^(.*)í(.*)$/$1i$2②/
+    - derive/^(.*)ǐ(.*)$/$1i$2③/
+    - derive/^(.*)ì(.*)$/$1i$2④/
+    - derive/^(.*)ū(.*)$/$1u$2①/
+    - derive/^(.*)ú(.*)$/$1u$2②/
+    - derive/^(.*)ǔ(.*)$/$1u$2③/
+    - derive/^(.*)ù(.*)$/$1u$2④/
+    - derive/^(.*)ǖ(.*)$/$1v$2①/
+    - derive/^(.*)ǘ(.*)$/$1v$2②/
+    - derive/^(.*)ǚ(.*)$/$1v$2③/
+    - derive/^(.*)ǜ(.*)$/$1v$2④/
+    - derive/^(.*)ü(.*)$/$1v$2/
+    - derive/^(.*)ń(.*)$/$1n$2②/
+    - derive/^(.*)ň(.*)$/$1n$2③/
+    - derive/^(.*)ǹ(.*)$/$1n$2④/
+    - xlit/①②③④/7890
+    # - derive/^ng(\d)$/eng$1/
+    # - xform/^n(\d)/en$2/
+    - derive/(.+)(\d)/$1/
+    - derive/([nl])ve(\d)/$1ue$2/                            #让üè兼容ue
+    - derive/^([jqx])v(\d)$/$1u$2/
+    - derive/^([jqxy])u(\d)/$1v$2/
+    - derive/^([jqxy])iu(\d)/$1iv$2/
+    - derive/^([jqxy])ue(\d)/$1ve$2/
+    - abbrev/^([qwrtypsdfghjklzxcbnm]).+$/$1/  #不携带元音的声母派生出首字母简码来
+    - abbrev/^([qwrtypsdfghjklzxcbnm]).+(\d)$/$1$2/  #不携带元音的声母派生出首字母简码来+数字声调
+    - abbrev/^([aoe])([ioun])(\d)$/$1/             #携带两个字符的元音首字母派生出简码来
+    - abbrev/^([aoe])([ioun])(\d)$/$1$3/       #携带两个字符的元音首字母派生出简码来+数字声调
+    - erase/^(.+)[āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜüńňǹ](.+)$/              # 刪除原始編碼以加速檢索
+preedit_pinyin_add_tone:
+  __append:
+  # 7890 表示声调
+    - xform/^(.*)ai7/$1āi/
+    - xform/^(.*)ei7/$1ēi/
+    - xform/^(.*)ui7/$1uī/
+    - xform/^(.*)ao7/$1āo/
+    - xform/^(.*)ou7/$1ōu/
+    - xform/^(.*)iu7/$1iǖ/
+    - xform/^(.*)ie7/$1iē/
+    - xform/^(.*)ue7/$1uē/
+    - xform/^(.*)er7/$1ēr/
+    - xform/^(.*)an7/$1ān/
+    - xform/^(.*)en7/$1ēn/
+    - xform/^(.*)in7/$1īn/
+    - xform/^(.*)un7/$1ūn/
+    - xform/^(.*)vn7/$1ǖn/
+    - xform/^(.*)ang7/$1āng/
+    - xform/^(.*)eng7/$1ēng/
+    - xform/^(.*)ing7/$1īng/
+    - xform/^(.*)ong7/$1ōng/
+    - xform/^(.*)a7/$1ā/
+    - xform/^(.*)o7/$1ō/
+    - xform/^(.*)e7/$1ē/
+    - xform/^(.*)i7/$1ī/
+    - xform/^(.*)u7/$1ū/
+    - xform/^(.*)v7/$1ǖ/
+
+    - xform/^(.*)ai8/$1ái/
+    - xform/^(.*)ei8/$1éi/
+    - xform/^(.*)ui8/$1uí/
+    - xform/^(.*)ao8/$1áo/
+    - xform/^(.*)ou8/$1óu/
+    - xform/^(.*)iu8/$1iǘ/
+    - xform/^(.*)ie8/$1ié/
+    - xform/^(.*)ue8/$1ué/
+    - xform/^(.*)er8/$1ér/
+    - xform/^(.*)an8/$1án/
+    - xform/^(.*)en8/$1én/
+    - xform/^(.*)in8/$1ín/
+    - xform/^(.*)un8/$1ún/
+    - xform/^(.*)vn8/$1ǘn/
+    - xform/^(.*)ang8/$1áng/
+    - xform/^(.*)eng8/$1éng/
+    - xform/^(.*)ing8/$1íng/
+    - xform/^(.*)ong8/$1óng/
+    - xform/^(.*)a8/$1á/
+    - xform/^(.*)o8/$1ó/
+    - xform/^(.*)e8/$1é/
+    - xform/^(.*)i8/$1í/
+    - xform/^(.*)u8/$1ú/
+    - xform/^(.*)v8/$1ǘ/
+
+    - xform/^(.*)ai9/$1ǎi/
+    - xform/^(.*)ei9/$1ěi/
+    - xform/^(.*)ui9/$1uǐ/
+    - xform/^(.*)ao9/$1ǎo/
+    - xform/^(.*)ou9/$1ǒu/
+    - xform/^(.*)iu9/$1iǚ/
+    - xform/^(.*)ie9/$1iě/
+    - xform/^(.*)ue9/$1uě/
+    - xform/^(.*)er9/$1ěr/
+    - xform/^(.*)an9/$1ǎn/
+    - xform/^(.*)en9/$1ěn/
+    - xform/^(.*)in9/$1ǐn/
+    - xform/^(.*)un9/$1ǔn/
+    - xform/^(.*)vn9/$1ǚn/
+    - xform/^(.*)ang9/$1ǎng/
+    - xform/^(.*)eng9/$1ěng/
+    - xform/^(.*)ing9/$1ǐng/
+    - xform/^(.*)ong9/$1ǒng/
+    - xform/^(.*)a9/$1ǎ/
+    - xform/^(.*)o9/$1ǒ/
+    - xform/^(.*)e9/$1ě/
+    - xform/^(.*)i9/$1ǐ/
+    - xform/^(.*)u9/$1ǔ/
+    - xform/^(.*)v9/$1ǚ/
+
+    - xform/^(.*)ai0/$1ài/
+    - xform/^(.*)ei0/$1èi/
+    - xform/^(.*)ui0/$1uì/
+    - xform/^(.*)ao0/$1ào/
+    - xform/^(.*)ou0/$1òu/
+    - xform/^(.*)iu0/$1iù/
+    - xform/^(.*)ie0/$1iè/
+    - xform/^(.*)ue0/$1uè/
+    - xform/^(.*)er0/$1èr/
+    - xform/^(.*)an0/$1àn/
+    - xform/^(.*)en0/$1èn/
+    - xform/^(.*)in0/$1ìn/
+    - xform/^(.*)un0/$1ùn/
+    - xform/^(.*)vn0/$1ùn/
+    - xform/^(.*)ang0/$1àng/
+    - xform/^(.*)eng0/$1èng/
+    - xform/^(.*)ing0/$1ìng/
+    - xform/^(.*)ong0/$1òng/
+    - xform/^(.*)a0/$1à/
+    - xform/^(.*)o0/$1ò/
+    - xform/^(.*)e0/$1è/
+    - xform/^(.*)i0/$1ì/
+    - xform/^(.*)u0/$1ù/
+    - xform/^(.*)v0/$1ù/
+  
+algebra_ziyanma:                               # 自然码
+  __append:
+    - xform/^([a-z]+)$/$1④/
+    - xform/^(.*)ā(.*)$/$1a$2①/
+    - xform/^(.*)á(.*)$/$1a$2②/
+    - xform/^(.*)ǎ(.*)$/$1a$2③/
+    - xform/^(.*)à(.*)$/$1a$2④/
+    - xform/^(.*)ō(.*)$/$1o$2①/
+    - xform/^(.*)ó(.*)$/$1o$2②/
+    - xform/^(.*)ǒ(.*)$/$1o$2③/
+    - xform/^(.*)ò(.*)$/$1o$2④/
+    - xform/^(.*)ē(.*)$/$1e$2①/
+    - xform/^(.*)é(.*)$/$1e$2②/
+    - xform/^(.*)ě(.*)$/$1e$2③/
+    - xform/^(.*)è(.*)$/$1e$2④/
+    - xform/^(.*)ī(.*)$/$1i$2①/
+    - xform/^(.*)í(.*)$/$1i$2②/
+    - xform/^(.*)ǐ(.*)$/$1i$2③/
+    - xform/^(.*)ì(.*)$/$1i$2④/
+    - xform/^(.*)ū(.*)$/$1u$2①/
+    - xform/^(.*)ú(.*)$/$1u$2②/
+    - xform/^(.*)ǔ(.*)$/$1u$2③/
+    - xform/^(.*)ù(.*)$/$1u$2④/
+    - xform/^(.*)ǖ(.*)$/$1v$2①/
+    - xform/^(.*)ǘ(.*)$/$1v$2②/
+    - xform/^(.*)ǚ(.*)$/$1v$2③/
+    - xform/^(.*)ǜ(.*)$/$1v$2④/
+    - xform/^(.*)ü(.*)$/$1v$2/
+    - xform/^(.*)ń(.*)$/$1n$2②/
+    - xform/^(.*)ň(.*)$/$1n$2③/
+    - xform/^(.*)ǹ(.*)$/$1n$2④/
+    - xlit/①②③④/7890/
+    - derive/^ng(\d)$/eng$1/
+    - xform/^n(\d)/en$2/
+    - derive/^([jqxy])u(\d)$/$1v$2/
+    - derive/^([aoe])([ioun])(\d)$/$1$1$2$3/
+    - xform/^([aoe])(ng)?(\d)$/$1$1$2$3/
+    - xform/iu(\d)$/Ⓠ$1/
+    - xform/[iu]a(\d)$/Ⓦ$1/
+    - xform/[uv]an(\d)$/Ⓡ$1/
+    - xform/[uv]e(\d)$/Ⓣ$1/
+    - xform/ing|uai(\d)$/Ⓨ$1/
+    - xform/^sh/Ⓤ/
+    - xform/^ch/Ⓘ/
+    - xform/^zh/Ⓥ/
+    - xform/uo(\d)$/Ⓞ$1/
+    - xform/[uv]n(\d)$/Ⓟ$1/
+    - xform/(.)i?ong(\d)$/$1Ⓢ$2/
+    - xform/[iu]ang(\d)$/Ⓓ$1/
+    - xform/(.)en(\d)$/$1Ⓕ$2/
+    - xform/(.)eng(\d)$/$1Ⓖ$2/
+    - xform/(.)ang(\d)$/$1Ⓗ$2/
+    - xform/ian(\d)$/Ⓜ$1/
+    - xform/(.)an(\d)$/$1Ⓙ$2/
+    - xform/iao(\d)$/Ⓒ$1/
+    - xform/(.)ao(\d)$/$1Ⓚ$2/
+    - xform/(.)ai(\d)$/$1Ⓛ$2/
+    - xform/(.)ei(\d)$/$1Ⓩ$2/
+    - xform/ie(\d)$/Ⓧ$1/
+    - xform/ui(\d)$/Ⓥ$1/
+    - xform/(.)ou(\d)$/$1Ⓑ$2/
+    - xform/in(\d)$/Ⓝ$1/
+    - xlit/ⓆⓌⓇⓉⓎⓊⒾⓄⓅⓈⒹⒻⒼⒽⓂⒿⒸⓀⓁⓏⓍⓋⒷⓃ/qwrtyuiopsdfghmjcklzxvbn/
+    - derive/^(..)(\d)$/$1/
+    #- abbrev/^([a-z]).+$/$1/   #简拼
+algebra_fly:                    # 小鹤双拼
+  __append:
+    - xform/^([a-z]+)$/$1④/
+    - xform/^(.*)ā(.*)$/$1a$2①/
+    - xform/^(.*)á(.*)$/$1a$2②/
+    - xform/^(.*)ǎ(.*)$/$1a$2③/
+    - xform/^(.*)à(.*)$/$1a$2④/
+    - xform/^(.*)ō(.*)$/$1o$2①/
+    - xform/^(.*)ó(.*)$/$1o$2②/
+    - xform/^(.*)ǒ(.*)$/$1o$2③/
+    - xform/^(.*)ò(.*)$/$1o$2④/
+    - xform/^(.*)ē(.*)$/$1e$2①/
+    - xform/^(.*)é(.*)$/$1e$2②/
+    - xform/^(.*)ě(.*)$/$1e$2③/
+    - xform/^(.*)è(.*)$/$1e$2④/
+    - xform/^(.*)ī(.*)$/$1i$2①/
+    - xform/^(.*)í(.*)$/$1i$2②/
+    - xform/^(.*)ǐ(.*)$/$1i$2③/
+    - xform/^(.*)ì(.*)$/$1i$2④/
+    - xform/^(.*)ū(.*)$/$1u$2①/
+    - xform/^(.*)ú(.*)$/$1u$2②/
+    - xform/^(.*)ǔ(.*)$/$1u$2③/
+    - xform/^(.*)ù(.*)$/$1u$2④/
+    - xform/^(.*)ǖ(.*)$/$1v$2①/
+    - xform/^(.*)ǘ(.*)$/$1v$2②/
+    - xform/^(.*)ǚ(.*)$/$1v$2③/
+    - xform/^(.*)ǜ(.*)$/$1v$2④/
+    - xform/^(.*)ü(.*)$/$1v$2/
+    - xform/^(.*)ń(.*)$/$1n$2②/
+    - xform/^(.*)ň(.*)$/$1n$2③/
+    - xform/^(.*)ǹ(.*)$/$1n$2④/
+    - xlit/①②③④/7890/
+    - derive/^ng(\d)$/eng$1/
+    - xform/^n(\d)/en$2/
+    - derive/^([jqxy])u(\d)$/$1v$2/
+    - derive/^([aoe])([ioun])(\d)$/$1$1$2$3/
+    - xform/^([aoe])(ng)?(\d)$/$1$1$2$3/
+    - xform/iu(\d)$/Ⓠ$1/
+    - xform/(.)ei(\d)$/$1Ⓦ$2/
+    - xform/uan(\d)$/Ⓡ$1/
+    - xform/[uv]e(\d)$/Ⓣ$1/
+    - xform/un(\d)$/Ⓨ$1/
+    - xform/^sh/Ⓤ/
+    - xform/^ch/Ⓘ/
+    - xform/^zh/Ⓥ/
+    - xform/uo(\d)$/Ⓞ$1/
+    - xform/ie(\d)$/Ⓟ$1/
+    - xform/(.)i?ong(\d)$/$1Ⓢ$2/
+    - xform/ing|uai(\d)$/Ⓚ$1/
+    - xform/(.)ai(\d)$/$1Ⓓ$2/
+    - xform/(.)eng(\d)$/$1Ⓖ$2/
+    - xform/(.)en(\d)$/$1Ⓕ$2/
+    - xform/[iu]ang(\d)$/Ⓛ$1/
+    - xform/(.)ang(\d)$/$1Ⓗ$2/
+    - xform/ian(\d)$/Ⓜ$1/
+    - xform/(.)an(\d)$/$1Ⓙ$2/
+    - xform/(.)ou(\d)$/$1Ⓩ$2/
+    - xform/[iu]a(\d)$/Ⓧ$1/
+    - xform/iao(\d)$/Ⓝ$1/
+    - xform/(.)ao(\d)$/$1Ⓒ$2/
+    - xform/ui(\d)$/Ⓥ$1/
+    - xform/in(\d)$/Ⓑ$1/
+    - xlit/ⓆⓌⓇⓉⓎⓊⒾⓄⓅⓈⒹⒻⒼⒽⒿⓀⓁⓏⓍⒸⓋⒷⓃⓂ/qwrtyuiopsdfghjklzxcvbnm/
+    - derive/^(..)(\d)$/$1/
+
+algebra_pinyin:
+  __append:
+    # - derive/^([nl])ue$/$1ve/
+    # - derive/^([jqxy])u/$1v/
+    # 简拼（只输入声母）?
+    # - abbrev/^([a-z]).+$/$1/
+    # - abbrev/^([zcs]h).+$/$1/
+    # - derive/un$/uen/
+    # - derive/ui$/uei/
+    # - derive/iu$/iou/
+    # - derive/([aeiou])ng$/$1gn/
+    # - derive/([dtngkhrzcs])o(u|ng)$/$1o/
+    # - derive/ong$/on/
+    # - derive/ao$/oa/
+    # - derive/([iu])a(o|ng?)$/a$1$2/
+algebra_wubi_sentence:
+  __append:
+  # xform --改寫〔不保留原形〕
+  # derive --衍生〔保留原形〕
+  # abbrev --簡拼〔出字優先級較上兩組更低〕
+  # fuzz --畧拼〔此種簡拼僅組詞，不出單字〕
+  # xlit --變換〔適合大量一對一變換〕
+  # erase --刪除
+  # 阿长与山海经	bs,kg ta,yi gn,gd mm,mm it,xu xc,ag;x0,00	2
+    # 下面说的双拼 不是双拼输入法的双拼
+    # 前面部分说的是字典中的规则，后半部分说的是用户可输入对应的格式以匹配这种格式的编码
+    # 当一个字有多个五笔编码时 会用";" 分隔，如上面的 “经”: xc,ag;x0,00
+      - xlit/;,/%@/               # 替换词库中原本的;,等分隔符
+      - derive/^(\w)(\w)@(.+)$/$1$2/ # 纯双码的情况 (单字 只需要输前两个码的情况)
+      - derive/^(\w)(\w)@(\w)(\w)%(\w)(\w)@(.+)$/$5$6/ # 一字（词）有两种码的情况(输前两个码的情况)
+      - derive/^(\w)(\w)@(\w)(.+)$/$1$2$3/ # (输前3个码的情况)
+      # 一字（词）有两种码的情况+一位辅助码的情况(需要输前3个码的情况)
+      - derive/^(\w)(\w)@(\w)(\w)%(\w)(\w)@(\w)(.+)$/$5$6$7/
+
+
+      - derive|^(\w)(\w)@(\w)(\w)$|$1$2$3$4,| # 输入4个全码后 结尾加"," 以强制4个码匹配全码
+      - derive|^(\w)(\w)@(\w)(\w)%(.+)$|$1$2$3$4,| # 双码+2位辅助码的情况 结尾加","
+      - derive|^(\w)(\w)@(\w)(\w)%(\w)(\w)@(\w)(\w)$|$5$6$7$8,| # 双码+2位辅助码的情况 结尾加","
+
+      - derive|^(\w)(\w)@(\w)0.+$|$1$2$3,| # 3码全码的字，3码全码后加","
+      - derive|^(\w)(\w)@00.+$|$1$2,| # 2码全码的字，2码全码后加","
+      - derive|^(\w)0@00.+$|$1,| # 1码全码的字，3码全码后加","
+
+      - derive|^.+%(\w)(\w)@(\w)0$|$1$2$3,| # 3码全码的字，3码全码后加","
+      - derive|^.+%(\w)(\w)@00$|$1$2,| # 2码全码的字，2码全码后加","
+      - derive|^.+%(\w)0@00$|$1,| # 1码全码的字，3码全码后加","
+      # 简码来 像拼音只输入bpmf
+      # [wubi-py] single-letter fuzz codes collide with pinyin initials in mixed schema;
+      # first-level short codes are provided explicitly by chars_wubi_py_x035.dict.yaml
+      # - fuzz/^(\w)(\w)@(.+)$/$1/ # 纯双码的情况 (单字 只需要输前两个码的情况)
+      # [wubi-py] single-letter fuzz codes collide with pinyin initials in mixed schema;
+      # first-level short codes are provided explicitly by chars_wubi_py_x035.dict.yaml
+      # - fuzz/^(\w)(\w)@(\w)(\w)%(\w)(\w)@(.+)$/$5/ # 一字（词）有两种码的情况(输前两个码的情况)
+      - erase/^(.+)@(.+)$/              # 刪除原始編碼以加速檢索
+
+# 五笔拼音混流专用 (egret_wubi_py): 同 algebra_wubi_sentence 但去掉两条单字母 fuzz 简码
+# 单字母 fuzz 码在混流方案中会与拼音首字母缩写碰撞，产生噪音句子路径（如 qshi 组出“解析上海”）。
+# 一级简码改由字库显式条目提供（chars_wubi_py_x035.dict.yaml 尾部的 25 条 <letter>0 码）。
+# egret_wubi_sentence 等纯五笔方案继续使用 algebra_wubi_sentence，不受影响。
+algebra_wubi_py_sentence:
+  __append:
+      - xlit/;,/%@/               # 替换词库中原本的;,等分隔符
+      - derive/^(\w)(\w)@(.+)$/$1$2/ # 纯双码的情况 (单字 只需要输前两个码的情况)
+      - derive/^(\w)(\w)@(\w)(\w)%(\w)(\w)@(.+)$/$5$6/ # 一字（词）有两种码的情况(输前两个码的情况)
+      - derive/^(\w)(\w)@(\w)(.+)$/$1$2$3/ # (输前3个码的情况)
+      - derive/^(\w)(\w)@(\w)(\w)%(\w)(\w)@(\w)(.+)$/$5$6$7/ # 双码+1位辅助码
+      - derive|^(\w)(\w)@(\w)(\w)$|$1$2$3$4,| # 4码后加","强制全码
+      - derive|^(\w)(\w)@(\w)(\w)%(.+)$|$1$2$3$4,|
+      - derive|^(\w)(\w)@(\w)(\w)%(\w)(\w)@(\w)(\w)$|$5$6$7$8,|
+      - derive|^(\w)(\w)@(\w)0.+$|$1$2$3,| # 3码全码后加","
+      - derive|^(\w)(\w)@00.+$|$1$2,| # 2码全码后加","
+      - derive|^(\w)0@00.+$|$1,| # 1码全码后加","
+      - derive|^.+%(\w)(\w)@(\w)0$|$1$2$3,|
+      - derive|^.+%(\w)(\w)@00$|$1$2,|
+      - derive|^.+%(\w)0@00$|$1,|
+      # 注: 无 fuzz 单字母简码两条；一级简码由 chars_wubi_py_x035.dict.yaml 显式条目提供
+      - erase/^(.+)@(.+)$/              # 刪除原始編碼以加速檢索
+# 五笔支持长句，3码或1码时需以“,”结尾
+wubi_sentence_speller:
+  # speller:
+  max_code_length: 5
+  # table_translator翻译器，支持自动上屏。例如 “zmhu”可以自动上屏“怎么回事”
+  auto_select: true
+  auto_select_pattern: ^[a-z]+,|^[a-df-zA-DF-Z]\w{3}|^e\w{4}
+  # 如果不想让什么标点直接上屏，可以加在 alphabet，或者编辑标点符号为两个及以上的映射
+  # 7890 表示声调1234
+  alphabet: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA[|,/7890
+  # initials 定义仅作为始码的按键，排除 ` 让单个的 ` 可以直接上屏
+  initials: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA
+  # 第一位<空格>是拼音之间的分隔符；第二位<'>表示可以手动输入单引号来分割拼音。
+  delimiter: " ;'"
+  # ## speller 未允许 aj 表示 an
+  # algebra:
+  #   __patch:
+  #     - algebra_wubi_sentence
+# emojis:
+#   # tag: emojis
+#   dictionary: emoji
+#   enable_completion: false
+#   initial_quality: 1
+#   # prefix: "AE"
+#   # suffix: "/"
+#   tips: " Emoji"
+#   user_dict: emoji.user.dict
+#   # ↓ 用户词典格式，tabledb（文本） 或 userdb （二进制）。
+#   db_class: tabledb
+grammar:
+  language: zh-hans-t-essay-bgc
+  collocation_max_length: 8         #命中的最长词组
+  collocation_min_length: 2         #命中的最短词组，搭配词频健全的词库时候应当最小值设为3避开2字高频词
+  collocation_penalty: -10          #默认-12 对常见搭配词组施加的惩罚值。较高的负值会降低这些搭配被选中的概率，防止过于频繁地出现某些固定搭配。
+  non_collocation_penalty: -12      #默认-12 对非搭配词组施加的惩罚值。较高的负值会降低非搭配词组被选中的概率，避免不合逻辑或不常见的词组组合。
+  weak_collocation_penalty: -24     #默认-24 对弱搭配词组施加的惩罚值。保持默认值通常是为了有效过滤掉不太常见但仍然合理的词组组合。
+  rear_penalty: -30                 #默认-18 对词组中后续词语的位置施加的惩罚值。较高的负值会降低某些词语在句子后部出现的概率，防止句子结构不自然。
+
+
+reverse_lookup_stroke:
+  dictionary: stroke
+  enable_completion: true
+  prefix: "`"
+  suffix: "'"
+  tips: 〔笔画〕
+  preedit_format:
+    - xlit/hspnz/一丨丿丶乙/
+reverse_lookup_pinyin:
+  dictionary: egret_py
+  prefix: "`"
+  suffix: "'"
+  tips: 〔拼音〕
+  initial_quality: 1 # 优先级
+  user_dict: egret_py.user.dict
+  # ↓ 用户词典格式，tabledb（文本） 或 userdb （二进制）。
+  db_class: tabledb
+  overwrite_comment: true # 覆盖其他提示
+  preedit_format: # 上屏码显示格式，
+    __patch:
+      - preedit_pinyin_add_tone     #全拼（显示音调 7890）
+    # - xform/([nl])v/$1ü/
+    # - xform/([nl])ue/$1üe/
+    # - xform/([jqxy])v/$1u/

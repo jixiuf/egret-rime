@@ -1,0 +1,7 @@
+build/
+*.userdb
+sync/
+installation.yaml
+rime.log
+*.tmp
+*.gram
