@@ -11,6 +11,7 @@
 
 | 文件 | 内容 |
 |------|------|
+| [PROGRESS.md](PROGRESS.md) | **项目进度与交接（活文档）**：当前状态/后台任务/待办/决策/踩坑——接手先读 |
 | [rime-architecture.md](rime-architecture.md) | 引擎全景：按键处理管线、组件模型（Ticket/Registry）、Segment/Translation 数据流 |
 | [librime-source-map.md](librime-source-map.md) | librime 源码地图：目录/文件职责、读码入口、插件（lua / octagram） |
 | [schema-config-reference.md](schema-config-reference.md) | schema 配置全解：engine 各组件、translator 常用/专用选项、__include/__patch |
