@@ -12,13 +12,14 @@
 
 ## 1. 当前状态（一句话）
 
-环境自包含可用（`make test` 20/20）；**阶段 A 抽取完成**（60,458 篇 / 12.5 亿汉字）；
-**阶段 B 全量清洗运行中**（4 并发 nice 15，约 1 小时）；开源语料下载接近完成
-（THUCNews 完成、人民日报 65/79、维基 3.16/3.17 GB）。
+环境自包含可用（`make test` 20/20）；**阶段 A/B 完成**（抽取 60,458 篇 / 清洗产出
+para 4.6G + short 3.2G）；**词典已分三档并可一键切换**（core/base/full 均 20/20）；
+**一键刷新入口 `bash scripts/refresh.sh` 已就绪**（fetch→extract→clean→freq→dict→gram→verify，
+全部增量可重跑）；gram 全量训练运行中。
 
 **产品目标（用户澄清，2026-09-27）**：做**通用**输入法 →
-词典要**尽量全**，且**允许用户选小词典**、**允许用户选简体或繁体**。
-→ 清洗不做简繁一刀切、白名单放宽、词库分层（见 §9）。
+词典要**尽量全**、**允许用户选小词典**、**允许用户选简体或繁体**，
+且**五笔码与拼音码要同步覆盖**（不能有"某一档只剩五笔"的碗）。
 
 ## 2. 新 session 接手步骤
 
@@ -38,13 +39,11 @@ make test                           # 黄金用例（20 条），确认引擎仍
 
 | 任务 | 启动方式 | 日志 | 结果落点 |
 |---|---|---|---|
-| 阶段 B 全量清洗 | `third-party/venv/bin/python scripts/corpus/clean.py --jobs 4 --nice 15` | `log/clean.log` | `data/corpus/clean/{para,short}/` |
-| 开源语料下载 | `bash scripts/corpus/fetch_open.sh thucnews people-daily classical` | `log/fetch-open.log` | `data/input/open/<name>/` |
-| zhwiki dump 下载 | `bash scripts/corpus/wiki_pipeline.sh download` | `log/dl-zhwiki.log` | `data/corpus/raw/*.bz2` |
+| gram 全量训练 | `MINCOUNTS=50:30:15:8:4 bash scripts/corpus/gram.sh` | `log/gram.log` | `data/gram/zh-hans-egret.gram` |
 
-> 三者都支持断点续跑/增量（清洗按 `clean_index.jsonl` 跳过已处理 key）。
+> 一键刷新可代替逐个阶段：`bash scripts/refresh.sh`（增量，可反复重跑）。
 > 下载器写 `.part` 再改名——**抽取器只见完整文件**，避免半成品污染增量索引。
-> 注意：**清洗必须用 `third-party/venv/bin/python`**（系统 python 没装 C++ OpenCC）。
+> 注意：**清洗/词频/gram 必须用 `third-party/venv/bin/python`**（系统 python 无 C++ OpenCC / jieba）。
 
 ## 4. 已完成（均带验证）
 
@@ -64,14 +63,32 @@ make test                           # 黄金用例（20 条），确认引擎仍
 - **实测**：epub 4,287 本（10.7 亿汉字）+ 文稿 56,157 篇（1.8 亿汉字）
   = 60,458 篇 / 12.5 亿汉字 / 4.1 GB；epub 1.4 min、文稿 14 s。
 
-### 4.3 阶段 B 清洗（实现完成，正在跑）
+### 4.3 阶段 B 清洗（全量完成）
 - `clean.py`：样板行剔除 / 中文占比过滤 / 繁简可选 / 白名单可选 / 断句 /
-  全局去重。输出 `clean/para/<格式>.txt`（整段，供词频）与
-  `clean/short/<格式>.txt`（纯汉字短句，供 n-gram）。
-- 并行架构：worker 写分片（本地去重）→ merge 层全局去重。
-- **性能**：200 篇 0.2 min（4 并发，15 篇/s）→ 全量约 1 小时。
+  全局去重。输出 `clean/para/<格式>.txt`（整段）与 `clean/short/<格式>.txt`（纯汉字短句）。
+- 并行架构：worker 写分片（本地去重）→ merge 层全局去重；分片 append-only 可增量。
+- **实测**：para 4.6G/1517 万行，short 3.2G/3803 万行（共 6.8G，含 3 套台账）。
 
-### 4.4 开源语料接入
+### 4.4 阶段 freq 词频（实现完成）
+- `freq.py`：jieba 分词（HMM=False 确定性）+ 纯汉字词过滤（长 1~8）+
+  按来源计数 + 合并 + log-norm 权重；指纹驱动增量（未变的来源跳过）。
+- 产物：`freq/by_source/<格式>.tsv`、`freq/word_freq.tsv`（word/count/weight/sources）。
+
+### 4.5 词典分档（已实现并验证）
+- `gen_dict_tiers.py`：同源按权重切 core(≥571)/base(≥451)/full(>0)，
+  **五笔码（万象码+86 造词码）与拼音码同步分层**。
+- `set_tier.py`：改写两个包装 dict 的 import_tables（自动归一历史直引）。
+- `make tier TIER=core|base|full` 一条命令切档。
+- **验证：三档均 20/20 黄金用例通过**；体积 core 1.2M / base 3.7M / full 26M。
+- 字表与拼音字表**不随档位变**（字是基础，简码属肌肉记忆层）。
+
+### 4.6 一键刷新 + gram 管线
+- `scripts/refresh.sh`：阶段 fetch/extract/clean/freq/dict/gram/verify，
+  支持 `--from/--only/--full/--list`，全部增量可重跑。
+- `scripts/corpus/gram.sh`：clean/short → 字符 2-6gram 计数 → build_grammar →
+  `data/gram/<language>.gram`；指纹驱动、支持 `--sample` 冒烟与 `--restart`。
+
+### 4.7 开源语料接入
 - 参考 **RIME-LMDG**（万象 gram 工厂）：维基链路 `gensim extract_pages +
   filter_wiki + OpenCC t2s`（145 万篇）；短句化 = **标点断句 + 只留汉字**。
 - 清单 `open_sources.tsv`；下载器 `fetch_open.sh`；维基管线 `wiki_pipeline.sh`
@@ -83,30 +100,33 @@ make test                           # 黄金用例（20 条），确认引擎仍
 
 | # | 任务 | 依赖 | 状态 |
 |---|---|---|---|
-| A2 | zhwiki 预处理（`wiki_pipeline.sh extract && publish`）+ 增量抽取 | dump 下载完成 | 待 |
+| A2 | zhwiki 预处理（`wiki_pipeline.sh extract && publish`）+ 增量抽取 | dump 已下载并 **md5 验证通过** | 待 |
 | A3 | 人民日报/古文增量抽取；百度百科(15.7G)、ChineseWebText2.0 抽样 7G | 下载完成 | 待 |
-| B3 | 阶段 B 验收：抽样质检 + 统计账本（去重率/留存率） | 清洗跑完 | 待 |
-| **C0** | **词库分层设计**：小/基础/完整 三档 + 简/繁 两版，用户可切换 | 用户确认档位边界 | 待问 |
-| C1 | 词频统计：分词(jieba + 领域词典) → 词频表 → 与知频/腾讯/万象对照 | B3 | 待 |
-| C2 | 权重重归一：`reweight_words.py` 用语料词频重写 base.small 权重 | C1 | 待 |
+| B3 | 阶段 B 验收：抽样质检 + 统计账本 | 已完成 | ✅ |
+| C1 | 词频统计 `freq.py` | 已实现 | ✅ 待跑 |
+| C2 | 权重重归一：`reweight_words.py` 用语料词频重写词条权重 | C1 | 待 |
 | C3 | 混合拼写词条（首字五笔 2 码 + 次字拼音，修 ckwan 类盲区） | C1 | 待 |
 | C4 | 成语 top-N 显式入库（语料频次 ≥3/百万） | C1 | 待 |
-| C5 | 简/繁双向补全（OpenCC s2t/t2s 生成对侧词条） | C1 | 待 |
-| D1 | 字符 2-6gram 计数（`rime-char-gram-builder`，分片可加量） | B3 | 待 |
-| D2 | kenlm → arpa → build_grammar → `.gram`；与 essay-bgc/wanxiang-lts AB | D1 | 待 |
+| C5 | 语料新词入库（现词库没有但语料高频的词） | C1 | 待 |
+| C6 | 拼音 full 档补全（当前拼音词只到 6.3 万；可 pypinyin 生成长尾） | C1 | 待 |
+| D1 | 字符 2-6gram 全量训练 | 运行中 | 🔄 |
+| D2 | 与 essay-bgc / wanxiang-lts 做 21 例混流批 AB | D1 | 待 |
 | E1 | 评测：黄金用例 + 21 例混流批 + rime-schema-compare | C/D | 待 |
 
 ## 6. 关键命令速查
 
 ```bash
-make setup / env-test / test / test-rebuild / gen / deploy      # 环境与回归
-make corpus-extract / corpus-dry-run / corpus-status            # 阶段 A
-bash scripts/corpus/fetch_open.sh [name...] / --list            # 开源语料下载
-bash scripts/corpus/wiki_pipeline.sh [download|extract|publish] # 维基管线
-# 阶段 B（务必用 venv python）
+make setup / env-test / test / test-rebuild / gen                       # 环境与回归
+make refresh / refresh-list                                             # 一键刷新全部产物
+make corpus-extract / corpus-dry-run / corpus-status                    # 阶段 A
+make tiers / make tier TIER=core|base|full                              # 词典分档
+bash scripts/corpus/fetch_open.sh [name...] / --list                    # 开源语料下载
+bash scripts/corpus/wiki_pipeline.sh [download|extract|publish]         # 维基管线
+bash scripts/corpus/gram.sh [--sample N|--restart]                      # gram 训练
+# 阶段 B/C（务必用 venv python）
 third-party/venv/bin/python scripts/corpus/clean.py --jobs 4 --nice 15
-third-party/venv/bin/python scripts/corpus/clean.py --merge-only
-python3 scripts/rime_paths.py                                   # 路径自检
+third-party/venv/bin/python scripts/corpus/freq.py --jobs 4 --nice 15
+python3 scripts/rime_paths.py                                           # 路径自检
 ```
 
 ## 7. 踩坑与结论（避免重复踩）

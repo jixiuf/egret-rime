@@ -32,6 +32,7 @@ mkdir -p "$THIRD" "$DATA" "$LOGS"
 log() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 ok()  { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 die() { printf '    \033[31m✗\033[0m %s\n' "$*" >&2; exit 1; }
+warn() { printf '    \033[33m!\033[0m %s\n' "$*"; }
 
 # --- 第三方仓库清单: 目录名 | git 地址 | 锁定 commit | 说明 --------------------
 # commit 为 clone 时经三通道(直连 API / socks 代理 / gh-proxy)交叉校验后的值;
@@ -121,6 +122,10 @@ do_build() {
     >"$LOGS/librime-cmake.log" 2>&1 || { tail -20 "$LOGS/librime-cmake.log"; die "librime configure 失败"; }
   grep -q "Found plugin" "$LOGS/librime-cmake.log" && grep "Found plugin" "$LOGS/librime-cmake.log" | sed 's/^/    /'
   cmake --build . -j "$(nproc)" >"$LOGS/librime-build.log" 2>&1 || { tail -20 "$LOGS/librime-build.log"; die "librime 编译失败"; }
+  # 插件工具不在默认 all 目标里，需显式构建；再链到 bin/ 方便引用
+  cmake --build . --target build_grammar -j "$(nproc)" >"$LOGS/librime-tools.log" 2>&1 \
+    || warn "build_grammar 构建失败（gram 阶段会缺工具）"
+  ln -sfn ../plugins/librime-octagram/bin/build_grammar "$src/build/bin/build_grammar"
   ok "librime 工具: $src/build/bin/{rime_api_console,rime_deployer,build_grammar}"
 
   log "构建 kenlm"

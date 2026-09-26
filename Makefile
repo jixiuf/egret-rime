@@ -38,7 +38,7 @@ PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
 
 GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram
 
-.PHONY: setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status
+.PHONY: setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -96,9 +96,20 @@ test-rebuild: env-test
 	test -z "$$(git -C $(REPO) status --porcelain user.yaml)" || \
 		echo "⚠ 仓库 user.yaml 被回写污染, 请检查 (陷阱 #1)"
 
-# --- 词库生成 ---------------------------------------------------------------
+# --- 词库生成与分档 ---------------------------------------------------------
 gen:
 	$(PYTHON) scripts/gen_wubi_py_unified_dicts.py
+
+# 词典分档：core(≈2万词) / base(≈6.3万词, 默认) / full(≈78万词)
+# 五笔码与拼音码同步分层，保证“拼音也能打全”。三档均通过黄金用例 20/20。
+tiers:            ## 生成三档词表（不改当前档位）
+	$(PYTHON) scripts/gen_dict_tiers.py
+
+tier:             ## 切档: make tier TIER=core|base|full
+	@test -n "$(TIER)" || { echo "用法: make tier TIER=core|base|full"; exit 1; }
+	$(PYTHON) scripts/gen_dict_tiers.py --tier $(TIER)
+	$(PYTHON) scripts/set_tier.py $(TIER)
+	@echo "已切到 $(TIER) 档；重新部署: make deploy（或 make test-rebuild 本地验证）"
 
 # --- 部署到输入法 -----------------------------------------------------------
 deploy: $(GRAM)
@@ -111,6 +122,13 @@ deploy: $(GRAM)
 	@echo "已部署到 $(TARGET) (重新部署/重启输入法后生效)"
 
 # --- 语料管线（阶段 A~E）----------------------------------------------------
+# 一键刷新：用 data/input 下最新语料增量刷新全部产物（抽取→清洗→词频→词典→gram→验证）
+refresh:          ## 一键刷新全部产物（增量，可直接重跑）
+	bash scripts/refresh.sh
+
+refresh-list:     ## 查看各阶段状态
+	bash scripts/refresh.sh --list
+
 # 投放：把语料丢进 data/input/（epub/md/html/纯文本混放均可）
 # 抽取：按文件类型自动分派处理器（见 scripts/corpus/formats.py）
 corpus-extract:   ## 增量抽取 input -> extract/（按类型自动识别）

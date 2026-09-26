@@ -19,6 +19,6 @@ encoder:
       formula: "AaAbYaZa"
 import_tables:
   - dicts/egret_wubi_py/egret_wubi_py_wubi_chars
-  - dicts/egret_wubi_py/egret_wubi_py_wubi_words
+  - dicts/egret_wubi_py/egret_wubi_py_wubi_words_base
   - dicts/egret_wubi_py/egret_wubi_py_user_phrases
 ...

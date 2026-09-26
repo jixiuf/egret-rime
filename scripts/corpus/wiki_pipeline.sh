@@ -37,9 +37,15 @@ do_download() {
     echo "已把 dump 移到 $RAW"
   fi
   if [ ! -f "$DUMP.md5ok" ]; then
-    echo "==> 下载 zhwiki dump (断点续传)"
-    nice -n 15 "${NET[@]}" curl -L -C - --retry 3 --retry-delay 5 -sS \
-      -o "$DUMP" "$BASE" || { echo "下载中断，可重跑本脚本续传"; exit 1; }
+    want_size="$( "${NET[@]}" curl -sI "$BASE" | awk 'tolower($1)=="content-length:"{print $2}' | tr -d '\r')"
+    have_size="$(stat -c%s "$DUMP" 2>/dev/null || echo 0)"
+    if [ -n "$want_size" ] && [ "$have_size" = "$want_size" ]; then
+      echo "==> dump 已完整 ($have_size 字节)，跳过下载"
+    else
+      echo "==> 下载 zhwiki dump (断点续传; 已有 $have_size / 期望 $want_size)"
+      nice -n 15 "${NET[@]}" curl -L -C - --retry 3 --retry-delay 5 -sS \
+        -o "$DUMP" "$BASE" || { echo "下载中断，可重跑本脚本续传"; exit 1; }
+    fi
     echo "==> 校验官方 md5"
     want="$( "${NET[@]}" curl -s "$BASE.md5" | awk '{print $1}')"
     [ -n "$want" ] || { echo "取不到官方 md5，跳过校验"; }

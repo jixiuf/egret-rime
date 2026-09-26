@@ -48,7 +48,7 @@ import_tables:
   # （缩放使派生五笔短码与拼音音节碰撞时，如 有de,简->de、扔re,n->ren，拼音读音获胜）
   # 生成脚本: scripts/gen_wubi_py_unified_dicts.py
   - dicts/egret_wubi_py/egret_wubi_py_chars   # 字表(五笔码+万象权重×0.35+一级简码)
-  - dicts/wb86_wangxiang_cn_dicts/base.small    # 基础词库(五笔码+万象权重,>450过滤碎片词)
+  - dicts/egret_wubi_py/egret_wubi_py_words_base    # 基础词库(五笔码+万象权重,>450过滤碎片词)
   # - dicts/wb86_cn_dicts/8105     # 旧字表(知频权重，量级与万象不兼容，弃用)
   # - dicts/wb86_cn_dicts/base.small     # 旧基础词库(同上)
   # - dicts/wb86_cn_dicts/ext.small      # 扩展词库
@@ -60,7 +60,7 @@ import_tables:
 # 有声调
   - dicts/egret_wubi_py/egret_wubi_py_pinyin_8105  # 拼音字表(无调化副本, 同音异调合并为同一音节)
   # - dicts/wangxiang_cn_dicts/8105        # 旧带调字表(派生无调拼写会跨音节竞争,弃用)
-  - dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small # 拼音基础词库(无调化副本)
+  - dicts/egret_wubi_py/egret_wubi_py_pinyin_words_base # 拼音基础词库(无调化副本)
   # - dicts/wangxiang_cn_dicts/base.small   # 旧带调词库(弃用)
   # - dicts/wangxiang_cn_dicts/correlation.small
   # - dicts/wangxiang_cn_dicts/chars            #字表，包含了所有带拼音的汉字
