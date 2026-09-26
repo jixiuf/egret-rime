@@ -5,3 +5,5 @@ installation.yaml
 rime.log
 *.tmp
 *.gram
+third-party/
+data/

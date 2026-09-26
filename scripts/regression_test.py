@@ -23,10 +23,23 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-LIBRIME_CONSOLE = os.path.expanduser(
-    "~/repos/librime/build/bin/rime_api_console")
-LIBRIME_DEPLOYER = os.path.expanduser(
-    "~/repos/librime/build/bin/rime_deployer")
+def _find_librime_bin(name):
+    """定位 librime 工具, 按优先级:
+    LIBRIME_BIN 环境变量 > ~/repos/librime (macOS 开发环境) >
+    本仓库 third-party/librime (Linux 自包含环境)。"""
+    candidates = []
+    if os.environ.get("LIBRIME_BIN"):
+        candidates.append(os.environ["LIBRIME_BIN"])
+    candidates.append(os.path.expanduser("~/repos/librime/build/bin"))
+    candidates.append(os.path.join(REPO, "third-party/librime/build/bin"))
+    for d in candidates:
+        if os.path.exists(os.path.join(d, name)):
+            return os.path.join(d, name)
+    return os.path.join(candidates[-1], name)  # 均缺失时返回末选, 便于报错
+
+
+LIBRIME_CONSOLE = _find_librime_bin("rime_api_console")
+LIBRIME_DEPLOYER = _find_librime_bin("rime_deployer")
 
 # 共享数据目录按平台探测: macOS=Squirrel SharedSupport;
 # Linux=ibus-rime 的 /usr/share/rime-data 或 fcitx5 的数据目录。
@@ -34,6 +47,7 @@ LIBRIME_DEPLOYER = os.path.expanduser(
 # import_preset: symbols/default 需要 symbols.yaml/default.yaml 源文件)。
 SQUIRREL_SHARED = "/Library/Input Methods/Squirrel.app/Contents/SharedSupport"
 LINUX_SHARED_CANDIDATES = [
+    os.path.join(REPO, "data/rime-shared"),
     "/usr/share/rime-data",
     "/usr/share/fcitx5/rime-data",
 ]
