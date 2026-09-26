@@ -88,20 +88,41 @@ make test                           # 黄金用例（20 条），确认引擎仍
 - `scripts/corpus/gram.sh`：clean/short → 字符 2-6gram 计数 → build_grammar →
   `data/gram/<language>.gram`；指纹驱动、支持 `--sample` 冒烟与 `--restart`。
 
-### 4.7 开源语料接入
+### 4.7 开源语料接入（可持续扩展）
 - 参考 **RIME-LMDG**（万象 gram 工厂）：维基链路 `gensim extract_pages +
   filter_wiki + OpenCC t2s`（145 万篇）；短句化 = **标点断句 + 只留汉字**。
-- 清单 `open_sources.tsv`；下载器 `fetch_open.sh`；维基管线 `wiki_pipeline.sh`
-  （下载 + **官方 md5 校验** + wikiextractor 预处理 + 投放 input）。
-- **排除**网文/社交媒体（docs 记录过「才最」口味污染）；2TB 的
-  ChineseWebText 只抽高质量子集 ~7G。
+- 清单位于 `scripts/corpus/open_sources.tsv`（TAB 分隔：name/dataset/glob/体积/许可/用途），
+  **加一行即多一个语料源**；下载器 `fetch_open.sh` 自动展开 HF 文件树、断点续传、
+  `.part`+改名、zip 自动解压、`--max-gb` 分批配额（带宽是瓶颈 ~5.7MB/s，串并行一样）。
+- 维基走专用管线 `wiki_pipeline.sh`（下载 + **官方 md5 校验** + wikiextractor + 投放）。
+
+已接入 / 正在拉取：
+
+| 源 | 体积 | 定位 |
+|---|---|---|
+| 电子书 epub | 13.5 亿字 | 自有：出版物级现代汉语 |
+| 文稿（听书+课程） | 2.1 亿字 | 自有：通俗口语讲解 |
+| zhwiki dump | 3.4G | 百科（md5 已校验） |
+| THUCNews | 2.1G | 新闻 15 类 |
+| 人民日报 1946- | 2.0G | 时政社论 |
+| 古文语料 | 0.11G | 成语/书面语 |
+| Fineweb-Edu-Chinese-V2.1 | 18G(抽 100/900) | 高质量教育网页文本 |
+| 百度百科 563 万 | 15.7G | 实体/术语 |
+| 中文口语对话 | 17G(抽 4/32) | **补自有语料全书面语的缺口** |
+| 法律法规 / 医疗对话 | 1.0G | 垂直领域术语 |
+
+**排除**网文/社交媒体（docs 记录过「才最」口味污染）。
+
+### 4.8 格式支持
+`formats.py` 注册式处理器：epub / markdown / html / 纯文本 / jsonl（gz 感知）/
+**parquet**（pyarrow 流式 batch 读，内存有界）。新增格式只需加一个类。
 
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |
 |---|---|---|---|
-| A2 | zhwiki 预处理（`wiki_pipeline.sh extract && publish`）+ 增量抽取 | dump 已下载并 **md5 验证通过** | 待 |
-| A3 | 人民日报/古文增量抽取；百度百科(15.7G)、ChineseWebText2.0 抽样 7G | 下载完成 | 待 |
+| A3 | 人民日报/古文增量抽取；新语料（Fineweb-Edu/百科/口语/法律/医疗）抽取 | 下载中（配额分批） | 🔄 |
+| A4 | zhwiki 预处理（`wiki_pipeline.sh extract && publish`）+ 增量抽取 | dump 已校验 | 待 |
 | B3 | 阶段 B 验收：抽样质检 + 统计账本 | 已完成 | ✅ |
 | C1 | 词频统计 `freq.py` | 已实现 | ✅ 待跑 |
 | C2 | 权重重归一：`reweight_words.py` 用语料词频重写词条权重 | C1 | 待 |

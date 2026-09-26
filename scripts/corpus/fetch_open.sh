@@ -7,10 +7,14 @@
 #   - 低优先级(nice) + 单并发，避免抢占带宽/IO
 #
 # 用法:
-#   bash scripts/corpus/fetch_open.sh                 # 拉全部
+#   bash scripts/corpus/fetch_open.sh                 # 拉全部（串行，断点续传）
 #   bash scripts/corpus/fetch_open.sh thucnews        # 只拉指定 name
+#   bash scripts/corpus/fetch_open.sh --max-gb 20     # 本次最多下载 20GB（可持续分批）
 #   bash scripts/corpus/fetch_open.sh --list          # 列出清单与状态
 #   USE_PROXY=off bash scripts/corpus/fetch_open.sh   # 不走代理
+#
+# 注: 代理带宽是瓶颈（实测串行/并行均 ~5.7MB/s），故不做并行；
+#     大语料建议用 --max-gb 分批拉，避免一次跑太久。
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -57,8 +61,17 @@ print('https://huggingface.co/datasets/%s/resolve/main/%s' % (sys.argv[1], urlli
 }
 
 list_only=0
-[ "${1:-}" = "--list" ] && list_only=1 && shift
-want=("$@")
+max_gb=0
+want=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --list) list_only=1; shift ;;
+    --max-gb) max_gb="$2"; shift 2 ;;
+    *) want+=("$1"); shift ;;
+  esac
+done
+budget=$((max_gb * 1024 * 1024 * 1024))
+downloaded=0
 
 printf '%-14s %-10s %-8s %s\n' NAME FILES SIZE NOTE
 while IFS=$'\t' read -r name ds glob size lic note; do
@@ -87,13 +100,29 @@ while IFS=$'\t' read -r name ds glob size lic note; do
     dest="$OUT/$name/$p"
     mkdir -p "$(dirname "$dest")"
     if [ -s "$dest" ] && [ "$(stat -c%s "$dest")" = "$sz" ]; then continue; fi
+    if [ "$max_gb" -gt 0 ] && [ "$downloaded" -ge "$budget" ]; then
+      echo "    (已达 --max-gb $max_gb 配额，本次停在这里；重跑继续)"
+      break 2
+    fi
     echo "  ↓ $name/$p"
     # 先写 .part 再改名: 抽取器只认完整文件, 避免半成品内容进入增量索引
     # (extract.py 会跳过 *.part)
     nice -n 15 "${NET[@]}" curl -L -C - --retry 3 --retry-delay 5 -sS \
       -o "$dest.part" "$(url_for "$ds" "$p")" && \
       [ "$(stat -c%s "$dest.part")" = "$sz" ] && mv -f "$dest.part" "$dest" \
-      || echo "    ! 未完成/大小不符: $p"
+      || { echo "    ! 未完成/大小不符: $p"; continue; }
+    downloaded=$((downloaded + sz))
+    # zip 包（如医疗对话数据集）自动解压，避免给抽取器加二进制格式
+    case "$p" in
+      *.zip)
+        if command -v unzip >/dev/null 2>&1; then
+          echo "    unzip -> $(dirname "$dest")/$(basename "$dest" .zip)/"
+          unzip -q -o "$dest" -d "$(dirname "$dest")/$(basename "$dest" .zip)" \
+            && rm -f "$dest" || echo "    ! 解压失败（保留 zip）"
+        else
+          echo "    ! 未安装 unzip，保留 zip（抽取器不会读它）"
+        fi ;;
+    esac
   done
 done < "$LIST"
 echo "完成（产物: $OUT）"

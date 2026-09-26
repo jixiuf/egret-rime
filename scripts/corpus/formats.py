@@ -265,6 +265,43 @@ class JsonLinesHandler(Handler):
         return list(self.stream(path))
 
 
+# --- Parquet（HF 上大多数高质量数据集的原生格式）---------------------------
+@register
+class ParquetHandler(Handler):
+    """Parquet 语料（可 gzip 无关）。按 batch 流式读取，内存有界。
+
+    取正文列（TEXT_FIELDS），兼取标题列；其余列忽略。
+    依赖 pyarrow（仅在本处理器被命中时才 import）。
+    """
+
+    name = "parquet"
+
+    def detect(self, path, head=b"", ext=""):
+        return ext == ".parquet" or head[:4] == b"PAR1"
+
+    def stream(self, path):
+        import pyarrow.parquet as pq
+
+        pf = pq.ParquetFile(path)
+        cols = list(pf.schema_arrow.names)
+        pick = [c for c in TITLE_FIELDS + TEXT_FIELDS if c in cols]
+        if not pick:
+            # 退一步：取所有字符串列（数据集体例差异很大）
+            import pyarrow as pa
+            pick = [f.name for f in pf.schema_arrow
+                    if pa.types.is_string(f.type) or pa.types.is_large_string(f.type)]
+        if not pick:
+            return
+        for batch in pf.iter_batches(batch_size=512, columns=pick):
+            for col in pick:
+                for v in batch.column(col).to_pylist():
+                    if isinstance(v, str) and v.strip():
+                        yield from clean_lines(v)
+
+    def paragraphs(self, path):
+        return list(self.stream(path))
+
+
 # --- 纯文本 -----------------------------------------------------------------
 @register
 class PlainTextHandler(Handler):

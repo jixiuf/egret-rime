@@ -13,6 +13,8 @@ name	dataset	glob	size	license	note
 thucnews	Tongjilibo/THUCNews	*.jsonl	2.09G	apache-2.0	新闻 15 类，74 万篇，短句节奏好
 people-daily	shenxs/people_daily_news	*.jsonl.gz	2.04G	cc0-1.0	人民日报 1946-，时政社论语体
 classical	gujilab/chinese-classical-corpus	corpus.jsonl,punctuate.jsonl	0.11G	未知(学术)	古文语料，补成语与书面语（小量）
-poetry	MatrixStudio/ChinesePoetry	data/*.parquet	1.64G	未知	诗词，五言七言（可选，需 parquet 支持）
-baidubaike	xuqinyang/BaiduBaike-5.63M	563w_baidubaike.json	15.7G	未知(学术)	百度百科 563 万条，实体/术语丰富（流式解析）
-cwt2-hq	Morton-Li/ChineseWebText2.0-HighQuality	data/CASIA-LM_ChineseWebText2.0_partial-00000*.parquet	~7G	未知	中文网页文本高质量子集（抽样 20/999 片）
+fineweb-edu	opencsg/Fineweb-Edu-Chinese-V2.1	2_3/0000*.parquet	~18G	odc-by	高质量教育网页文本(抽样 100/900 片)
+baidubaike	xuqinyang/BaiduBaike-5.63M	563w_baidubaike.json	15.7G	学术	百度百科 563 万条, 实体/术语丰富
+law	twang2218/chinese-law-and-regulations	data/*.parquet	0.15G	未知	法律法规, 垂直领域术语
+medical	BillGPT/Chinese-medical-dialogue-data	*.zip	0.87G	未知	医疗对话(口语+领域, 下载后自动解压)
+dialogue	CJY/Chinese-Dialogue-180k	data/train-0000[0-3]-of-00032.parquet	~17G	未知	口语对话(抽样 4/32), 补自有语料全书面语的缺口
