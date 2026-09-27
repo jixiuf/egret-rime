@@ -124,44 +124,66 @@ make test                           # 黄金用例（20 条），确认引擎仍
 新增 `scripts/corpus/gram_retune.sh`：聚合 TSV → 阈值过滤 → build_grammar，
 **秒级切换体积**（不必重算计数 85G）；`--stats` 给阈值→体积映射表。
 
-### 4.11 全拼路径调优：重大发现（❗open）
+### 4.11 全拼路径：LM 为何是净负作用（根因已定位）
 
-**评测集必须固定**：从 clean/short 采样生成——语料一变采样就变，两次评测是两套题，
-分数不可比（已踩：16/100 vs 12/100 完全不可比）。已修为 `data/corpus/eval/sentences.tsv`
-固定 200 句，`--regen-sentences` 才重建。
+**评测集必须固定**：早先从 clean/short 采样生成——语料一变采样就变，两次评测是两套题
+（已踩：16/100 vs 12/100 完全不可比）。已修为固定文件
+`data/corpus/eval/sentences.tsv`（200 句），`--regen-sentences` 才重建。
 
 **同题对比（200 句全拼还原，首候选==原句）**：
 
 | 配置 | 黄金 | 句子还原 |
 |---|---:|---:|
-| **无 gram**（bogus language） | 18/20 | **47/200 (24%)** |
-| essay-bgc 27.7MB | 20/20 | 36/200 (18%) |
-| 自训 58.8MB | 20/20 | 33/200 (16%) |
+| **无 gram** | 18/20 | **47/200 (24%)** |
+| 原配置（-10/-12/-24/-30）+ essay-bgc | 20/20 | 36/200 (18%) |
+| 原配置 + 自训 gram | 20/20 | 33/200 (16%) |
 
-**结论：在全拼路径上，LM 是净负作用**。gram 只在少数用例（ckwan→台湾 类）
-上得分，代价是大量同音字/分词被带偏。
+**根因（读源码得出，`src/rime/gear/grammar.h`）**：
 
-**罚分调参实验（均未超过无-gram）**：
+```cpp
+const double kPenalty = -13.8155;              // log(1e-6)
+return entry_weight + (grammar ? grammar->Query(context, text, is_rear) : kPenalty);
+```
 
-| 实验 | 罚分 | 句子还原 |
+- 无 grammar：每词固定 **-13.81**（等价于一个“倾向更少分段”的稳定先验）
+- 有 grammar：换成 `Query = log(count) - 罚分`，而默认罚分只有 **-10 / -12**
+  —— **高于 -13.81**，于是每个词都拿到一笔“白送奖金”，证据越多奖金越高，
+  而证据最多的恰恰是**高频单字** → 系统被奖励去拆字。
+- 且 `poet.cc:249`：有 grammar 走 **BeamSearch**（每位置 top-7），无 grammar 走
+  **DynamicProgramming**（无损）——两套搜索算法不同。
+
+**实验矩阵（均为同一 200 句固定评测集）**：
+
+| 实验 | 改动 | 句子还原 |
 |---|---|---:|
-| 大罚分（原默认增强） | -10/-60/-120/-60 | 35/200 |
-| 罚分全 0（只留 n-gram 证据值） | 0/0/0/0 | 32/200 |
-| 按“需比 value 更负”推的 | -25/-35/-45 | 32/200 |
-| 统一大负值（想逼近无-gram） | -100/-100/-100 | 34/200 |
+| 基线无 gram | bogus language | **47/200** |
+| 大罚分 | -10/-60/-120/-60 | 35/200 |
+| 罚分全 0 | 0/0/0/0（纯奖励） | 32/200 |
+| 对齐 kPenalty | -13.8155 ×3，rear 0 | 34/200 |
+| 对齐 + beam 7→64 | 改 `kMaxLineCandidates` 重编 | 34/200 |
+| 统一大负值 | -100 ×3 | 34/200 |
 
-→ 说明 **grammar 存在/缺席之间还有结构性差异**（poet 可能切换比较策略），
-不是罚分数值能解释的。需直接 instrument：按 docs 的方法给
-`plugins/librime-octagram/src/octagram.cc` 的 Query 加 LOG，看实际打分。
+→ **结论：罚分数值、beam 宽度都不是原因；LM 给的正向证据本身在全拼路径上
+是伤害（证据越多越差）**。推测：字符级 n-gram 的证据过于泛化（如 (的, X)
+无处不在），奖励的是“常用字序列”而非“正确词”。
 
-**权重回归（C2）**：用语料词频把词权重压回 0-1000 → 32/200，与基线无显著差异。
-但它修好了**词频证据本身**（如 `可以` 2001万 vs `可就` 10万，差 186 倍），
-是后续调优的基础。注意 log-norm 会把顶部压平（`一下` 3.09M → 875、
-`以下` 2.40M → 869，29% 频率差只剩 6 点权重差）。
+→ gram 的价值在**混流路径**：黄金用例 20/20 vs 无 gram 18/20（ckwan→台湾 类）。
 
-**失败模式**（看失败样例）：以**同音字选择**为主（哪里/那里、处处/出处、
-她/他、幸运/行运、说/朔），另有少量**吞字/多字**。字符级相似度均值 0.64 ——
-说明大部分字符是对的，错在局部裁决。
+**待选方向**（需产品决策）：
+1. 全拼路径不用 gram（24%），混流路径保留 gram —— 需分 translator 配置
+2. 换词级 gram / 训练更干净的语料（当前 char 级证据太泛）
+3. docs §6 的 `always_make_sentences` + 重排 lua：让 LM 只做候选重排、不参与分词
+
+**调参可复现命令**：
+```bash
+# 改罚分: egret.common.yaml 的 grammar 段 → 重跑评测
+third-party/venv/bin/python scripts/eval_gram.py --cases 0 --sentences 200 \
+  --gram "无gram=$PWD/data/gram/zh-hans-egret.gram|no-such-gram" \
+  --gram "有gram=$PWD/data/gram/zh-hans-egret.gram"
+# 改 librime 源码后重编（约 1 分钟）
+export PATH=/opt/rh/gcc-toolset-12/root/usr/bin:$PATH
+cd third-party/librime/build && cmake --build . -j 8 --target rime
+```
 
 ### 4.12 开源语料接入（可持续扩展）
 - 参考 **RIME-LMDG**（万象 gram 工厂）：维基链路 `gensim extract_pages +
