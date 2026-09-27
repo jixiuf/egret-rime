@@ -102,18 +102,32 @@ def build_mixed_cases(n):
     return cases[:n]
 
 
-def build_sentence_cases(n, min_len=4, max_len=12, seed=20260927):
+def build_sentence_cases(n, min_len=4, max_len=12, seed=20260927,
+                         regen=False):
     """句子级 LM 判别集：语料短句 → 全拼输入 → 看能否还原原句。
 
-    为什么需要它：混合拼写用例（首字五笔2码+次字拼音）大多被**词库**决定
-    （传统词组置顶，grammar 无从裁决），实测“不存在 gram”与真 gram 结果完全一样，
-    根本测不出 LM 差异。全拼长句必须靠组句，LM 才是决定因素。
+    **测评集必须固定**：否则语料一变、采样就变，两次评测不同题，
+    分数不可比（这一坑已踩：16/100 与 12/100 实际是两套题）。
+    首次从 clean/short 采样并存到 data/corpus/eval/sentences.tsv，
+    之后固定复用；--regen-sentences 可重建。
     """
     import random
     try:
         from pypinyin import lazy_pinyin
     except ImportError:
         sys.exit("句子评测需要 pypinyin（第三方 venv 里有）")
+
+    sent_file = os.path.join(rime_paths.DATA, "corpus", "eval", "sentences.tsv")
+    if os.path.exists(sent_file) and not regen:
+        out = []
+        with open(sent_file, encoding="utf-8") as f:
+            for line in f:
+                p = line.rstrip("\n").split("\t")
+                if len(p) == 2:
+                    out.append((p[0], p[1]))
+        print(f"  评测集: {sent_file}（固定 {len(out)} 句）")
+        return out[:n] if n else out
+
     rnd = random.Random(seed)
     cands = []
     for path in sorted(glob.glob(os.path.join(rime_paths.DATA, "corpus", "clean",
@@ -131,8 +145,13 @@ def build_sentence_cases(n, min_len=4, max_len=12, seed=20260927):
         if any(not y.isalpha() for y in syl):
             continue
         out.append(("".join(syl), s))
-        if len(out) >= n:
+        if n and len(out) >= n:
             break
+    os.makedirs(os.path.dirname(sent_file), exist_ok=True)
+    with open(sent_file, "w", encoding="utf-8") as f:
+        for code, s in out:
+            f.write(f"{code}\t{s}\n")
+    print(f"  评测集: 已生成并固定到 {sent_file}（{len(out)} 句）")
     return out
 
 
@@ -197,6 +216,8 @@ def main():
     ap.add_argument("--cases", type=int, default=30, help="混合用例条数")
     ap.add_argument("--sentences", type=int, default=0,
                     help="句子级评测条数（>0 时用全拼还原，测真实 LM 能力）")
+    ap.add_argument("--regen-sentences", action="store_true",
+                    help="重建固定评测集（默认为保证可比性不重建）")
     ap.add_argument("--dir", default=TEST_DIR)
     ap.add_argument("--gram", action="append", default=None,
                     help="label=path（可重复）")
@@ -207,7 +228,14 @@ def main():
     if args.gram:
         for g in args.gram:
             label, path = g.split("=", 1)
-            grams.append((label, path, os.path.splitext(os.path.basename(path))[0]))
+            # 支持 "label=path|language" 显式指定语言名（用于构造无-gram 对照：
+            #   --gram "无gram=/path/any.gram|no-such-gram"
+            lang = None
+            if "|" in path:
+                path, lang = path.split("|", 1)
+            if lang is None:
+                lang = os.path.splitext(os.path.basename(path))[0]
+            grams.append((label, path, lang))
     else:
         for label, path in [
             ("essay-bgc(现役)", os.path.join(rime_paths.GRAM_DIR,
@@ -224,7 +252,8 @@ def main():
         sys.exit("没有可评测的 gram")
 
     mixed = build_mixed_cases(args.cases)
-    sentences = build_sentence_cases(args.sentences) if args.sentences else []
+    sentences = build_sentence_cases(args.sentences,
+                                     regen=args.regen_sentences) if args.sentences else []
     print(f"评测集：黄金 {len(GOLDEN)} 条 + 混合拼写 {len(mixed)} 条"
           + (f" + 句子(全拼) {len(sentences)} 条" if sentences else ""))
     if args.list:

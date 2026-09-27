@@ -45,23 +45,24 @@ echo "==> Aho-Corasick 重扫（Rust，$JOBS 路并行）"
 # 避免多个实例共享同一路径时互相删除（曾经把分片目录删掉导致 split 失败）。
 PARTS="$(mktemp -d "${TMPDIR:-/tmp}/recount-XXXXXX")"
 trap 'rm -rf "$PARTS"' EXIT
-idx=0
+# 直接用 clean/para/*.txt 作为分片：不 split、不拷贝（clean/para 本身就是多文件，
+# 天然可并行）。仅当单个文件 >32GB 时才切，避免单路拖后腿。
 for f in "$CLEAN"/*.txt; do
+  [ -s "$f" ] || continue
   sz=$(stat -c%s "$f")
-  if [ "$sz" -gt $((8 * 1024 * 1024 * 1024)) ]; then
-    n=$(( (sz + 8*1024*1024*1024 - 1) / (8*1024*1024*1024) ))
-    split -n l/$n -d --additional-suffix=.txt "$f" "$PARTS/part-" \
+  base=$(basename "$f" .txt)
+  if [ "$sz" -gt $((32 * 1024 * 1024 * 1024)) ]; then
+    split -n l/2 -d --additional-suffix=.txt "$f" "$PARTS/$base-" \
       || { echo "split 失败: $f"; exit 1; }
   else
-    cp --reflink=auto "$f" "$PARTS/part-$(printf %02d $idx).txt" || cp "$f" "$PARTS/part-$(printf %02d $idx).txt"
-    idx=$((idx + 1))
+    ln -sf "$(readlink -f "$f")" "$PARTS/$base.txt"
   fi
 done
-total=$(ls "$PARTS"/part-*.txt 2>/dev/null | wc -l)
-echo "    分片 $total 份（源: clean/para/*.txt）"
+total=$(ls "$PARTS"/*.txt 2>/dev/null | wc -l)
+echo "    分片 $total 份（直接引用 clean/para/*.txt，零拷贝）"
 
 PIDS=()
-for p in "$PARTS"/part-*.txt; do
+for p in "$PARTS"/*.txt; do
   [ -s "$p" ] || continue
   o="${p%.txt}.out"
   nice -n 15 "$BIN" --corpus "$p" --source "$SRC" \
