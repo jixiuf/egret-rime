@@ -47,13 +47,19 @@ do_download() {
         -o "$DUMP" "$BASE" || { echo "下载中断，可重跑本脚本续传"; exit 1; }
     fi
     echo "==> 校验官方 md5"
-    want="$( "${NET[@]}" curl -s "$BASE.md5" | awk '{print $1}')"
-    [ -n "$want" ] || { echo "取不到官方 md5，跳过校验"; }
+    # 维基的校验文件是 zhwiki-latest-md5sums.txt（不是单个 .md5），
+    # 里面每行“<md5>  <文件名>”，按文件名匹配（文件名会带日期戳，如
+    # zhwiki-20260901-pages-articles.xml.bz2）。
+    want="$( "${NET[@]}" curl -s \
+      "https://dumps.wikimedia.org/zhwiki/latest/zhwiki-latest-md5sums.txt" \
+      | awk '$2 ~ /pages-articles\.xml\.bz2$/ {print $1; exit}' )"
     got="$(md5sum "$DUMP" | awk '{print $1}')"
-    if [ -n "$want" ] && [ "$want" != "$got" ]; then
-      echo "  ✗ md5 不符: 官方=$want 本地=$got"; exit 1
+    if [ -n "$want" ]; then
+      [ "$want" = "$got" ] || { echo "  ✗ md5 不符: 官方=$want 本地=$got"; exit 1; }
+      echo "  ✓ md5 $got"
+    else
+      echo "  取不到官方 md5，跳过校验（本地 md5=$got）"
     fi
-    echo "  ✓ md5 $got"
     touch "$DUMP.md5ok"
   fi
 }

@@ -4,6 +4,30 @@
 > 后台任务、待办清单、决策记录与踩坑。session 过大/过期后靠它无缝重建上下文；
 > 每完成一个里程碑或启停后台任务，**立即回写该文档**。
 
+## ⭐ 一条命令出产物（本项目的硬契约）
+
+```bash
+make setup                      # 新机器首次：拉依赖 + 编译 + venv + gram（约 10 分钟）
+bash scripts/refresh.sh         # 之后只跑这一条：用 data/input 最新语料增量出全部产物
+bash scripts/refresh.sh --deploy    # 出完直接部署到输入法
+bash scripts/refresh.sh --loop 30   # 常驻：每 30 分钟增量刷新（语料持续下载中）
+```
+
+**最终产物**（`bash scripts/refresh.sh --only artifacts` 可随时查看清单）：
+
+| 产物 | 位置 | 说明 |
+|---|---|---|
+| 词库（三档） | `dicts/egret_wubi_py/*_words_{core,base,full}.dict.yaml` | 每档**同时含五笔码与拼音码**；权重按语料词频回归到 0-1000 |
+| 86 造词码词库 | `dicts/egret_wubi_py/egret_wubi_py_wubi_words_*.dict.yaml` | 传统库（形码确定性层） |
+| 语言模型 | `data/gram/zh-hans-egret.gram` | 字级 2-6gram，约 59MB |
+| 方案词库包装 | `egret_wubi_py.dict.yaml` / `egret_wubi_py_wubi.dict.yaml` | 由 `--tier` 切换档位 |
+
+全链路：`fetch → extract → clean → freq → dict → gram → artifacts`，
+每一阶段都**增量、可中断、可重跑**；并发用 `--jobs`（负载 <12 时可用 6）。
+
+新增一个语料源 = 在 `scripts/corpus/open_sources.tsv` 加一行（或往 `data/input/` 丢文件），
+重跑 refresh.sh 即可——不需要改任何代码。
+
 本仓库是 egret_wubi_py（五笔拼音混流）方案的独立验证仓库，从
 ~/vmacs/rime 拆出（原仓库保留迁移时的副本，两边目前不同步）。
 

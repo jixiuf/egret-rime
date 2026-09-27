@@ -1,35 +1,31 @@
 #!/usr/bin/env bash
 # ============================================================================
-# egret-rime 一键刷新：用 data/input 下**最新**的语料刷新全部产物
+# egret-rime 一键出产物：一条命令，从 data/input 的最新语料到最终产物
 # ============================================================================
-# 设计目标（用户要求）：
-#   - 直接执行即可：脚本自己判断哪些数据是新的，只做增量，可反复重跑
-#   - 语料持续下载中也能用：任何阶段中断，重跑即续
-#   - 全链路覆盖：语料 → 抽取 → 清洗 → 词频 → 词典 → gram → 回归
+# 这是本项目的**唯一入口**（用户要求：一个脚本跑所有，生成最终产物）。
+#
+# 最终产物（artifacts）：
+#   1. 词库  dicts/egret_wubi_py/*.dict.yaml
+#      - 分三档：core(≈2万词) / base(≈6.3万词, 默认) / full(≈78万词)
+#      - 每档都同时含 **五笔码**（万象逗号码 + 86 造词码）与 **拼音码**
+#      - 权重已按语料词频回归到 0-1000（与 LM 同尺度）
+#   2. 语言模型  data/gram/zh-hans-egret.gram（字级 2-6gram）
+#   3. 部署（可选 --deploy）：软链到 Rime 用户目录，重启输入法即生效
+#
+# 全链路：fetch → extract → clean → freq → dict → gram → artifacts
 #
 # 用法:
-#   bash scripts/refresh.sh                 # 全链路（增量）
+#   bash scripts/refresh.sh                 # 增量刷新（可反复重跑，数据更新后直接再跑）
+#   bash scripts/refresh.sh --deploy        # 完成后部署到输入法
+#   bash scripts/refresh.sh --tier full     # 生成/切换到 full 档
+#   bash scripts/refresh.sh --loop 30       # 常驻：每 30 分钟增量刷新（语料持续下载中）
+#   bash scripts/refresh.sh --only gram     # 只跑某阶段
 #   bash scripts/refresh.sh --from clean    # 从某阶段开始
-#   bash scripts/refresh.sh --only dict     # 只跑某阶段
-#   bash scripts/refresh.sh --list          # 列出各阶段与当前状态
-#   bash scripts/refresh.sh --full          # 全量重建（清中间产物，耗时最长）
-#   bash scripts/refresh.sh --jobs 4 --nice 15
-#   bash scripts/refresh.sh --loop 30       # 常驻：每 30 分钟增量刷新一次（语料持续下载）
+#   bash scripts/refresh.sh --full          # 全量重建（清洗从零开始，最慢）
+#   bash scripts/refresh.sh --list          # 各阶段状态
+#   bash scripts/refresh.sh --jobs 6        # 并发（默认 3；负载 <12 时可用 6）
 #
-# 并发保护: 用 flock 防止两个 refresh 同时跑（会互相踩分片）
-#
-# 阶段:
-#   fetch    下载/更新开源语料（fetch_open + wiki dump，断点续传）
-#   extract  抽取：input/ → extract/（按文件类型自动分派）
-#   clean    清洗：extract/ → clean/{para,short}/
-#   freq     词频：clean/para → freq/（分词统计，供词典）
-#   dict     词典：分档词表 core/base/full + 方案词库 gen
-#   gram     语言模型：clean/short → n-gram → kenlm → .gram
-#   verify   验证：黄金用例回归 + 语料账本
-#
-# 环境变量:
-#   TIER=core|base|full   词典档位（默认 base）
-#   USE_PROXY=off         禁用 proxychains
+# 并发保护：flock 防重入；所有阶段 nice 15 + ioprio best-effort/7
 # ============================================================================
 set -uo pipefail
 
@@ -44,11 +40,7 @@ mkdir -p "$LOG"
 JOBS="${JOBS:-3}"
 NICE="${NICE:-15}"
 TIER="${TIER:-base}"
-FULL=0
-FROM=""
-ONLY=""
-LIST=0
-LOOP=0
+FULL=0; FROM=""; ONLY=""; LIST=0; LOOP=0; DEPLOY=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -60,61 +52,37 @@ while [ $# -gt 0 ]; do
     --loop) LOOP="$2"; shift 2 ;;
     --full) FULL=1; shift ;;
     --list) LIST=1; shift ;;
+    --deploy) DEPLOY=1; shift ;;
     -h|--help) sed -n '2,32p' "$0"; exit 0 ;;
     *) echo "未知参数: $1"; exit 1 ;;
   esac
 done
 
-# 防重入：同时在跑两个 refresh 会互相踩分片
+# 防重入：两个 refresh 并跑会互相踩分片
 if command -v flock >/dev/null 2>&1; then
   exec 9>"$LOG/.refresh.lock"
-  flock -n 9 || { echo "另一个 refresh 正在运行，退出"; exit 0; }
+  flock -n 9 || { echo "另一个 refresh 正在运行，本次退出"; exit 0; }
 fi
 
-STAGES=(fetch extract clean freq dict gram verify)
+STAGES=(fetch extract clean freq dict gram artifacts)
 
 log()  { printf '\n\033[1;36m═══ [%s] %s\033[0m\n' "$(date +%H:%M:%S)" "$*"; printf '[%s] %s\n' "$(date +%F\ %T)" "$*" >> "$RUNLOG"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; printf '  OK %s\n' "$*" >> "$RUNLOG"; }
 warn() { printf '    \033[33m!\033[0m %s\n' "$*"; printf '  WARN %s\n' "$*" >> "$RUNLOG"; }
 die()  { printf '    \033[31m✗\033[0m %s\n' "$*" >&2; printf '  FAIL %s\n' "$*" >> "$RUNLOG"; exit 1; }
 
-# 阶段状态快照（--list 用）
-status_line() {
+stage_status() {
   case "$1" in
-    fetch)
-      local n; n=$(find "$ROOT/data/input/open" -type f ! -name '*.part' 2>/dev/null | wc -l)
-      echo "开源语料文件 $n 个" ;;
-    extract)
-      local n; n=$(wc -l < "$ROOT/data/corpus/meta/extract_index.jsonl" 2>/dev/null || echo 0)
-      echo "已抽取 $n 篇" ;;
-    clean)
-      local n; n=$(wc -l < "$ROOT/data/corpus/meta/clean_index.jsonl" 2>/dev/null || echo 0)
-      echo "已清洗 $n 篇" ;;
-    freq)
-      local n=0
-      [ -d "$ROOT/data/corpus/freq" ] && n=$(find "$ROOT/data/corpus/freq" -name '*.tsv' 2>/dev/null | wc -l)
-      echo "词频表 $n 份" ;;
-    dict)
-      local t; t=$(grep -ohE 'egret_wubi_py_(words|wubi_words|pinyin_words)_(core|base|full)' \
-        "$ROOT/egret_wubi_py.dict.yaml" "$ROOT/egret_wubi_py_wubi.dict.yaml" 2>/dev/null | head -1)
-      echo "当前档位 ${t:-未分档}" ;;
-    gram)
-      local f; f=$(ls "$ROOT/data/gram"/*.gram 2>/dev/null | wc -l)
-      echo "gram 文件 $f 个" ;;
-    verify)
-      echo "黄金用例 20 条" ;;
+    fetch)   echo "开源语料 $(find "$ROOT/data/input/open" -type f ! -name '*.part' 2>/dev/null | wc -l) 个文件" ;;
+    extract) echo "已抽取 $(wc -l < "$ROOT/data/corpus/meta/extract_index.jsonl" 2>/dev/null || echo 0) 篇" ;;
+    clean)   echo "已清洗 $(wc -l < "$ROOT/data/corpus/meta/clean_index.jsonl" 2>/dev/null || echo 0) 篇" ;;
+    freq)    echo "重扫词频 $(du -h "$ROOT/data/corpus/freq/recount_full.txt" 2>/dev/null | cut -f1 || echo -)" ;;
+    dict)    echo "档位 $(grep -ohE 'egret_wubi_py_(words|wubi_words|pinyin_words)_(core|base|full)' "$ROOT/egret_wubi_py.dict.yaml" 2>/dev/null | head -1)" ;;
+    gram)    echo "gram $(ls -la "$ROOT/data/gram"/*.gram 2>/dev/null | wc -l) 个" ;;
+    artifacts) echo "见 bash scripts/refresh.sh --only artifacts" ;;
   esac
 }
 
-if [ "$LIST" = 1 ]; then
-  printf '%-10s %s\n' 阶段 状态
-  for s in "${STAGES[@]}"; do printf '%-10s %s\n' "$s" "$(status_line "$s")"; done
-  echo
-  echo "日志: $RUNLOG"
-  exit 0
-fi
-
-# 阶段顺序过滤
 run_stages() {
 run_from=1
 [ -n "$FROM" ] && run_from=0
@@ -123,78 +91,86 @@ for i in "${!STAGES[@]}"; do
   if [ -n "$FROM" ] && [ "$s" = "$FROM" ]; then run_from=1; fi
   if [ -n "$ONLY" ] && [ "$s" != "$ONLY" ]; then continue; fi
   [ "$run_from" = 0 ] && continue
+
   case "$s" in
     fetch)
-      log "阶段 fetch：更新开源语料"
-      bash "$ROOT/scripts/corpus/fetch_open.sh" >>"$RUNLOG" 2>&1 \
-        && ok "fetch_open 完成" || warn "fetch_open 有失败项（可重跑续传）"
+      log "阶段 fetch：更新开源语料（断点续传，配额分批）"
+      bash "$ROOT/scripts/corpus/fetch_open.sh" --max-gb "${FETCH_MAX_GB:-20}" >>"$RUNLOG" 2>&1 \
+        && ok "开源语料已更新" || warn "下载有失败项（重跑续传）"
       if [ -s "$ROOT/data/corpus/raw/zhwiki-latest-pages-articles.xml.bz2" ] \
          || [ -d "$ROOT/data/corpus/wikiextract" ]; then
         bash "$ROOT/scripts/corpus/wiki_pipeline.sh" >>"$RUNLOG" 2>&1 \
-          && ok "wikiextract 完成" || warn "wiki 预处理失败（见日志）"
-      else
-        warn "未发现 zhwiki dump，跳过维基预处理"
+          && ok "维基预处理完成" || warn "维基预处理未完成（可重跑）"
       fi
       ;;
     extract)
-      log "阶段 extract：抽取（增量）"
+      log "阶段 extract：抽取（增量，按文件类型自动分派）"
       "$PY" "$ROOT/scripts/corpus/extract.py" --jobs "$JOBS" --nice "$NICE" >>"$RUNLOG" 2>&1 \
-        && ok "$("$PY" "$ROOT/scripts/corpus/status.py" 2>/dev/null | tail -1)" || die "extract 失败"
+        || die "extract 失败（见 $RUNLOG）"
+      ok "$("$PY" "$ROOT/scripts/corpus/status.py" 2>/dev/null | tail -1)"
       ;;
     clean)
-      log "阶段 clean：清洗（增量）"
+      log "阶段 clean：清洗 + 短句切分（增量，布隆去重）"
       if [ "$FULL" = 1 ]; then
-        "$PY" "$ROOT/scripts/corpus/clean.py" --rebuild --jobs "$JOBS" --nice "$NICE" >>"$RUNLOG" 2>&1 \
-          && ok "全量清洗完成" || die "clean 失败"
+        "$PY" "$ROOT/scripts/corpus/clean.py" --rebuild --jobs "$JOBS" \
+          --nice "$NICE" --dedup-capacity 2.5e9 >>"$RUNLOG" 2>&1 || die "clean 失败"
+        ok "全量清洗完成"
       else
-        "$PY" "$ROOT/scripts/corpus/clean.py" --jobs "$JOBS" --nice "$NICE" >>"$RUNLOG" 2>&1 \
-          && ok "增量清洗完成" || die "clean 失败"
+        "$PY" "$ROOT/scripts/corpus/clean.py" --jobs "$JOBS" \
+          --nice "$NICE" --dedup-capacity 2.5e9 >>"$RUNLOG" 2>&1 || die "clean 失败"
+        ok "增量清洗完成"
       fi
       ;;
     freq)
-      log "阶段 freq：用语料重扫词频（Aho-Corasick，分钟级）"
-      bash "$ROOT/scripts/corpus/recount.sh" >>"$RUNLOG" 2>&1 \
-        && ok "词频重扫完成" || warn "重扫失败（见日志）"
+      log "阶段 freq：用语料重扫词频（Aho-Corasick，多路并行）"
+      bash "$ROOT/scripts/corpus/recount.sh" '' recount_full "$JOBS" >>"$RUNLOG" 2>&1 \
+        && ok "词频重扫完成" || warn "重扫失败（见日志；分片已保留）"
       ;;
     dict)
-      log "阶段 dict：权重回归 + 分档 + gen"
+      log "阶段 dict：权重回归 + 分档 + 方案词库生成（档位 $TIER）"
       if [ -s "$ROOT/data/corpus/freq/recount_full.txt" ]; then
         "$PY" "$ROOT/scripts/reweight_from_corpus.py" \
           --freq "$ROOT/data/corpus/freq/recount_full.txt" >>"$RUNLOG" 2>&1 \
-          && ok "词权重已按语料回归" || warn "权重回归失败"
+          && ok "词权重已按语料回归到 0-1000" || warn "权重回归失败"
       else
-        warn "无重扫词频（先跑 freq 阶段），跳过权重回归"
+        warn "无重扫词频，跳过权重回归"
       fi
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
-        && ok "分档词表已生成" || warn "分档生成失败"
+        && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "已切到 $TIER 档" || warn "切档失败"
       if [ "${SKIP_GEN:-0}" != 1 ]; then
         "$PY" "$ROOT/scripts/gen_wubi_py_unified_dicts.py" >>"$RUNLOG" 2>&1 \
-          && ok "方案词库 gen 完成" || warn "gen 失败（见日志；可能是源文件缺失）"
+          && ok "方案词库 gen 完成" || warn "gen 失败（见日志）"
       fi
       ;;
     gram)
-      log "阶段 gram：语言模型（n-gram → kenlm → .gram）"
-      if [ -f "$ROOT/scripts/corpus/gram.sh" ]; then
-        bash "$ROOT/scripts/corpus/gram.sh" >>"$RUNLOG" 2>&1 \
-          && ok "gram 训练完成" || warn "gram 失败（见日志）"
-      else
-        warn "scripts/corpus/gram.sh 尚未实现，跳过"
-      fi
+      log "阶段 gram：字符 2-6gram → .gram"
+      bash "$ROOT/scripts/corpus/gram.sh" >>"$RUNLOG" 2>&1 \
+        && ok "语言模型已生成" || warn "gram 失败（见日志）"
       ;;
-    verify)
-      log "阶段 verify：回归 + 账本"
-      "$PY" "$ROOT/scripts/corpus/status.py" 2>&1 | tee -a "$RUNLOG" | tail -8
-      ( cd "$ROOT" && make test-rebuild ) >>"$RUNLOG" 2>&1 \
-        && ok "黄金用例通过" || warn "回归有失败项（见日志）"
+    artifacts)
+      log "阶段 artifacts：最终产物清单"
+      "$PY" "$ROOT/scripts/artifacts.py" 2>&1 | tee -a "$RUNLOG"
       ;;
   esac
 done
+
+if [ "$DEPLOY" = 1 ]; then
+  log "部署到输入法"
+  ( cd "$ROOT" && make deploy ) >>"$RUNLOG" 2>&1 && ok "已部署" || warn "部署失败"
+fi
 }
 
+if [ "$LIST" = 1 ]; then
+  printf '%-12s %s\n' 阶段 状态
+  for s in "${STAGES[@]}"; do printf '%-12s %s\n' "$s" "$(stage_status "$s")"; done
+  echo; echo "日志: $RUNLOG"
+  exit 0
+fi
+
 if [ "$LOOP" -gt 0 ]; then
-  log "常驻模式：每 $LOOP 分钟增量刷新一次（Ctrl-C 或 kill 本进程退出）"
+  log "常驻模式：每 $LOOP 分钟增量刷新一轮（Ctrl-C 退出）"
   while true; do
     run_stages
     log "本轮结束，休眠 $LOOP 分钟"
@@ -202,8 +178,7 @@ if [ "$LOOP" -gt 0 ]; then
   done
 else
   run_stages
+  log "刷新结束"
+  echo "    日志: $RUNLOG"
+  [ "$DEPLOY" = 1 ] || echo "    部署到输入法: bash scripts/refresh.sh --deploy（或 make deploy）"
 fi
-
-log "刷新结束"
-echo "    日志: $RUNLOG"
-echo "    重新部署到输入法: make deploy"

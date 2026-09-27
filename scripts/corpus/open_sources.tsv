@@ -18,3 +18,4 @@ baidubaike	xuqinyang/BaiduBaike-5.63M	563w_baidubaike.json	15.7G	学术	百度�
 law	twang2218/chinese-law-and-regulations	data/*.parquet	0.15G	未知	法律法规, 垂直领域术语
 medical	BillGPT/Chinese-medical-dialogue-data	*.zip	0.87G	未知	医疗对话(口语+领域, 下载后自动解压)
 dialogue	CJY/Chinese-Dialogue-180k	data/train-0000[0-3]-of-00032.parquet	~17G	未知	口语对话(抽样 4/32), 补自有语料全书面语的缺口
+fineweb-edu-2	opencsg/Fineweb-Edu-Chinese-V2.1	2_3/0001*.parquet	~18G	odc-by	高质量教育网页文本(第二批 100/900 片)

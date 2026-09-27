@@ -27,6 +27,19 @@ wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
 以上恢复真值。gram 用字级 `zh-hans-t-essay-bgc.gram`（已入库）；
 wanxiang-lts 词级 gram 可切换，见 README 下文下载说明。
 
+## 一条命令出产物（推荐入口）
+
+```
+make setup                    # 新机器首次：依赖 + 编译 + venv
+bash scripts/refresh.sh       # 之后只跑这条：用最新语料增量出全部产物
+bash scripts/refresh.sh --deploy     # 出完部署到输入法
+bash scripts/refresh.sh --loop 30    # 常驻增量刷新（语料持续下载中）
+bash scripts/refresh.sh --tier full  # 换档（core/base/full）
+```
+
+产物：三档词库（每档含五笔码 + 拼音码）、86 造词码词库、字级 gram。
+清单：`bash scripts/refresh.sh --only artifacts`。
+
 ## 环境搭建（Linux 自包含）
 
 所有外部依赖与数据都在仓库内（`third-party/`、`data/`），均不入 git，
