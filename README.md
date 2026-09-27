@@ -27,6 +27,30 @@ wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
 以上恢复真值。gram 用字级 `zh-hans-t-essay-bgc.gram`（已入库）；
 wanxiang-lts 词级 gram 可切换，见 README 下文下载说明。
 
+## 部署到其它机器（如 macOS host-linux）
+
+开发机与使用机可能没有直连（本项目实测：开发机连不上 host-linux 的 ssh），
+所以用「自包含运行时包」的方式交付：
+
+```bash
+# ① 开发机：打运行时包（18MB，含 yaml/词库/lua/opencc/LM 重排表 + install.sh）
+make bundle                      # 产出 dist/egret-rime-runtime-<日期>.tar.gz
+
+# ② 把包拷到目标机（微信/网盘/U 盘 均可），然后：
+tar xzf egret-rime-runtime-*.tar.gz && cd egret-rime-runtime-*
+bash install.sh                  # macOS 默认 ~/Library/Rime
+bash install.sh --link ~/Library/Rime   # 软链模式（以后改本包即生效）
+
+# ③ 重新部署输入法（Squirrel 菜单栏图标 → 重新部署；fcitx5 → 托盘右键重新部署）
+```
+
+安装脚本会先把要覆盖的文件备份到 `<目标>/.egret-backup-<时间戳>/`，回滚只需拷回去。
+
+**重要**：交付包里**不需要** librime 的 `.gram`，也**不需要**给 librime 打任何补丁——
+LM 已改成纯 Lua 重排（见 `docs/PROGRESS.md` §4.13）。
+
+验证：输入 `e` 应出「有」，`jintiandetianqizenmeyang` 应出「今天的天气怎么样」。
+
 ## 一条命令出产物（推荐入口）
 
 ```

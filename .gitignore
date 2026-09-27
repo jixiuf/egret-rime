@@ -9,3 +9,4 @@ third-party/
 data/
 __pycache__/
 *.pyc
+dist/
