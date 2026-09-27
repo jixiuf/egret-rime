@@ -145,9 +145,14 @@ for i in "${!STAGES[@]}"; do
       fi
       ;;
     gram)
-      log "阶段 gram：字符 2-6gram → .gram"
+      log "阶段 gram：n-gram 统计 → Lua 重排表（LM 不参与分词）"
       bash "$ROOT/scripts/corpus/gram.sh" >>"$RUNLOG" 2>&1 \
-        && ok "语言模型已生成" || warn "gram 失败（见日志）"
+        && ok "n-gram 统计完成" || warn "gram 失败（见日志）"
+      if [ -s "$ROOT/data/gram/zh-hans-egret.2_6gram.tsv" ]; then
+        "$PY" "$ROOT/scripts/gen_lm_rerank.py" >>"$RUNLOG" 2>&1 \
+          && ok "Lua 重排表已生成（data/gram/lm_rerank.tsv）" \
+          || warn "重排表生成失败"
+      fi
       ;;
     artifacts)
       log "阶段 artifacts：最终产物清单"

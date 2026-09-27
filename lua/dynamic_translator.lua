@@ -39,16 +39,46 @@ function dynamic.init(env)
         or "script_translator@translator"
     -- 可选：最先查询的 translator（如拼音冲突的传统二级简码微型库）
     local first_translator_name = config:get_string(env.name_space .. "/first_translator")
+
+    -- LM 只重排、不参与分词（纯 Lua，不改 librime）
+    --   1) 临时把 grammar/language 改成一个不存在的名字 → 组句分词不再受 LM 影响
+    --      （poet 这时走按词库权重的路径，并可用 max_sentences 给出多个整句候选）
+    --   2) 创建完翻译器后立即恢复，不影响其它组件
+    --   3) 由 lm_rerank 用紧凑 n-gram 表在 Lua 里对整句候选重排
+    -- 见 docs/PROGRESS.md §4.13
+    env.lm_rerank = config:get_bool(env.name_space .. "/lm_rerank")
+    env.lm_debug = config:get_bool(env.name_space .. "/lm_rerank_debug")
+    local saved_language
+    if env.lm_rerank then
+        saved_language = config:get_string("grammar/language")
+        if saved_language and saved_language ~= "" then
+            config:set_string("grammar/language", "__lm_rerank_off__")
+        end
+        local ok, mod = pcall(require, "lm_rerank")
+        if ok and mod then
+            env.lm = mod
+            mod.load(config:get_string(env.name_space .. "/lm_rerank_table") or nil)
+        else
+            log.warning("[dynamic_translator] lm_rerank 载入失败: " .. tostring(mod))
+            env.lm_rerank = false
+        end
+    end
+
     env.first_translator = first_translator_name
         and Component.Translator(env.engine, "", first_translator_name) or nil
     env.table_translator = Component.Translator(env.engine, "", table_translator_name)
     env.script_translator = Component.Translator(env.engine, "", script_translator_name)
+
+    if saved_language and saved_language ~= "" then
+        config:set_string("grammar/language", saved_language)
+    end
 end
 
 function dynamic.fini(env)
     env.first_translator = nil
     env.table_translator = nil
     env.script_translator = nil
+    env.lm = nil
 end
 
 function dynamic.func(input, seg, env)
@@ -82,6 +112,11 @@ function dynamic.func(input, seg, env)
         end
     end
     collect(env.script_translator:query(input, seg), script_cands, false)
+    -- LM 只重排：把整句候选按 n-gram 表打分重排（不改变与其它候选的分组关系）
+    if env.lm_rerank and env.lm then
+        env.lm.rerank_sentences(script_cands)
+        if env.lm_debug then env.lm.debug(script_cands, input) end
+    end
     if (env.engine.context.input == input) then
         collect(env.table_translator:query(input, seg), table_early, true)
     end

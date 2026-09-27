@@ -93,6 +93,12 @@ dynamic_translator:
   first_translator: table_translator@egret_wubi_py_wubi
   table_translator: table_translator@custom_phrase
   script_translator: script_translator@translator
+  # LM 只重排、不参与分词（纯 Lua，不改 librime）：
+  #   关掉 grammar 影响 → 分词只按词库权重 → lm_rerank 用紧凑 n-gram 表重排整句
+  #   需配合 translator/max_sentences 给出多个整句候选；详见 docs/PROGRESS.md §4.13
+  lm_rerank: true
+  lm_rerank_table: lm_rerank.tsv
+  lm_rerank_debug: false
 
 # ---- 传统五笔库（简码表+全码+词组显式码，每码唯一条目）----
 # 注意: 配置块键必须与 first_translator 的 @tag 一致;
@@ -146,6 +152,9 @@ custom_phrase:
 # ---- 混合库 script：五笔+拼音混合分词 + LM 组句（混流核心）----
 translator:
   always_make_sentences: true    # 实验: 精确词匹配也让 grammar 参与裁决
+  # LM 重排需要多个“按权重排序”的整句候选；这两个值越大候选越多（也越慢）
+  max_sentences: 20
+  sentence_cutoff_threshold: 0.5
   dictionary: egret_wubi_py
   prism: egret_wubi_py
   enable_user_dict: true

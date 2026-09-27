@@ -174,37 +174,68 @@ return entry_weight + (grammar ? grammar->Query(context, text, is_rear) : kPenal
 2. 换词级 gram / 训练更干净的语料（当前 char 级证据太泛）
 3. docs §6 的 `always_make_sentences` + 重排 lua：让 LM 只做候选重排、不参与分词
 
-### 4.12 ⭐ 新机制：LM 只重排、不参与分词（已实现并调优）
+### 4.13 ⭐ LM 只重排、不参与分词（**纯 Lua 实现，不改 librime**）
 
-方向 3 落地为一个 **librime 源码补丁**（存在仓库里，`make setup` 会自动打）：
+**最终方案**：把 LM 从 librime 搬到 Lua 层。librime 只按词库权重分词，LM 只对整句候选重排。
+
+实现（全部在我们自己的代码/数据里）：
 
 ```
-scripts/patches/librime-rerank-only.patch   # 改 poet.h / poet.cc，157 行
-  开关（schema 的 grammar 段，默认关，不影响上游行为）:
-    grammar/rerank_only: true     # 搜索阶段不计 LM（等价无-gram），末态按 LM 重排
-    grammar/rerank_margin: 5      # 保守重排：LM 只优于无-LM 结果 >=5 分时才改
+scripts/gen_lm_rerank.py    从 3470 万条 n-gram 聚合数据抽 60 万条（含 1gram）
+                            → data/gram/lm_rerank.tsv（8MB）+ .meta（总字数）
+lua/lm_rerank.lua           载入表 + 条件概率打分 + 对 Sentence 候选重排
+lua/dynamic_translator.lua  init: 临时把 grammar/language 改成不存在的名字，创建
+                            “分词不受 LM 影响”的翻译器（创建后立即恢复）
+                            func: 对整句候选按 LM 分数重排（不改变候选项分组）
+egret_wubi_py.schema.yaml   dynamic_translator/lm_rerank: true
+                            translator/max_sentences: 20（给多个整句候选）
+```
+
+**打分公式（关键）**：条件概率 + 阶数 backoff + unigram 底线
+
+```
+score = Σ_i max( logP(c_i | c_{i-3..i-1}) , ..., logP(c_i | c_{i-1}) , logP(c_i) )
+  其中 logP = log count(ngram) − log count(ngram 前缀)，unigram 以总字数归一
 ```
 
 **效果（同一 200 句固定评测集）**：
 
 | 配置 | 黄金 | 句子还原 |
 |---|---:|---:|
-| 原配置（LM 参与分词） | **20/20** | 32/200 (16%) |
+| 原配置（LM 参与分词） | 20/20 | 32/200 (16%) |
 | 无 gram | 18/20 | 47/200 (24%) |
-| rerank_only，margin=0 | 19/20 | 43/200 (22%) |
-| **rerank_only，margin=5** | 18/20 | **52/200 (26%)** |
-| rerank_only，margin=10 / 20 / 60 | 18/20 | 48 / 47 / 48 |
+| librime 补丁 rerank（已废弃，见下） | 18/20 | 52/200 (26%) |
+| **纯 Lua 重排（原生 librime）** | **20/20** | **55/200 (28%)** |
 
-→ **句子还原 16% → 26%（+62% 相对提升）**，证明“把 LM 从分词决策里拿出来”是对的。
-→ 代价：黄金用例 20/20 → 18/20（丢 `时代广场→时代光场`、`我今天没有空→我进甜美有空`，
-   两者靠 LM 参与分词才能对）。
-→ margin 是“信任 LM 的程度”：0=完全交给 LM（43/19），越大越退回无-gram（47-48/18）。
+→ 相对原配置 **+72%**，且**黄金用例 20/20 全过**（比补丁版更好）。
 
-**默认仍为关（保持 20/20 基线）**；要启用就在 `egret.common.yaml` 的 `grammar:` 里加上述两行。
+**已废弃**：早先的 `scripts/patches/librime-rerank-only.patch`（改 poet.cc）已删除，
+`third-party/librime` 已还原为原生（无本地改动）——方案现在不依赖任何 librime 修改。
 
-**踩坑（写这个补丁时）**：`vector v(line.components().begin(), line.components().end())`
-—— 两次调用 `components()` 会生成两个不同临时对象，begin/end 属于不同容器 → UB，
-实测直接 core dump（`std::length_error`）。必须先 `auto c = line.components();`。
+**踩坑记录（写这个时踩的）**：
+1. **`log count` 直接累加会挑错**：log count 天然偏爱高频短 n-gram，会把
+   「我今天没有控/恐/孔」排在「我今天没有空」前。必须用条件概率。
+2. **无证据的罚分不能比真实低频概率还高**：固定罚 -3000 比
+   `logP(是|看) = -4901` 更高 → 「我看**式**荞麦」赢了「我看**是**荞麦」。
+   必须 backoff 到 unigram 概率做底线。
+3. **首字符要单独算**：循环从 i=2 开始会漏第一个字，导致多个候选同分并列。
+4. **Lua 里候选类型要用 `cand:get_dynamic_type()`**（返回 "Sentence"/"Phrase"），
+   不是 `cand.type`（那是静态串，组合句也是 phrase）。
+5. **Lua 的 `return` 必须是块内最后一句**：在 `return M` 后追加函数是语法错误，
+   而 `luac -p` 能报出来，值得先跑一遍。
+6. `log.warning`/`log.info` 在 console 里看不到，诊断请用 `log.error`。
+
+**调参/诊断**：
+```yaml
+dynamic_translator:
+  lm_rerank: true          # 开关
+  lm_rerank_debug: true    # 打印候选与 LM 分数（log.error 级）
+```
+```bash
+python3 scripts/gen_lm_rerank.py --top2 300000 --top3 200000 --top4 100000
+third-party/venv/bin/python scripts/eval_gram.py --cases 0 --sentences 200 \
+  --gram "x=$PWD/data/gram/zh-hans-egret.gram"
+```
 
 **调参可复现命令**：
 ```bash

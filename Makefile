@@ -85,6 +85,8 @@ env-test:
 		ln -sf $(LIBRIME_BIN)/$$f $(TEST_DIR)/ 2>/dev/null || true; \
 	done
 	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
+	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
+	@cp -f $(GRAM_DIR)/lm_rerank.tsv $(TEST_DIR)/ 2>/dev/null || true
 	@# 先部署出 build/ 产物: 空 build/ 下首次 console 会撞维护竞态(陷阱 #2)
 	@$(LIBRIME_BIN)/rime_deployer --build $(TEST_DIR) $(SHARED_DIR) \
 		$(TEST_DIR)/build >/dev/null 2>&1 || true
@@ -135,6 +137,7 @@ deploy: $(GRAM)
 	ln -sfn "$(REPO)/opencc" "$(TARGET)opencc"
 	ln -sf "$(REPO)/"*.yaml "$(TARGET)"
 	ln -sf "$(GRAM)" "$(TARGET)"
+	ln -sf "$(GRAM_DIR)/lm_rerank.tsv" "$(TARGET)"
 	@echo "已部署到 $(TARGET) (重新部署/重启输入法后生效)"
 
 # --- 语料管线（阶段 A~E）----------------------------------------------------
