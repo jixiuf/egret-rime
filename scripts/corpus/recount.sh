@@ -12,7 +12,8 @@
 #       data/corpus/freq/recount_full.filtered.txt   被过滤条目
 #
 # 用法:
-#   bash scripts/corpus/recount.sh [源词表] [输出名]
+#   bash scripts/corpus/recount.sh [源词表] [输出名] [并发数]
+#   bash scripts/corpus/recount.sh '' recount_full 6      # 6 路并行扫描
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -22,6 +23,7 @@ LOG="$ROOT/data/corpus/log"
 BIN="$ROOT/third-party/rime-corpus-processing/frequency/target/release/rime-frequency"
 SRC="${1:-$ROOT/dicts/egret_wubi_py/egret_wubi_py_words_full.dict.yaml}"
 NAME="${2:-recount_full}"
+JOBS="${3:-${RECOUNT_JOBS:-6}}"
 
 mkdir -p "$FREQ" "$LOG"
 [ -x "$BIN" ] || { echo "缺少 rime-frequency（make setup-build）"; exit 1; }
@@ -40,11 +42,29 @@ else
 fi
 echo "    语料 $(du -h "$CORPUS" | cut -f1)  源词表 $(basename "$SRC")"
 
-echo "==> Aho-Corasick 重扫（Rust）"
-nice -n 15 "$BIN" --corpus "$CORPUS" --source "$SRC" \
-  --output "$FREQ/$NAME.txt" \
-  --filtered-output "$FREQ/$NAME.filtered.txt" \
-  --low-frequency-threshold 1 2>&1 | tail -4
+echo "==> Aho-Corasick 重扫（Rust，$JOBS 路并行）"
+# 把语料按行拆成 JOBS 份，并行扫描后合并计数——单进程扫 44GB 需 ~25min，
+# 6 路并行降到 ~5min（本机核数 16，有冗余）。
+PARTS="$FREQ/.parts-$NAME"
+rm -rf "$PARTS"; mkdir -p "$PARTS"
+split -n l/$JOBS -d --additional-suffix=.txt "$CORPUS" "$PARTS/part-"
+PIDS=()
+for i in $(seq 0 $((JOBS - 1))); do
+  p=$(printf "%s/part-%02d.txt" "$PARTS" "$i")
+  [ -s "$p" ] || continue
+  nice -n 15 "$BIN" --corpus "$p" --source "$SRC" \
+    --output "$PARTS/out-$i.txt" \
+    --filtered-output "$PARTS/flt-$i.txt" \
+    --low-frequency-threshold 1 > "$PARTS/log-$i.txt" 2>&1 &
+  PIDS+=($!)
+done
+for pid in "${PIDS[@]}"; do wait "$pid"; done
+grep -h "\[done\]" "$PARTS"/log-*.txt 2>/dev/null | tail -2
+
+# 合并各分片：按词累加频次（Rime dict 格式：word<TAB>code<TAB>count）
+# 以 word+code 为键累加，保证同一词条的编码不被弄混
+nice -n 15 awk -F'\t' '\n  /^#/ {next}\n  NF>=3 && $3 ~ /^[0-9]+$/ { k=$1"\t"$2; s[k]+=$3; if (!(k in seen)) {seen[k]=1} }\n  END { for (k in s) print k"\t"s[k] }\n' "$PARTS"/out-*.txt > "$FREQ/$NAME.txt"
+rm -rf "$PARTS"
 
 ls -la "$FREQ/$NAME.txt" 2>/dev/null | awk '{printf "产出: %s  %.1f MB\n", $9, $5/1048576}'
 echo "下一步: python3 scripts/reweight_from_corpus.py --freq $FREQ/$NAME.txt"
