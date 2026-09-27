@@ -88,7 +88,7 @@ make test                           # 黄金用例（20 条），确认引擎仍
 - `scripts/corpus/gram.sh`：clean/short → 字符 2-6gram 计数 → build_grammar →
   `data/gram/<language>.gram`；指纹驱动、支持 `--sample` 冒烟与 `--restart`。
 
-### 4.9 环境严重 bug 修复：LM 之前一直没生效（❗）
+### 4.7 环境严重 bug 修复：LM 之前一直没生效（❗）
 **现象**：切换 `grammar/language` 到不存在的名字，结果与真 gram **完全一致**。
 **根因**：librime 运行时 `user_data_dir` 与 `shared_data_dir` 默认都是 `.`，
 而 `make env-test` 把 `default.yaml/symbols.yaml/essay.txt` 放在了 `data/rime-shared/`，
@@ -98,7 +98,7 @@ make test                           # 黄金用例（20 条），确认引擎仍
 **验证**：`ckwan` 无 gram→台万、essay-bgc/自训→台湾；无 key_binder 报错。
 **影响**：此前所有回归都是"无 LM"跑的（20/20 仍成立，但 LM 类结论不可信）。
 
-### 4.10 LM 评测（新工具 + 首批数据）
+### 4.8 LM 评测（新工具 + 首批数据）
 新增 `scripts/eval_gram.py`：黄金用例 + 混合拼写 + **句子级（全拼还原）**。
 
 **关键发现：混合拼写用例测不出 LM 差异**——它们被词库决定（传统词组置顶），
@@ -124,7 +124,7 @@ make test                           # 黄金用例（20 条），确认引擎仍
 新增 `scripts/corpus/gram_retune.sh`：聚合 TSV → 阈值过滤 → build_grammar，
 **秒级切换体积**（不必重算计数 85G）；`--stats` 给阈值→体积映射表。
 
-### 4.11 全拼路径：LM 为何是净负作用（根因已定位）
+### 4.9 全拼路径：LM 为何是净负作用（根因已定位）
 
 **评测集必须固定**：早先从 clean/short 采样生成——语料一变采样就变，两次评测是两套题
 （已踩：16/100 vs 12/100 完全不可比）。已修为固定文件
@@ -174,7 +174,7 @@ return entry_weight + (grammar ? grammar->Query(context, text, is_rear) : kPenal
 2. 换词级 gram / 训练更干净的语料（当前 char 级证据太泛）
 3. docs §6 的 `always_make_sentences` + 重排 lua：让 LM 只做候选重排、不参与分词
 
-### 4.15 部署到 host-linux（已实装并验证）
+### 4.10 部署到 host-linux（已实装并验证）
 
 **环境**（与开发机不同，之前误以为是 macOS）：
 
@@ -218,7 +218,7 @@ SSH_AUTH_SOCK=/tmp/ssh-XXXX/agent.NNN ssh -p 8093 jixiuf@localhost hostname  # �
 symbols:punctuator`（连你的 `egret_wubi` 方案一起编译失败）。必须传全：
 `rime_deployer --build <用户目录> /usr/share/rime-data <用户目录>/build`。
 
-### 4.15 部署到 host-linux（已实装并验证）
+### 4.11 部署到 host-linux（已实装并验证）
 
 **环境**（不是 macOS）：Gentoo Linux + fcitx5，Rime 用户目录
 `~/.local/share/fcitx5/rime`。
@@ -271,7 +271,7 @@ sudo emerge -1 '=app-i18n/librime-1.17.0'     # 同时重建 lua / octagram 插�
 4. 判定候选类型要用 `c:get_dynamic_type()`（返回 "Sentence"/"Phrase"）；
    `c.type` 在部分版本对句子返回小写 "sentence"，不可靠。
 
-### 4.13 ⭐ LM 只重排、不参与分词（**纯 Lua 实现，不改 librime**）
+### 4.12 ⭐ LM 只重排、不参与分词（**纯 Lua 实现，不改 librime**）
 
 **最终方案**：把 LM 从 librime 搬到 Lua 层。librime 只按词库权重分词，LM 只对整句候选重排。
 
@@ -345,7 +345,36 @@ export PATH=/opt/rh/gcc-toolset-12/root/usr/bin:$PATH
 cd third-party/librime/build && cmake --build . -j 8 --target rime
 ```
 
-### 4.13 开源语料接入（可持续扩展）
+### 4.13 评测口径修正 + 多来源整句评测集（重要）
+
+用户指出"一分钟经理这类句子不通顺"，并建议用**不同类型文章的整句**做测试。修正如下：
+
+**新评测集** `data/corpus/eval/sentences_v2.tsv`（`scripts/gen_eval_set.py`）：
+- 从 `clean/para/` 切**完整句**（必须有句末标点，避免行尾碎片）
+- 随机窗口采样（每源 400×1MB，多进程）→ **35 秒**完成（旧版全量扫描要 40 分钟）
+- 过滤：8~20 字、全汉字∈高频字表、**语感过滤**（字符级平均 log 概率 ≥ 阈值，
+  滤掉"四北仓台米"这类碎片）、去标题/编号/残句（不以「的了在和…」开头、引号配平）
+- **按来源分层**：epub 书籍 / jsonl（新闻+维基+百科）/ parquet（网页文本）/ markdown（课程文稿）
+- **关键：期望文本去标点**——输入是纯拼音，用户不会把逗号算进拼音；
+  旧集只剥句末标点，导致"少一个逗号"被算成错，**虚低准确率**（13% → 实际 21%）
+
+**结果（160 句，原生 librime）**：
+
+| 配置 | 完全命中 | 字符准确率 |
+|---|---:|---:|
+| A 原配置（LM 参与分词） | 21/160 (13%) | 53.4% |
+| B 无 gram | 28/160 (18%) | 54.3% |
+| **C Lua 重排（当前）** | **34/160 (21%)** | **57.9%** |
+
+→ Lua 重排相对原配置 **+62%**，字符准确率 +4.5pp。指标同时报告"完全命中"与
+"字符准确率"（长句完全命中天然低，字符准确率更稳定可追踪）。
+
+**已知缺口（下一步）**：
+- 重排天花板：正确句只在候选里 ~50%（max_sentences=50 时 52%）
+- LM 表偏小：60 万条 char 2-4gram；失败样例需要的是 `P(理|钟经)` 这类三元组
+- 重排只看 LM，**丢掉了词库权重**信息 → 应加权融合
+
+### 4.14 开源语料接入（可持续扩展）
 - 参考 **RIME-LMDG**（万象 gram 工厂）：维基链路 `gensim extract_pages +
   filter_wiki + OpenCC t2s`（145 万篇）；短句化 = **标点断句 + 只留汉字**。
 - 清单位于 `scripts/corpus/open_sources.tsv`（TAB 分隔：name/dataset/glob/体积/许可/用途），
@@ -370,7 +399,7 @@ cd third-party/librime/build && cmake --build . -j 8 --target rime
 
 **排除**网文/社交媒体（docs 记录过「才最」口味污染）。
 
-### 4.8 格式支持
+### 4.15 格式支持
 `formats.py` 注册式处理器：epub / markdown / html / 纯文本 / jsonl（gz 感知）/
 **parquet**（pyarrow 流式 batch 读，内存有界）。新增格式只需加一个类。
 

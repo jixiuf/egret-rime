@@ -117,13 +117,16 @@ def build_sentence_cases(n, min_len=4, max_len=12, seed=20260927,
     except ImportError:
         sys.exit("句子评测需要 pypinyin（第三方 venv 里有）")
 
-    sent_file = os.path.join(rime_paths.DATA, "corpus", "eval", "sentences.tsv")
+    sent_file = os.environ.get("EVAL_SENT_FILE") or next(
+        (p for p in (os.path.join(rime_paths.DATA, "corpus", "eval", "sentences_v2.tsv"),
+                     os.path.join(rime_paths.DATA, "corpus", "eval", "sentences.tsv"))
+         if os.path.exists(p)), "")
     if os.path.exists(sent_file) and not regen:
         out = []
         with open(sent_file, encoding="utf-8") as f:
             for line in f:
                 p = line.rstrip("\n").split("\t")
-                if len(p) == 2:
+                if len(p) >= 2:
                     out.append((p[0], p[1]))
         print(f"  评测集: {sent_file}（固定 {len(out)} 句）")
         return out[:n] if n else out
