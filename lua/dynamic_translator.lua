@@ -48,6 +48,7 @@ function dynamic.init(env)
     -- 见 docs/PROGRESS.md §4.13
     env.lm_rerank = config:get_bool(env.name_space .. "/lm_rerank")
     env.lm_debug = config:get_bool(env.name_space .. "/lm_rerank_debug")
+    env.lm_keep_sentences = config:get_int(env.name_space .. "/lm_keep_sentences") or 1
     local saved_language
     if env.lm_rerank then
         saved_language = config:get_string("grammar/language")
@@ -115,6 +116,8 @@ function dynamic.func(input, seg, env)
     -- LM 只重排：把整句候选按 n-gram 表打分重排（不改变与其它候选的分组关系）
     if env.lm_rerank and env.lm then
         env.lm.rerank_sentences(script_cands)
+        -- 重排后只把最佳整句留在首位，其余整句挪到尾部（避免首屏全是一字之差的整句）
+        env.lm.limit_sentences(script_cands, env.lm_keep_sentences or 1)
         if env.lm_debug then env.lm.debug(script_cands, input) end
     end
     if (env.engine.context.input == input) then

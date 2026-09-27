@@ -130,4 +130,42 @@ end
 
 
 --- 调试：打印整句候选及其 LM 分数（由 dynamic_translator 按配置开启）
+--- 限制“展示”的整句数量：重排后只留前 keep 个在首位，
+-- 其余整句挪到候选流尾部（仍可翻页找到，但不污染首屏）。
+-- 为何需要：max_sentences 开大是为了给重排足够候选，但直接展示会让
+-- 一整页都是“今天的天气怎么阳/养/杨/洋/央”这类只差一字的整句变体。
+function M.limit_sentences(cands, keep)
+    keep = keep or 1
+    local out, extra, seen = {}, {}, 0
+    for _, c in ipairs(cands) do
+        if c:get_dynamic_type() == "Sentence" then
+            seen = seen + 1
+            if seen > keep then
+                extra[#extra + 1] = c
+            else
+                out[#out + 1] = c
+            end
+        else
+            out[#out + 1] = c
+        end
+    end
+    for _, c in ipairs(extra) do out[#out + 1] = c end
+    for i = 1, #out do cands[i] = out[i] end
+    return #extra
+end
+
+--- 调试：打印整句候选与 LM 分数（由 dynamic_translator 按配置开启）
+function M.debug(cands, input)
+    local n = 0
+    for _, c in ipairs(cands) do
+        if c:get_dynamic_type() == "Sentence" then
+            n = n + 1
+            if n <= 25 then
+                log.error(string.format("[LMDBG] %s #%d score=%.0f %s",
+                    input, n, M.score(c.text), c.text))
+            end
+        end
+    end
+end
+
 return M

@@ -99,6 +99,7 @@ dynamic_translator:
   lm_rerank: true
   lm_rerank_table: lm_rerank.tsv
   lm_rerank_debug: false
+  lm_keep_sentences: 1        # 首屏只留 1 个整句，其余挪到尾部
 
 # ---- 传统五笔库（简码表+全码+词组显式码，每码唯一条目）----
 # 注意: 配置块键必须与 first_translator 的 @tag 一致;
