@@ -27,7 +27,18 @@ wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
 以上恢复真值。gram 用字级 `zh-hans-t-essay-bgc.gram`（已入库）；
 wanxiang-lts 词级 gram 可切换，见 README 下文下载说明。
 
-## 部署到其它机器（如 macOS host-linux）
+## 部署到 host-linux（Gentoo + fcitx5，已验证）
+
+```bash
+bash scripts/deploy_host-linux.sh --probe    # 先看远端环境
+bash scripts/deploy_host-linux.sh            # 完整部署（自动找 agent socket → 打包 → scp → 远端安装 → 重部署）
+```
+
+细节：host-linux 的 `~/.local/share/fcitx5/rime` **全部软链**到 `~/vmacs/rime`，
+所以脚本更新的是 `~/vmacs/rime`（git 仓库，有 `.deploy-backup-<时间戳>/` 备份），
+再为新增的根级文件补软链；实测只需传 16 个文件。详见 docs/PROGRESS.md §4.15。
+
+## 部署到其它机器（无直连时）
 
 开发机与使用机可能没有直连（本项目实测：开发机连不上 host-linux 的 ssh），
 所以用「自包含运行时包」的方式交付：

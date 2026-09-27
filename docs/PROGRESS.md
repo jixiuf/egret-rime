@@ -174,6 +174,50 @@ return entry_weight + (grammar ? grammar->Query(context, text, is_rear) : kPenal
 2. 换词级 gram / 训练更干净的语料（当前 char 级证据太泛）
 3. docs §6 的 `always_make_sentences` + 重排 lua：让 LM 只做候选重排、不参与分词
 
+### 4.15 部署到 host-linux（已实装并验证）
+
+**环境**（与开发机不同，之前误以为是 macOS）：
+
+| | 开发机 | host-linux |
+|---|---|---|
+| 系统 | Rocky 8 | **Gentoo Linux 7.2.2** |
+| 前端 | — | **fcitx5**（`/usr/bin/fcitx5`） |
+| Rime 用户目录 | `data/rime-test` | `~/.local/share/fcitx5/rime`（**全部软链**到 `~/vmacs/rime`） |
+| 共享数据 | 自备 `data/rime-shared` | `/usr/share/rime-data` ✓ |
+| librime | 自建 `third-party/librime` | `~/repos/librime` + `/usr/bin/rime_deployer` |
+
+**怎么连上的**：开发机 **没有** host-linux 的私钥（`~/.ssh/id_rsa` 服务端不认），
+但你的 ssh 会话把 gpg-agent（SSH 认证子钥 `4BFB0214B523B786`，对应
+`authorized_keys` 里的 `openpgp:0xB523B786`）**转发**到了本机：
+
+```bash
+# 找一个活的 agent 转发 socket，然后 ssh -p 8093 jixiuf@localhost
+SSH_AUTH_SOCK=/tmp/ssh-XXXX/agent.NNN ssh -p 8093 jixiuf@localhost hostname  # → host-linux
+```
+
+`scripts/deploy_host-linux.sh` 会自动找可用 socket、最小集打包、scp、远端备份+安装+重部署。
+
+**关键：不要往 Rime 用户目录拷文件**——那里全是软链，正确做法是更新 `~/vmacs/rime`
+（git 仓库，好回滚），再为**新增的根级文件**（`lm_rerank.tsv/.meta`）在 Rime 目录补软链。
+
+**实测只需传 16 个文件**（6 个共有词库文件两边 md5 完全一致，不用传；
+解包前先 md5 对过）：schema/dict 包装 3 个 + lua 2 个 + 档位词表 9 个 + LM 表 2 个。
+
+**验证（在 host-linux 上用它的 `rime_api_console` 跑）**：
+
+| 输入 | 结果 |
+|---|---|
+| `e` / `q` / `yi` | 有 / 我 / 就 ✓ |
+| `jintiandetianqizenmeyang` | 今天的天气怎么样 ✓ |
+| `wojintianmeiyoukong` | 我今天没有空 ✓（LM 重排生效） |
+| `wokanshiqiaomai` | 我看是荞麦 ✓（LM 重排生效） |
+| `ckwan` / `taiwan` | 台湾 / 台湾 ✓ |
+
+**踩坑**： `rime_deployer --build <用户目录>` 的 `shared_data_dir` 默认是**当前目录**，
+不给就会报 `resource could not be loaded: symbols` / `failed to include section
+symbols:punctuator`（连你的 `egret_wubi` 方案一起编译失败）。必须传全：
+`rime_deployer --build <用户目录> /usr/share/rime-data <用户目录>/build`。
+
 ### 4.13 ⭐ LM 只重排、不参与分词（**纯 Lua 实现，不改 librime**）
 
 **最终方案**：把 LM 从 librime 搬到 Lua 层。librime 只按词库权重分词，LM 只对整句候选重排。

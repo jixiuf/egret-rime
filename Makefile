@@ -38,7 +38,7 @@ PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
 
 GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram
 
-.PHONY: bundle setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram
+.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -144,6 +144,9 @@ deploy: $(GRAM)
 # 一键刷新：用 data/input 下最新语料增量刷新全部产物（抽取→清洗→词频→词典→gram→验证）
 bundle:           ## 打出可拷到其它机器的运行时部署包 (dist/*.tar.gz)
 	bash scripts/deploy_bundle.sh
+
+deploy-remote:    ## 部署到远程 Rime 机器（默认 jixiuf@localhost:8093）
+	bash scripts/deploy_remote.sh $(HOST) $(PORT)
 
 refresh:          ## 一键刷新全部产物（增量，可直接重跑）
 	bash scripts/refresh.sh
