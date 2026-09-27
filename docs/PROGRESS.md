@@ -218,6 +218,59 @@ SSH_AUTH_SOCK=/tmp/ssh-XXXX/agent.NNN ssh -p 8093 jixiuf@localhost hostname  # �
 symbols:punctuator`（连你的 `egret_wubi` 方案一起编译失败）。必须传全：
 `rime_deployer --build <用户目录> /usr/share/rime-data <用户目录>/build`。
 
+### 4.15 部署到 host-linux（已实装并验证）
+
+**环境**（不是 macOS）：Gentoo Linux + fcitx5，Rime 用户目录
+`~/.local/share/fcitx5/rime`。
+
+**❗ 关键前提：新架构需要 librime ≥ 1.17**
+
+| librime | `max_sentences` 配置键 | `MakeSentences` 符号 | 后果 |
+|---|---|---|---|
+| 1.16.1（host-linux 原装） | ✗ | ✗ | 只能给出 **1 个**整句候选 → 重排无从下手，
+而且 grammar 被关掉 → 退化成纯权重（`ckwan→台万`） |
+| **1.17.0** | ✓ | ✓ | 20 个整句候选 → LM 重排生效（`ckwan→台湾`） |
+
+判据：`strings <librime.so> | grep -c max_sentences`（1.16.1 为 0）。
+
+**处理**：把 host-linux 的系统 librime 从 1.16.1 升到 1.17.0：
+```bash
+# 1.17.0 在 gentoo 仓库里但被 ~amd64 mask
+printf 'app-i18n/librime ~amd64\napp-i18n/librime-lua ~amd64\napp-i18n/librime-octagram ~amd64\n' \
+  > /etc/portage/package.accept_keywords/rime-1.17
+sudo emerge -1 '=app-i18n/librime-1.17.0'     # 同时重建 lua / octagram 插件
+```
+注意：远端 shell 是 **zsh**，`=app-i18n/...` 会被 zsh 当成 `=cmd` 展开 →
+必须用 `bash -c '... "=app-i18n/librime-1.17.0"'` 或转义。
+
+**升级副作用**：`librime-octagram`（::local 包）编译失败（C++ 模板约束错），
+但**旧的 octagram.so 仍可加载**，且我们的方案不用 grammar（Lua 里把它指向了
+不存在的语言），实测 8/8 用例全过。你其它方案若依赖 grammar，可后续重建该包。
+
+**部署方式（按用户要求：目录自包含，不软链 vmacs）**：
+`scripts/deploy_host-linux_direct.sh`：
+1. 整目录备份 → `~/rime-backup-<时间戳>.tar.gz`
+2. 把现有软链**实体化**（`cp -aL`，保留你其它方案与用户词典；*.gram 保持软链）
+3. 覆盖 16 个运行时文件
+4. `rime_deployer --build <用户目录> /usr/share/rime-data <用户目录>/build`
+5. 重启 fcitx5（`setsid fcitx5 -d`）
+
+**验证（host-linux，系统 librime 1.17.0）8/8 通过**：
+`e→有` / `q→我` / `yi→就` / `jintiandetianqizenmeyang→今天的天气怎么样` /
+`wojintianmeiyoukong→我今天没有空` / `wokanshiqiaomai→我看是荞麦` /
+`ckwan→台湾` / `taiwan→台湾`
+
+**踩坑**：
+1. `rime_deployer --build <用户目录>` 的 shared_data_dir 默认是**当前目录**，
+   必须显式传 `/usr/share/rime-data`，否则 `failed to include section symbols:punctuator`
+   （会连带把你其它方案一起编译失败）。
+2. **失败的部署会留下半成品 build**（prism.bin 新、table.bin 旧）→ 表现是
+   "输入法激活但没中文"。碰到这个先 `rm -rf build` 重跑部署。
+3. ssh 命令里加 `-n` 会吞掉 heredoc 的 stdin（远端什么都不执行），
+   用 heredoc 时不要加 `-n`。
+4. 判定候选类型要用 `c:get_dynamic_type()`（返回 "Sentence"/"Phrase"）；
+   `c.type` 在部分版本对句子返回小写 "sentence"，不可靠。
+
 ### 4.13 ⭐ LM 只重排、不参与分词（**纯 Lua 实现，不改 librime**）
 
 **最终方案**：把 LM 从 librime 搬到 Lua 层。librime 只按词库权重分词，LM 只对整句候选重排。

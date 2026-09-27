@@ -130,18 +130,4 @@ end
 
 
 --- 调试：打印整句候选及其 LM 分数（由 dynamic_translator 按配置开启）
-function M.debug(cands, input)
-    local n = 0
-    for _, c in ipairs(cands) do
-        if c:get_dynamic_type() == "Sentence" then
-            n = n + 1
-            if n <= 12 then
-                log.error(string.format("[LMDBG] %s #%d score=%-8.0f %s",
-                    input, n, M.score(c.text), c.text))
-            end
-        end
-    end
-    log.error(string.format("[LMDBG] %s sentence_cands=%d", input, n))
-end
-
 return M
