@@ -111,6 +111,18 @@ do_build() {
   log "构建 librime + 插件 (octagram, lua)"
   src="$THIRD/librime"
   mkdir -p "$src/plugins"
+  # 应用 egret 本地补丁（不是上游内容，必须显式打）：
+  #   librime-rerank-only.patch = 「LM 只做重排、不参与分词」的实验开关，
+  #   由 schema 的 grammar/rerank_only 控制（默认关，不影响上游行为）。
+  #   实测全拼句子还原 16% -> 26%，见 docs/PROGRESS.md §4.11。
+  for p in "$ROOT"/scripts/patches/*.patch; do
+    [ -f "$p" ] || continue
+    if git -C "$src" apply --check "$p" 2>/dev/null; then
+      git -C "$src" apply "$p" && ok "已应用补丁 $(basename "$p")"
+    else
+      ok "补丁 $(basename "$p") 已应用或无需应用"
+    fi
+  done
   ln -sfn ../../librime-octagram "$src/plugins/librime-octagram"
   ln -sfn ../../librime-lua "$src/plugins/librime-lua"
   rm -rf "$src/build"; mkdir -p "$src/build"; cd "$src/build"

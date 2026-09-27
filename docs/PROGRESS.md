@@ -174,6 +174,38 @@ return entry_weight + (grammar ? grammar->Query(context, text, is_rear) : kPenal
 2. 换词级 gram / 训练更干净的语料（当前 char 级证据太泛）
 3. docs §6 的 `always_make_sentences` + 重排 lua：让 LM 只做候选重排、不参与分词
 
+### 4.12 ⭐ 新机制：LM 只重排、不参与分词（已实现并调优）
+
+方向 3 落地为一个 **librime 源码补丁**（存在仓库里，`make setup` 会自动打）：
+
+```
+scripts/patches/librime-rerank-only.patch   # 改 poet.h / poet.cc，157 行
+  开关（schema 的 grammar 段，默认关，不影响上游行为）:
+    grammar/rerank_only: true     # 搜索阶段不计 LM（等价无-gram），末态按 LM 重排
+    grammar/rerank_margin: 5      # 保守重排：LM 只优于无-LM 结果 >=5 分时才改
+```
+
+**效果（同一 200 句固定评测集）**：
+
+| 配置 | 黄金 | 句子还原 |
+|---|---:|---:|
+| 原配置（LM 参与分词） | **20/20** | 32/200 (16%) |
+| 无 gram | 18/20 | 47/200 (24%) |
+| rerank_only，margin=0 | 19/20 | 43/200 (22%) |
+| **rerank_only，margin=5** | 18/20 | **52/200 (26%)** |
+| rerank_only，margin=10 / 20 / 60 | 18/20 | 48 / 47 / 48 |
+
+→ **句子还原 16% → 26%（+62% 相对提升）**，证明“把 LM 从分词决策里拿出来”是对的。
+→ 代价：黄金用例 20/20 → 18/20（丢 `时代广场→时代光场`、`我今天没有空→我进甜美有空`，
+   两者靠 LM 参与分词才能对）。
+→ margin 是“信任 LM 的程度”：0=完全交给 LM（43/19），越大越退回无-gram（47-48/18）。
+
+**默认仍为关（保持 20/20 基线）**；要启用就在 `egret.common.yaml` 的 `grammar:` 里加上述两行。
+
+**踩坑（写这个补丁时）**：`vector v(line.components().begin(), line.components().end())`
+—— 两次调用 `components()` 会生成两个不同临时对象，begin/end 属于不同容器 → UB，
+实测直接 core dump（`std::length_error`）。必须先 `auto c = line.components();`。
+
 **调参可复现命令**：
 ```bash
 # 改罚分: egret.common.yaml 的 grammar 段 → 重跑评测
@@ -185,7 +217,7 @@ export PATH=/opt/rh/gcc-toolset-12/root/usr/bin:$PATH
 cd third-party/librime/build && cmake --build . -j 8 --target rime
 ```
 
-### 4.12 开源语料接入（可持续扩展）
+### 4.13 开源语料接入（可持续扩展）
 - 参考 **RIME-LMDG**（万象 gram 工厂）：维基链路 `gensim extract_pages +
   filter_wiki + OpenCC t2s`（145 万篇）；短句化 = **标点断句 + 只留汉字**。
 - 清单位于 `scripts/corpus/open_sources.tsv`（TAB 分隔：name/dataset/glob/体积/许可/用途），
