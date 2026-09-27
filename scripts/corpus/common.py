@@ -123,6 +123,27 @@ def sha256_file(path, chunk=1 << 20):
     return h.hexdigest()
 
 
+def file_key(path, hints=None):
+    """为文件生成增量 key。
+
+    优先级：
+      1) hints（同步清单的 oss_key md5，内容寻址且免读文件）
+      2) 小文件（<64MB）：sha256（内容寻址，能真正去重；文稿类都是小的）
+      3) 大文件：size+mtime 指纹——sha256 一个 16GB 语料包要读完整盘，
+         而大语料包本来就几乎不可能重复，不值得这个 IO 代价
+    """
+    name = os.path.basename(path)
+    if hints and name in hints:
+        return hints[name]
+    try:
+        st = os.stat(path)
+    except OSError:
+        return sha256_file(path)
+    if st.st_size < 64 * 1024 * 1024:
+        return sha256_file(path)
+    return f"sz{st.st_size}-mt{int(st.st_mtime)}"
+
+
 def load_epms_keys(manifest=SYNC_MANIFEST):
     """同步清单: 文件名 -> 内容寻址 key（oss_key 的 md5 段）。"""
     keys = {}
@@ -165,3 +186,70 @@ def human(n):
         if n < 1000 or unit == "G":
             return f"{n:.1f}{unit}" if unit else str(n)
         n /= 1000.0
+
+
+class BloomFilter:
+    """内存有界的判重集合（位数组 + k 个哈希），代价是可配置误判率。
+
+    为什么需要：全量语料（30k+ 本书）的短句行数可达十亿量级，
+    Python set 需几十 GB（每条 ~40B）→ 必然 OOM。
+    布隆过滤器 ~10 bit/条 能把 10 亿条压到 ~1GB。
+
+    语义：`add_if_new(h)` 返回 True 表示“之前未见过”。误判只会把新的
+    当成旧的（宁少不混），因此不会写入重复行，只是极少量新行被丢弃。
+    """
+
+    def __init__(self, capacity=1_000_000_000, fp_rate=0.02):
+        import math
+        import numpy as np
+        self.nbits = max(1 << 20, int(-capacity * math.log(fp_rate)
+                                      / (math.log(2) ** 2)))
+        self.k = max(1, min(8, int(round(self.nbits / capacity * math.log(2)))))
+        self.bits = np.zeros((self.nbits + 7) // 8, dtype=np.uint8)
+        self.n = 0
+
+    def add_if_new(self, h):
+        h1 = h & 0xFFFFFFFFFFFFFFFF
+        h2 = ((h >> 33) | (h << 31)) & 0xFFFFFFFFFFFFFFFF
+        bits, nbits, new = self.bits, self.nbits, False
+        for i in range(self.k):
+            byte, bit = divmod((h1 + i * h2) % nbits, 8)
+            mask = 1 << bit
+            if not (bits[byte] & mask):
+                bits[byte] |= mask
+                new = True
+        if new:
+            self.n += 1
+        return new
+
+    def add_batch_if_new(self, hashes):
+        """批量判定：hashes 为 list[int] → 返回 numpy bool 数组（True=新的）。
+
+        为何批量：逐条 Python 循环 k=6 次取模只有 ~0.4M 条/s，
+        十亿级行数要跑一个多小时；numpy 向量化后可到几千万条/s。
+        同批内重复不会被发现（可接受：下一批会捉住）。
+        """
+        import numpy as np
+        h = np.asarray(hashes, dtype=np.uint64)
+        h1 = h & np.uint64(0xFFFFFFFF)
+        h2 = (h >> np.uint64(32)) | np.uint64(1)
+        idx = np.arange(self.k, dtype=np.uint64)
+        pos = ((h1[:, None] + idx[None, :] * h2[:, None])
+               % np.uint64(self.nbits))
+        byte = (pos >> np.uint64(3)).astype(np.int64)
+        bitv = (np.uint64(1) << (pos & np.uint64(7))).astype(np.uint8)
+        present = np.all((self.bits[byte] & bitv) != 0, axis=1)
+        new = ~present
+        if new.any():
+            nb = byte[new]
+            nv = bitv[new]
+            # 按列置位：比 np.bitwise_or.at 快很多。代价：同批内两行命中
+            # 同一个字节时只置一次（少量位丢失 → 后续误判率略升，可接受）
+            for j in range(self.k):
+                self.bits[nb[:, j]] |= nv[:, j]
+            self.n += int(new.sum())
+        return new
+
+    @property
+    def mem_mb(self):
+        return self.bits.nbytes / 2 ** 20

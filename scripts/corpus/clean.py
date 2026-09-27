@@ -83,6 +83,10 @@ KEEP_PARA = re.compile(r"[^\u4e00-\u9fff\u3400-\u4dbf" + PUNCT_OK + r"]")
 KEEP_SHORT = re.compile(r"[^\u4e00-\u9fff\u3400-\u4dbf]")
 SENT_SPLIT = re.compile(r"[。！？；!?;…]+|\n")
 
+# 去重用的 64 位掩码与分块行数
+HASH_MASK = (1 << 64) - 1
+CHUNK_LINES = 200_000
+
 
 def load_charset(name):
     """白名单：cjk-ext(默认) / cjk / 8105 / none。返回 str(正则模式) 或 set。"""
@@ -133,27 +137,53 @@ def load_t2s(enabled, tag=""):
 
 
 def h64(s):
-    """64 位内容哈希（blake2b）。crc32 只有 32 位，本量级会大量误判重复。"""
+    """64 位内容哈希（blake2b）。crc32 只有 32 位，本量级会大量误判重复。
+
+    仅用于索引/统计等需要可复现的场合；去重路径用内置 hash() 更快
+    （见 Cleaner._filter 与 merge），代价是跨进程不可复现——去重不需要。
+    """
     return int.from_bytes(hashlib.blake2b(s.encode("utf-8"),
                                           digest_size=8).digest(), "little")
 
 
 class Cleaner:
-    def __init__(self, charset, t2s_para=None, t2s_short=None):
+    def __init__(self, charset, t2s_para=None, t2s_short=None,
+                 dedup_capacity=250_000_000):
         self.para_f, self.short_f = make_filters(charset)
         self.t2s_para = t2s_para
         self.t2s_short = t2s_short
-        self.seen_para = set()
-        self.seen_short = set()
+        # 用有界布隆过滤器而非 set：全量语料行数可达十亿级，set 会 OOM
+        self.seen_para = C.BloomFilter(dedup_capacity)
+        self.seen_short = C.BloomFilter(dedup_capacity)
         self.stats = collections.Counter()
 
     def file(self, path):
-        """清洗一个文件 -> (para 行列表, short 句列表)。逐行流式，大文件安全。"""
-        paras, shorts = [], []
+        """清洗一个文件 -> (para 行列表, short 句列表)。
+
+        分块批处理：每 CHUNK_LINES 行做一次批量去重（布隆过滤器向量化）。
+        逐条调用布隆只有 ~0.4M/s，批量后可到几千万/s；同时内存有界。
+        """
+        out_p, out_s = [], []
+        bp, bs = [], []
         with open(path, encoding="utf-8") as f:
             for raw in f:
-                self.line(raw.rstrip("\n"), paras, shorts)
-        return paras, shorts
+                self.line(raw.rstrip("\n"), bp, bs)
+                if len(bp) + len(bs) >= CHUNK_LINES:
+                    out_p.extend(self._filter(bp, self.seen_para))
+                    out_s.extend(self._filter(bs, self.seen_short))
+                    bp, bs = [], []
+        out_p.extend(self._filter(bp, self.seen_para))
+        out_s.extend(self._filter(bs, self.seen_short))
+        return out_p, out_s
+
+    def _filter(self, items, seen):
+        """批量去重：返回其中的新条目。"""
+        if not items:
+            return items
+        keep = seen.add_batch_if_new([hash(x) & HASH_MASK for x in items])
+        n_keep = int(keep.sum())
+        self.stats["dupe"] += len(items) - n_keep
+        return [x for x, k in zip(items, keep) if k]
 
     def line(self, raw, paras, shorts):
         if not raw:
@@ -171,23 +201,20 @@ class Cleaner:
             return
         # para：保留原字形（繁体词形不能抹掉），供分词/词频
         p = self.para_f(self.t2s_para(line) if self.t2s_para else line)
-        if p and self.add(p, self.seen_para):
+        if p:
             paras.append(p)
         # short：转简后断句去标点，供字符 n-gram（统计集中）
         sline = self.t2s_short(line) if self.t2s_short else line
         for s in SENT_SPLIT.split(sline):
             s = self.short_f(s)
-            if len(s) < 2:
-                continue
-            if self.add(s, self.seen_short):
+            if len(s) >= 2:
                 shorts.append(s)
 
     def add(self, s, seen):
-        h = h64(s)
-        if h in seen:
+        # seen 为 BloomFilter：返回 True 表示“之前未见过”
+        if not seen.add_if_new(h64(s)):
             self.stats["dupe"] += 1
             return False
-        seen.add(h)
         return True
 
 
@@ -195,10 +222,11 @@ class Cleaner:
 _W = {}
 
 
-def _init_worker(charset, short_t2s, para_t2s):
+def _init_worker(charset, short_t2s, para_t2s, cap):
     _W["cleaner"] = Cleaner(load_charset(charset),
                             load_t2s(para_t2s, "整段"),
-                            load_t2s(short_t2s, "短句"))
+                            load_t2s(short_t2s, "短句"),
+                            dedup_capacity=max(1_000_000, cap))
 
 
 def _work(task):
@@ -220,8 +248,8 @@ def _work(task):
 
 
 # --- 合并（全局去重）--------------------------------------------------------
-def merge():
-    print("==> 合并分片（全局去重）")
+def merge(dedup_capacity=1_000_000_000):
+    print(f"==> 合并分片（全局去重，布隆容量 {dedup_capacity/1e9:.1f}e9）")
     t0 = time.time()
     for kind, outdir in (("para", PARA_DIR), ("short", SHORT_DIR)):
         sdir = os.path.join(SHARD_DIR, kind)
@@ -231,32 +259,48 @@ def merge():
                        for f in os.listdir(sdir) if f.endswith(".txt")})
         for fmt in fmts:
             shards = sorted(glob.glob(os.path.join(sdir, f"{fmt}.*.txt")))
-            if not shards:
-                continue
-            seen = set()
             out = os.path.join(outdir, f"{fmt}.txt")
+            # 关键：把**已有的最终产物**也当作一个输入分片。
+            # 否则增量运行时 merge 会用“仅新分片”覆盖旧产物，把历史数据丢掉。
+            inputs = ([out] if os.path.exists(out) else []) + shards
+            if len(inputs) <= (1 if os.path.exists(out) else 0):
+                continue
+            seen = C.BloomFilter(dedup_capacity)
             tmp = out + ".tmp"
             n_in = n_out = 0
+            batch = []
+
+            def flush(o):
+                nonlocal n_out
+                if not batch:
+                    return
+                keep = seen.add_batch_if_new([hash(x) & HASH_MASK
+                                              for x in batch])
+                for x, kp in zip(batch, keep):
+                    if kp:
+                        o.write(x)
+                        o.write("\n")
+                        n_out += 1
+                batch.clear()
+
             with open(tmp, "w", encoding="utf-8") as o:
-                for sh in shards:
+                for sh in inputs:
                     with open(sh, encoding="utf-8") as f:
                         for line in f:
                             line = line.rstrip("\n")
                             if not line:
                                 continue
                             n_in += 1
-                            h = h64(line)
-                            if h in seen:
-                                continue
-                            seen.add(h)
-                            o.write(line)
-                            o.write("\n")
-                            n_out += 1
+                            batch.append(line)
+                            if len(batch) >= CHUNK_LINES:
+                                flush(o)
+                flush(o)
             os.replace(tmp, out)
             for sh in shards:
                 os.remove(sh)
-            print(f"  {kind}/{fmt}: {n_in} -> {n_out} 行"
-                  f"（去重 {n_in-n_out}）  {os.path.getsize(out)/2**20:.1f} MB")
+            tag = "含旧产物" if inputs[0] == out else "仅分片"
+            print(f"  {kind}/{fmt}: {n_in} -> {n_out} 行（去重 {n_in-n_out}, {tag}）"
+                  f"  {os.path.getsize(out)/2**20:.1f} MB  布隆 {seen.mem_mb:.0f}MB")
     print(f"合并用时 {(time.time()-t0)/60:.1f} min")
 
 
@@ -302,6 +346,8 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--no-merge", action="store_true")
     ap.add_argument("--merge-only", action="store_true")
+    ap.add_argument("--dedup-capacity", type=float, default=1.0e9,
+                    help="布隆过滤器容量（条）；worker 按其 1/jobs 分配")
     args = ap.parse_args()
 
     th = C.throttle(args.nice)
@@ -314,7 +360,7 @@ def main():
         os.remove(CLEAN_INDEX)
 
     if args.merge_only:
-        merge()
+        merge(int(args.dedup_capacity))
         return
 
     idx = index_load()
@@ -329,7 +375,7 @@ def main():
     print(f"待清洗: {len(todo)}   已处理: {len(idx)}")
     if args.dry_run or not todo:
         if not args.no_merge:
-            merge()
+            merge(int(args.dedup_capacity))
         return
 
     t0 = time.time()
@@ -338,7 +384,8 @@ def main():
     try:
         with cf.ProcessPoolExecutor(
                 max_workers=args.jobs, initializer=_init_worker,
-                initargs=(args.charset, args.short_t2s, args.para_t2s)) as ex:
+                initargs=(args.charset, args.short_t2s, args.para_t2s,
+                          int(args.dedup_capacity / max(1, args.jobs)))) as ex:
             for rec in ex.map(_work, todo, chunksize=16):
                 writer.add(**rec)
                 done += 1
@@ -356,7 +403,7 @@ def main():
     print(f"清洗完成: ok={ok} err={err} 用时 {(time.time()-t0)/60:.1f} min")
 
     if not args.no_merge:
-        merge()
+        merge(int(args.dedup_capacity))
 
 
 if __name__ == "__main__":

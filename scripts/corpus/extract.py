@@ -98,7 +98,7 @@ def build_tasks(roots, force=False, limit=0):
         if handler is None:
             unknown.append((rel, ext))
             continue
-        key = hints.get(os.path.basename(path)) or C.sha256_file(path)
+        key = C.file_key(path, hints)
         if key in seen:
             dup += 1
             continue

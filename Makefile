@@ -38,7 +38,7 @@ PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
 
 GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram
 
-.PHONY: setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list
+.PHONY: setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -116,6 +116,16 @@ tier:             ## 切档: make tier TIER=core|base|full
 	$(PYTHON) scripts/gen_dict_tiers.py --tier $(TIER)
 	$(PYTHON) scripts/set_tier.py $(TIER)
 	@echo "已切到 $(TIER) 档；重新部署: make deploy（或 make test-rebuild 本地验证）"
+
+# C2 权重回归：用语料词频把词条权重压回 0-1000（与字库/LM 同尺度）
+reweight:         ## 用语料词频重写词条权重（先跑 corpus-freq）
+	$(PYTHON) scripts/reweight_from_corpus.py --dry-run
+	@read -p "确认写入? [y/N] " a; [ "$$a" = y ] || exit 1
+	$(PYTHON) scripts/reweight_from_corpus.py
+
+# LM 评测：黄金 + 句子级（全拼还原）
+eval-gram:        ## AB 评测各套 gram（默认比 essay-bgc vs 自训）
+	$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 100
 
 # --- 部署到输入法 -----------------------------------------------------------
 deploy: $(GRAM)

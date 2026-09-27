@@ -14,6 +14,9 @@
 #   bash scripts/refresh.sh --list          # 列出各阶段与当前状态
 #   bash scripts/refresh.sh --full          # 全量重建（清中间产物，耗时最长）
 #   bash scripts/refresh.sh --jobs 4 --nice 15
+#   bash scripts/refresh.sh --loop 30       # 常驻：每 30 分钟增量刷新一次（语料持续下载）
+#
+# 并发保护: 用 flock 防止两个 refresh 同时跑（会互相踩分片）
 #
 # 阶段:
 #   fetch    下载/更新开源语料（fetch_open + wiki dump，断点续传）
@@ -45,6 +48,7 @@ FULL=0
 FROM=""
 ONLY=""
 LIST=0
+LOOP=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -53,12 +57,19 @@ while [ $# -gt 0 ]; do
     --jobs) JOBS="$2"; shift 2 ;;
     --nice) NICE="$2"; shift 2 ;;
     --tier) TIER="$2"; shift 2 ;;
+    --loop) LOOP="$2"; shift 2 ;;
     --full) FULL=1; shift ;;
     --list) LIST=1; shift ;;
-    -h|--help) sed -n '2,30p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,32p' "$0"; exit 0 ;;
     *) echo "未知参数: $1"; exit 1 ;;
   esac
 done
+
+# 防重入：同时在跑两个 refresh 会互相踩分片
+if command -v flock >/dev/null 2>&1; then
+  exec 9>"$LOG/.refresh.lock"
+  flock -n 9 || { echo "另一个 refresh 正在运行，退出"; exit 0; }
+fi
 
 STAGES=(fetch extract clean freq dict gram verify)
 
@@ -104,6 +115,7 @@ if [ "$LIST" = 1 ]; then
 fi
 
 # 阶段顺序过滤
+run_stages() {
 run_from=1
 [ -n "$FROM" ] && run_from=0
 for i in "${!STAGES[@]}"; do
@@ -140,21 +152,24 @@ for i in "${!STAGES[@]}"; do
       fi
       ;;
     freq)
-      log "阶段 freq：词频统计（增量）"
-      if [ -x "$ROOT/scripts/corpus/freq.py" ] || [ -f "$ROOT/scripts/corpus/freq.py" ]; then
-        "$PY" "$ROOT/scripts/corpus/freq.py" --jobs "$JOBS" --nice "$NICE" >>"$RUNLOG" 2>&1 \
-          && ok "词频统计完成" || warn "freq 失败（见日志）"
-      else
-        warn "scripts/corpus/freq.py 尚未实现，跳过"
-      fi
+      log "阶段 freq：用语料重扫词频（Aho-Corasick，分钟级）"
+      bash "$ROOT/scripts/corpus/recount.sh" >>"$RUNLOG" 2>&1 \
+        && ok "词频重扫完成" || warn "重扫失败（见日志）"
       ;;
     dict)
-      log "阶段 dict：词典（分档 + gen）"
+      log "阶段 dict：权重回归 + 分档 + gen"
+      if [ -s "$ROOT/data/corpus/freq/recount_full.txt" ]; then
+        "$PY" "$ROOT/scripts/reweight_from_corpus.py" \
+          --freq "$ROOT/data/corpus/freq/recount_full.txt" >>"$RUNLOG" 2>&1 \
+          && ok "词权重已按语料回归" || warn "权重回归失败"
+      else
+        warn "无重扫词频（先跑 freq 阶段），跳过权重回归"
+      fi
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "分档词表已生成" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "已切到 $TIER 档" || warn "切档失败"
-      if [ -f "$ROOT/scripts/gen_dict_tiers.py" ] && [ "${SKIP_GEN:-0}" != 1 ]; then
+      if [ "${SKIP_GEN:-0}" != 1 ]; then
         "$PY" "$ROOT/scripts/gen_wubi_py_unified_dicts.py" >>"$RUNLOG" 2>&1 \
           && ok "方案词库 gen 完成" || warn "gen 失败（见日志；可能是源文件缺失）"
       fi
@@ -176,6 +191,18 @@ for i in "${!STAGES[@]}"; do
       ;;
   esac
 done
+}
+
+if [ "$LOOP" -gt 0 ]; then
+  log "常驻模式：每 $LOOP 分钟增量刷新一次（Ctrl-C 或 kill 本进程退出）"
+  while true; do
+    run_stages
+    log "本轮结束，休眠 $LOOP 分钟"
+    sleep $((LOOP * 60))
+  done
+else
+  run_stages
+fi
 
 log "刷新结束"
 echo "    日志: $RUNLOG"

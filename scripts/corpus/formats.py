@@ -205,7 +205,8 @@ class HtmlHandler(Handler):
 # --- JSONL / NDJSON（可 gzip）------------------------------------------------
 # 常见字段名，按优先级取第一个命中的：正文 / 标题
 TEXT_FIELDS = ("text", "content", "body", "article", "document", "raw",
-               "sentence", "passage", "abstract")
+               "sentence", "passage", "abstract", "summary",
+               "description", "desc", "intro", "completion", "output")
 TITLE_FIELDS = ("title", "headline", "name", "subject")
 
 
