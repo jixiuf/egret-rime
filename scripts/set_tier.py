@@ -24,7 +24,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 
-WRAPPERS = ["egret_wubi_py.dict.yaml", "egret_wubi.dict.yaml"]
+WRAPPERS = ["egret_wubi_py.dict.yaml", "egret_wubi.dict.yaml", "egret_py.dict.yaml"]
 TIERS = ("core", "base", "full")
 
 # 历史直引 -> 分档文件（首次切档时归一）

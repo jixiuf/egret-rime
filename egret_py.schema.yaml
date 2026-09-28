@@ -1,0 +1,95 @@
+#   -*- coding: utf-8 -*-
+# 白鹭全拼（egret_py）—— 纯拼音方案。
+#
+# 两个用途：
+#   ① 直接当全拼输入法用（词典由本仓库语料管线生成）
+#   ② 作为五笔方案「`+拼音」反查的词典来源（egret.common.yaml:reverse_lookup_pinyin），
+#      上游同款做法：五笔方案里 ` 反查拼音、拼音方案里 ` 反查笔画。
+schema:
+  schema_id: egret_py
+  name: "白鹭全拼"
+  version: "1.0"
+  author:
+    - 發明人 jixiuf
+  description: |
+    Egret 白鹭全拼 —— 用本仓库生成的拼音字/词表（语料词频回归权重）。
+    既可单独当全拼输入法，也是五笔方案反查用的词典。
+  dependencies:
+    - stroke # builtin: hspnz(一丨丿丶乙)
+__include: egret.common.yaml:editor
+__include: egret.common.yaml:switches
+__include: egret.common.yaml:opencc
+__include: egret.common.yaml:guide
+__include: egret.common.yaml:lua_config
+
+speller:
+  alphabet: "zyxwvutsrqponmlkjihgfedcba'"
+  delimiter: " '"
+  max_code_length: 4
+  auto_select: false
+  algebra:
+    __patch:
+      - egret.common.yaml:algebra_remove_pinyin_tone
+
+translator:
+  dictionary: egret_py
+  prism: egret_py
+  enable_user_dict: true
+  db_class: tabledb            # 拼音侧自学习调频
+  user_dict: egret_py.user.dict
+  enable_completion: false
+  enable_sentence: true
+  max_sentences: 100           # 注意 librime 会 clamp 到 [1,100]
+  max_homophones: 7
+  initial_quality: 1
+  # 注：**不加 grammar** —— 实测全拼路径带 gram 反而更差（13~16% vs 24%），
+  # 见 docs/PROGRESS.md §4.9；混流方案（egret_wubi_py）才用 LM 重排。
+
+reverse_lookup:
+  __patch:
+    - egret.common.yaml:reverse_lookup_stroke   # `+hspnz 反查笔画
+
+engine:
+  processors:
+    - lua_processor@*select_character
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - script_translator
+    - reverse_lookup_translator@reverse_lookup
+    - lua_translator@*date_translator
+    - lua_translator@*lunar
+    - lua_translator@*number_translator
+    - lua_translator@*unicode
+  filters:
+    - simplifier@emoji
+    - reverse_lookup_filter@wubi_comment   # ★ 打拼音时显示候选的五笔码（学五笔）
+    - lua_filter@*long_word_filter
+    - lua_filter@*reduce_emoji_filter
+    - simplifier@traditionalize
+    - uniquifier
+
+abc_segmentor:
+  extra_tags:
+    - reverse_lookup
+
+# 候选注释显示五笔编码（librime 原生 reverse_lookup_filter，见 egret_wubi_py.schema.yaml）
+wubi_comment:
+  tags: [ abc ]
+  dictionary: egret_wubi
+  overwrite_comment: true
+  comment_format:
+    - "xform/[ ].*$//"
+    - "xform/^/ /"

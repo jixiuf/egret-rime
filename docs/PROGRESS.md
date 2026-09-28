@@ -614,6 +614,34 @@ jintiande → 今天的 / 今天 wygd   de → 胡 de
 3. 自写 Lua filter + 反向索引（`set_comment` 对 Phrase 生效 ✓，与 `set_text` 不同）——**能用但没必要**，
    原生组件已覆盖 ✓（用户明确要求"非必要少用 Lua"）。
 
+### 4.21 词库组织梳理 + 生成产物移出 git
+
+**背景**：整族改名后出现 `egret_wubi_wubi_words_*`（生成器前缀笔误）等冗余；且
+`dicts/` 里 30+MB 的分档词表在 git 里频繁变动、diff 噪声大。
+
+**三个库的分工（现已清晰）**：
+| 库 | 角色 | schema |
+|---|---|---|
+| `egret_wubi` | 形码确定性层（86 显式简码/全码/词组码，table_translator 置顶） | egret_wubi.schema.yaml（内部辅助，只为编译词库） |
+| `egret_py` | 读音层（纯全拼，也是「`+拼音」反查的词典源） | egret_py.schema.yaml（白鹭全拼） |
+| `egret_wubi_py` | 混流层（五笔码+拼音音节，script_translator 组句 + LM） | egret_wubi_py.schema.yaml（主方案） |
+
+**处置**：
+- **删除**：`egret_wubi_wubi_words_{core,base,full}`（改名笔误，无人引用）
+- **生成器修正**：`gen_dict_tiers.py` 传统库改为 `kind=words + prefix=egret_wubi`
+  → 产出 `egret_wubi_words_{tier}`（与 wrapper 的 import 一致）
+- **移出 git**（`.gitignore`，工作区文件保留）：三族分档词表 9 个（~33MB）
+  + 拼音词表中间产物 `egret_wubi_py_pinyin_base_small`（1.2MB）
+- **仍入 git**（源数据）：字表层、`egret_wubi_words.dict.yaml`（86 造词码源）、
+  `wb86_wangxiang_cn_dicts/*`、`wubi86/*`、`*_8105`、用户短语、整句词库（需语料，重建成本高）
+
+**可复现性已验证**：删光全部 9 个分档表 → `bash scripts/refresh.sh --only dict` 全部重建
+→ 黄金 20/20 ✓。Makefile 的 `env-test` 加了自愈守卫（缺失时自动跑一次 dict 阶段），
+新克隆 `make test` 也能直接通过。
+
+**新增能力（本轮）**：`egret_py` 纯全拼方案（`nihao → 你好 wqvb` 顺带显示五笔码）；
+混合方案点亮「`+拼音」反查（`` `wo' `` → 我/握/沃 + 五笔码注释）；拼音方案里 ` = 反查笔画。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |

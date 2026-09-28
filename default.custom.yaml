@@ -1,6 +1,7 @@
 patch:
   schema_list:
     - schema: egret_wubi_py
+    - schema: egret_py        # 纯全拼（也是 `+拼音 反查的词典来源）
 
   menu/page_size: 6
 

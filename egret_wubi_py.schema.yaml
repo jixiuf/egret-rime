@@ -76,6 +76,8 @@ engine:
     #   first: egret_wubi 传统五笔库（简码/全码/词组显式码，唯一候选置顶）
     #   then:  custom_phrase(混合库 table) + translator(混合库 script+LM 组句)
     #   混合库同时含五笔码与拼音音节 → 句中五笔/拼音混合输入
+    # 「`+拼音」反查：打出拼音候选并显示其五笔码（词典 egret_py，见 egret_py.dict.yaml）
+    - reverse_lookup_translator@reverse_lookup
     - lua_translator@*dynamic_translator
   filters:
   # 长词优先 (即wq 后 第4个词的长度必然大于第1个候选,即提升部分长词到第4，5个选项)
@@ -195,3 +197,8 @@ wubi_comment:
   comment_format:
     - "xform/[ ].*$//"              # 一个字有多个五笔码时只显示第一个
     - "xform/^/ /"                  # 前面留空格，与候选文本视觉分隔
+
+# 「`+拼音」反查（`` `wo' `` → 候选带五笔码注释）。词典是 egret_py（脚本生成的拼音表）。
+reverse_lookup:
+  __patch:
+    - egret.common.yaml:reverse_lookup_pinyin

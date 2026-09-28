@@ -1,0 +1,20 @@
+#   -*- coding: utf-8 -*-
+# Rime dictionary: egret_py（白鹭全拼）
+#
+# 用途：
+#   ① 纯拼音输入方案的字/词库（egret_py.schema.yaml）
+#   ② 五笔方案「`+拼音」反查的词典来源（egret.common.yaml:reverse_lookup_pinyin）
+#
+# 来源：本仓库自建语料管线产出的拼音表（scripts/gen_pinyin_words.py 用 pypinyin
+# 从仓库内五笔词表现场标注 + 语料词频回归权重），不依赖外部万象词库。
+# 词表随 `make tier TIER=core|base|full` 切换（scripts/set_tier.py）。
+---
+name: egret_py
+version: "2026.09.29"
+sort: by_weight
+use_preset_vocabulary: false
+import_tables:
+  - dicts/egret_wubi_py/egret_wubi_py_pinyin_8105        # 字表：8105 常用字，无调音节
+  - dicts/egret_wubi_py/egret_wubi_py_pinyin_words_base  # 词表：按档位（core/base/full）切换
+  - dicts/egret_wubi_py/egret_wubi_py_user_phrases       # 手工维护的短语
+...

@@ -63,6 +63,11 @@ $(GRAM):
 
 # --- 测试环境（仓库内自包含，等价于 macOS 的 ~/rime-test）-------------------
 env-test:
+	@# 分档词表是生成产物（不入 git，见 .gitignore）：缺失时自动跑一次 dict 阶段，
+	@# 保证新克隆 `make test` 也能通过（唯一入口仍是 scripts/refresh.sh）
+	@[ -f "$(REPO)/dicts/egret_wubi_py/egret_wubi_py_words_base.dict.yaml" ] || \
+	  { echo "生成产物缺失，自动跑 scripts/refresh.sh --only dict ..."; \
+	    bash "$(REPO)/scripts/refresh.sh" --only dict >/dev/null 2>&1 || true; }
 	@mkdir -p $(TEST_DIR)/build
 	@for f in $(REPO)/*.yaml; do \
 		case "$$(basename $$f)" in \

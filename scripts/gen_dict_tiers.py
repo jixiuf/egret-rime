@@ -111,7 +111,7 @@ def main():
         # (kind, 源, 说明, 文件名前缀)
         # 传统库（86 造词码）2016-09 改名为 egret_wubi_*（与 schema/根包装一致，对齐上游）
         ("words", SRC_WUBI, "混合库五笔词（万象逗号码）", "egret_wubi_py"),
-        ("wubi_words", SRC_WUBI_TRAD, "传统库五笔词（86 造词码）", "egret_wubi"),
+        ("words", SRC_WUBI_TRAD, "传统库五笔词（86 造词码）", "egret_wubi"),   # 注意 kind 用 words + 前缀 egret_wubi -> egret_wubi_words_{tier}
         ("pinyin_words", SRC_PINYIN, "拼音词（无调音节）", "egret_wubi_py"),
     ]
     tiers = list(TIERS) if args.tier == "all" else [args.tier]
