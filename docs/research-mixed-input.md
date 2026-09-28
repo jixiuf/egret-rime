@@ -57,7 +57,7 @@
 
 ### 2.1 传统库开组句 → 五笔短码序列立刻能组句（仅纯五笔，见上方修正）
 
-`egret_wubi_py_wubi.enable_sentence: true` 后（配合已有的 `enable_completion: true`）：
+`egret_wubi.enable_sentence: true` 后（配合已有的 `enable_completion: true`）：
 
 ```
 qktqn    → 我吃饭      ← q(我) + kt→吃(ktn 补全) + qn→饭(qnr 补全)
@@ -124,7 +124,7 @@ qktnqnrb → 我吃饭了     trwuktnqnr → 我们吃饭
 
 ```yaml
 # egret_wubi_py.schema.yaml
-egret_wubi_py_wubi:              # 传统五笔库
+egret_wubi:              # 传统五笔库
   enable_sentence: false         # ← R1 要开（开了五笔短码才能组句，但拼音会有垃圾句）
   enable_completion: true        # ★ 短码补全的关键（kt→吃 ktn）
   initial_quality: 1000          # ★ 恒压混合库（P4 的直接原因）

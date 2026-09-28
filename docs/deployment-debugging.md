@@ -129,7 +129,7 @@ printf 'tffu\n\n' | ~/repos/librime/build/bin/rime_api_console
   子目录化后根包装未同步 → 传统库编译失败）。
 - 在软链目录内 `ln -sf` 会自引用覆盖源文件（毁过 dynamic_translator.lua）。
   正确姿势：先 `rm` 再 `ln -s`。
-- 用户目录下根包装 `egret_wubi_py.dict.yaml`、`egret_wubi_py_wubi.dict.yaml`
+- 用户目录下根包装 `egret_wubi_py.dict.yaml`、`egret_wubi.dict.yaml`
   均应为软链 → 本仓库（`~/repos/egret-rime`）检出路径（其他平台同理）。
 
 ## 6. librime 本地构建

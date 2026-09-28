@@ -6,7 +6,7 @@
 # 五笔支持长句，单字全码不足4码时 可以","结尾
 
 # 2026-09 v5 架构（双词库双翻译器，编码空间彻底分离）:
-#   - first_translator: egret_wubi_py_wubi 传统结构五笔库（显式简码/全码/词组码，无派生
+#   - first_translator: egret_wubi 传统结构五笔库（显式简码/全码/词组码，无派生
 #     短码 → 每码唯一条目 → 简码/全码首候选绝对确定，码表=wubi86.dict.yaml 传统表）
 #   - 混合库 egret_wubi_py（五笔字词+拼音音节）: script_translator 混合分词 + LM
 #     组句 → 句中五笔/拼音混合连续输入；custom_phrase 出字词候选
@@ -24,7 +24,7 @@ schema:
     # 独立仓库版: 已剥离 egret_py/egret_wubi 反查依赖(原仓库另有这两方案),
     # stroke 为共享数据内置
     - stroke # builtin: hspnz(一丨丿丶乙)
-    - egret_wubi_py_wubi    # 传统五笔库(first_translator 置顶用)
+    - egret_wubi    # 传统五笔库(first_translator 置顶用)
 __include: egret.common.yaml:editor
 __include: egret.common.yaml:switches
 __include: egret.common.yaml:opencc
@@ -73,7 +73,7 @@ engine:
     - lua_translator@*number_translator  # R 输入大写数字
     - lua_translator@*unicode              # Unicode
     # 顶层调度翻译器（lua 只做转发排序）：
-    #   first: egret_wubi_py_wubi 传统五笔库（简码/全码/词组显式码，唯一候选置顶）
+    #   first: egret_wubi 传统五笔库（简码/全码/词组显式码，唯一候选置顶）
     #   then:  custom_phrase(混合库 table) + translator(混合库 script+LM 组句)
     #   混合库同时含五笔码与拼音音节 → 句中五笔/拼音混合输入
     - lua_translator@*dynamic_translator
@@ -95,7 +95,7 @@ engine:
 
 # ---- 顶层调度：first=传统五笔库，先于混合库，保证简码/全码首候选确定 ----
 dynamic_translator:
-  first_translator: table_translator@egret_wubi_py_wubi
+  first_translator: table_translator@egret_wubi
   table_translator: table_translator@custom_phrase
   script_translator: script_translator@translator
   # LM 只重排、不参与分词（纯 Lua，不改 librime）：
@@ -114,10 +114,10 @@ dynamic_translator:
 
 # ---- 传统五笔库（简码表+全码+词组显式码，每码唯一条目）----
 # 注意: 配置块键必须与 first_translator 的 @tag 一致;
-# dictionary 不支持子目录路径, 指向用户目录根的 egret_wubi_py_wubi.dict.yaml
-egret_wubi_py_wubi:
-  dictionary: egret_wubi_py_wubi
-  prism: egret_wubi_py_wubi
+# dictionary 不支持子目录路径, 指向用户目录根的 egret_wubi.dict.yaml
+egret_wubi:
+  dictionary: egret_wubi
+  prism: egret_wubi
   enable_user_dict: true       # 造词（历史码=传统规则，兼容）
   enable_encoder: true
   encode_commit_history: true
@@ -127,7 +127,7 @@ egret_wubi_py_wubi:
   enable_completion: true
   initial_quality: 1000        # 置顶（词典内同码词组按权重排序）
   db_class: userdb             # 用户词典必须 userdb(LevelDB) 才能造词/调频; tabledb 只读!
-  user_dict: egret_wubi_py_wubi.user.dict
+  user_dict: egret_wubi_py_wubi.user.dict   # 名字故意不改：保住用户已有造词/调频记录（build/egret_wubi_py_wubi.user.dict.userdb）
   # 造词取码规则(与词库生成规则一致): 2字=2+2, 3字=2+1+1, 4字=1x4, 5字+=2+1+1
   encoder:
     rules:
@@ -146,7 +146,7 @@ custom_phrase:
   dictionary: egret_wubi_py
   prism: egret_wubi_py
   enable_user_dict: true
-  enable_encoder: false        # 造词由 egret_wubi_py_wubi 的编码器负责
+  enable_encoder: false        # 造词由 egret_wubi 的编码器负责
   encode_commit_history: false
   enable_sentence: false
   enable_completion: false
@@ -190,7 +190,7 @@ abc_segmentor:
 # 反查词典用传统五笔库（字含一/二/三级简码与全码，词含标准词组码）
 wubi_comment:
   tags: [ abc ]
-  dictionary: egret_wubi_py_wubi    # 反查用它：字含一/二/三级简码与全码，词含标准词组码
+  dictionary: egret_wubi    # 反查用它：字含一/二/三级简码与全码，词含标准词组码
   overwrite_comment: true           # 覆盖其它提示（如补全标记）
   comment_format:
     - "xform/[ ].*$//"              # 一个字有多个五笔码时只显示第一个

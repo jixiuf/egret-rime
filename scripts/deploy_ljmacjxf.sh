@@ -161,8 +161,8 @@ SRC_DST=(
   "egret.common.yaml|egret.common.yaml"
   "egret_wubi_py.schema.yaml|egret_wubi_py.schema.yaml"
   "egret_wubi_py.dict.yaml|egret_wubi_py.dict.yaml"
-  "egret_wubi_py_wubi.schema.yaml|egret_wubi_py_wubi.schema.yaml"
-  "egret_wubi_py_wubi.dict.yaml|egret_wubi_py_wubi.dict.yaml"
+  "egret_wubi.schema.yaml|egret_wubi.schema.yaml"
+  "egret_wubi.dict.yaml|egret_wubi.dict.yaml"
   "data/gram/lm_rerank.tsv|lm_rerank.tsv"
   "data/gram/lm_rerank.meta|lm_rerank.meta"
 )

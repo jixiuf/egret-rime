@@ -85,7 +85,7 @@ KNOWN_LM_CASES = [
 
 USERDB_DIRS = [
     "egret_wubi_py.user.dict.userdb",
-    "egret_wubi_py_wubi.user.dict.userdb",
+    "egret_wubi.user.dict.userdb",
 ]
 
 

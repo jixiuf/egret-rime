@@ -534,7 +534,7 @@ xietiaotujinsigequanmianzhanlvebuju → 协调推进四个全面战略布局
 **总根源**（此前多轮都在别的层面打转）：
 本方案的设计是「**一级简码只在传统库发**」——于是
 ```
-传统库字表 egret_wubi_py_wubi_chars:  我 → q(一级简码) / trn / trnt / trxy
+传统库字表 egret_wubi_chars:  我 → q(一级简码) / trn / trnt / trxy
 混合库字表 egret_wubi_py_chars:        我 → trx / trxy / trnt        ← 没有 q ✗
 ```
 而**组句是混合库的 script_translator 在 prism（拼写空间）上做的** →
@@ -591,7 +591,7 @@ filters:
   - reverse_lookup_filter@wubi_comment     # 放在 simplifier@traditionalize 之前（查简体文本）
 wubi_comment:
   tags: [ abc ]
-  dictionary: egret_wubi_py_wubi   # 反查用它：字含一/二/三级简码与全码，词含标准词组码
+  dictionary: egret_wubi   # 反查用它：字含一/二/三级简码与全码，词含标准词组码
   overwrite_comment: true          # 覆盖其它提示（如补全标记）
   comment_format:
     - "xform/[ ].*$//"             # 一个字有多个五笔码时只显示第一个 ★关键技巧

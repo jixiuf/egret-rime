@@ -326,7 +326,7 @@ def gen_chars():
             emitted.add(key)
             out += l + "\n"
             n += 1
-    # 一级简码由根包装（egret_wubi_py_wubi.dict.yaml）负责；
+    # 一级简码由根包装（egret_wubi.dict.yaml）负责；
     # 此处若发纯字母 token 会与拼音音节冲突（如 e：有 vs 额）
     os.makedirs(OUT_DIR, exist_ok=True)
     with open(os.path.join(OUT_DIR, "egret_wubi_py_chars.dict.yaml"), "w", encoding="utf-8") as f:
@@ -384,11 +384,11 @@ def gen_wubi_traditional():
       - 知频 8105 表（字权重：log 归一化 0..1000，不缩放）
       - base.small.dict.yaml（词组源，每字需要一个规范全码 canon 取码）
     输出（3 个文件）:
-      1. dicts/egret_wubi_py/egret_wubi_py_wubi_chars.dict.yaml
+      1. dicts/egret_wubi_py/egret_wubi_chars.dict.yaml
          （单字：显式一/二/三级简码 + 全码）
-      2. dicts/egret_wubi_py/egret_wubi_py_wubi_words.dict.yaml
+      2. dicts/egret_wubi_py/egret_wubi_words.dict.yaml
          （词组：显式词码 + 万象权重）
-      3. 仓库根 egret_wubi_py_wubi.dict.yaml（薄包装：encoder/rules
+      3. 仓库根 egret_wubi.dict.yaml（薄包装：encoder/rules
          造词规则 + import_tables 引入上述两数据文件 + 用户词组表；
          部署时软链到 Rime 用户目录根）
     """
@@ -490,9 +490,9 @@ def gen_wubi_traditional():
     n += nw
     # 薄包装(根) + 数据文件(dicts/): chars 与 words 分文件, 便于维护
     # 包装头: encoder 造词规则 + import_tables 引用两个数据文件
-    wrapper = header("egret_wubi_py_wubi", [
-        "传统结构五笔词库（供 table_translator@egret_wubi_py_wubi）：",
-        "  薄包装：数据在 dicts/egret_wubi_py_wubi_{chars,words}.dict.yaml",
+    wrapper = header("egret_wubi", [
+        "传统结构五笔词库（供 table_translator@egret_wubi）：",
+        "  薄包装：数据在 dicts/egret_wubi_{chars,words}.dict.yaml",
         "  字权重：语料表（知频）log 归一化 0..1000",
         "  词权重：万象词权重",
     ]).replace("...\n", "")
@@ -507,8 +507,8 @@ def gen_wubi_traditional():
     - length_in_range: [5, 10]
       formula: "AaAbYaZa"
 import_tables:
-  - dicts/egret_wubi_py/egret_wubi_py_wubi_chars
-  - dicts/egret_wubi_py/egret_wubi_py_wubi_words
+  - dicts/egret_wubi_py/egret_wubi_chars
+  - dicts/egret_wubi_py/egret_wubi_words
   - dicts/egret_wubi_py/egret_wubi_py_user_phrases
 ...
 """
@@ -518,19 +518,19 @@ import_tables:
         if not line or "\t" not in line:
             continue
         (word_entries if len(line.split("\t")[0]) >= 2 else char_entries).append(line)
-    with open(os.path.join(OUT_DIR, "egret_wubi_py_wubi_chars.dict.yaml"), "w", encoding="utf-8") as f:
-        f.write(header("egret_wubi_py_wubi_chars", [
+    with open(os.path.join(OUT_DIR, "egret_wubi_chars.dict.yaml"), "w", encoding="utf-8") as f:
+        f.write(header("egret_wubi_chars", [
             "传统五笔字表（一/二/三级简码 + 全码）",
-            "（由 ../../egret_wubi_py_wubi.dict.yaml 引入）",
+            "（由 ../../egret_wubi.dict.yaml 引入）",
         ]) + "\n".join(char_entries) + "\n")
-    with open(os.path.join(OUT_DIR, "egret_wubi_py_wubi_words.dict.yaml"), "w", encoding="utf-8") as f:
-        f.write(header("egret_wubi_py_wubi_words", [
+    with open(os.path.join(OUT_DIR, "egret_wubi_words.dict.yaml"), "w", encoding="utf-8") as f:
+        f.write(header("egret_wubi_words", [
             "传统五笔词组（经典 86 版造词码）",
-            "（由 ../../egret_wubi_py_wubi.dict.yaml 引入）",
+            "（由 ../../egret_wubi.dict.yaml 引入）",
         ]) + "\n".join(word_entries) + "\n")
-    with open(os.path.join(os.path.dirname(DICTS), "egret_wubi_py_wubi.dict.yaml"), "w", encoding="utf-8") as f:
+    with open(os.path.join(os.path.dirname(DICTS), "egret_wubi.dict.yaml"), "w", encoding="utf-8") as f:
         f.write(wrapper)
-        print("egret_wubi_py_wubi:", nchars, "char entries +", nw, "words (root wrapper + dicts/)")
+        print("egret_wubi:", nchars, "char entries +", nw, "words (root wrapper + dicts/)")
 
 
 

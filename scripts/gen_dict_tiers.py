@@ -19,7 +19,7 @@
 
 产物（dicts/egret_wubi_py/）：
     egret_wubi_py_words_{tier}.dict.yaml         混合库五笔词（万象逗号码，供 script_translator）
-    egret_wubi_py_wubi_words_{tier}.dict.yaml    传统库五笔词（86 造词码，供 table_translator）
+    egret_wubi_words_{tier}.dict.yaml    传统库五笔词（86 造词码，供 table_translator）
     egret_wubi_py_pinyin_words_{tier}.dict.yaml  拼音词（无调音节）
 
 切换：`make tier TIER=core|base|full`（改写两个包装 dict 的 import_tables）。
@@ -42,7 +42,7 @@ import rime_paths  # noqa: E402
 DICTS = rime_paths.DICTS
 OUT = os.path.join(DICTS, "egret_wubi_py")
 SRC_WUBI = os.path.join(DICTS, "wb86_wangxiang_cn_dicts", "base.dict.yaml")
-SRC_WUBI_TRAD = os.path.join(OUT, "egret_wubi_py_wubi_words.dict.yaml")
+SRC_WUBI_TRAD = os.path.join(OUT, "egret_wubi_words.dict.yaml")
 SRC_PINYIN = os.path.join(OUT, "egret_wubi_py_pinyin_base_small.dict.yaml")
 
 # tier -> 最低权重（含）。base 与现状一致：万象 base.small 用的是 > 450
@@ -82,9 +82,9 @@ def rows(path):
                 yield p[0], p[1], int(p[2])
 
 
-def write_tier(kind, src, tier, minw, note):
+def write_tier(kind, src, tier, minw, note, prefix="egret_wubi_py"):
     """按权重过滤写出一个档位文件，返回条目数。"""
-    name = f"egret_wubi_py_{kind}_{tier}"
+    name = f"{prefix}_{kind}_{tier}"
     out_path = os.path.join(OUT, name + ".dict.yaml")
     n = 0
     with open(out_path, "w", encoding="utf-8") as f:
@@ -108,30 +108,31 @@ def main():
         sys.exit(f"缺少源文件: {SRC_WUBI}")
 
     jobs = [
-        # (kind, 源, 说明)
-        ("words", SRC_WUBI, "混合库五笔词（万象逗号码）"),
-        ("wubi_words", SRC_WUBI_TRAD, "传统库五笔词（86 造词码）"),
-        ("pinyin_words", SRC_PINYIN, "拼音词（无调音节）"),
+        # (kind, 源, 说明, 文件名前缀)
+        # 传统库（86 造词码）2016-09 改名为 egret_wubi_*（与 schema/根包装一致，对齐上游）
+        ("words", SRC_WUBI, "混合库五笔词（万象逗号码）", "egret_wubi_py"),
+        ("wubi_words", SRC_WUBI_TRAD, "传统库五笔词（86 造词码）", "egret_wubi"),
+        ("pinyin_words", SRC_PINYIN, "拼音词（无调音节）", "egret_wubi_py"),
     ]
     tiers = list(TIERS) if args.tier == "all" else [args.tier]
 
-    for kind, src, note in jobs:
+    for kind, src, note, prefix in jobs:
         if not os.path.exists(src):
             print(f"  ! 跳过 {kind}: 源文件缺失 {src}")
             continue
         for tier in tiers:
             minw = TIERS[tier]
-            n = write_tier(kind, src, tier, minw, note)
+            n = write_tier(kind, src, tier, minw, note, prefix)
             print(f"  {kind:<14} {tier:<5} >= {minw:<4} {n:>7} 条")
 
     if args.tier == "all" or args.stats:
         print("\n档位规模合计（三套码相加）：")
         for tier in TIERS:
             tot = 0
-            for kind, src, _ in jobs:
+            for kind, src, _, prefix in jobs:
                 if not os.path.exists(src):
                     continue
-                p = os.path.join(OUT, f"egret_wubi_py_{kind}_{tier}.dict.yaml")
+                p = os.path.join(OUT, f"{prefix}_{kind}_{tier}.dict.yaml")
                 if os.path.exists(p):
                     tot += sum(1 for _ in rows(p))
             print(f"  {tier:<5} {tot:>8} 条  （{TIER_DESC[tier]}）")

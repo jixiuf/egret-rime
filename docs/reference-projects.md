@@ -117,7 +117,7 @@
   → 短语打分清洗(LMDG 滑动窗口脚本思路: 保留真实搭配)
   → 编码标注:
       拼音 → pypinyin 元数据(注意多音字, LMDG/pypinyin) 或汉字转拼音
-      五笔 → 单字全码表(egret_wubi_py_wubi_chars) 按字拆词取码
+      五笔 → 单字全码表(egret_wubi_chars) 按字拆词取码
              (deal_ice_dict_to_wubi_1.py / deal_super_2jian.py 逻辑)
   → 权重归一化(log-norm 0-1000, 统一刻度! 见 architecture 坑1)
   → import 到对应表 / 分类 cell 表

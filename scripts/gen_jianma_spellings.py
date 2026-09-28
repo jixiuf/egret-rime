@@ -18,7 +18,7 @@
   qktqn/qktnqnr → 我吃饭   qktnqnrb → 我吃饭了   qchifanle → 我吃饭了
   trwuchifan → 我们吃饭    jintiande… → 今天的天气怎么样    黄金 20/20 ✓
 
-来源：传统库字表 `egret_wubi_py_wubi_chars.dict.yaml`（权威简码表）
+来源：传统库字表 `egret_wubi_chars.dict.yaml`（权威简码表）
 幂等：已存在的 (字, 码) 不重复追加。
 """
 import os, sys
@@ -28,7 +28,7 @@ import rime_paths
 D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
 
 def main():
-    src=os.path.join(D,"egret_wubi_py_wubi_chars.dict.yaml")
+    src=os.path.join(D,"egret_wubi_chars.dict.yaml")
     dst=os.path.join(D,"egret_wubi_py_chars.dict.yaml")
     st=False; jm={}
     for line in open(src,encoding="utf-8"):

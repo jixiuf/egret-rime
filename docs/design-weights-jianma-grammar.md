@@ -21,7 +21,7 @@
 
 ## 1. 现状基线（实测数字）
 
-### 1.1 传统库（table_translator@egret_wubi_py_wubi，确定性空间）
+### 1.1 传统库（table_translator@egret_wubi，确定性空间）
 
 | 码长 | 条目数 | 说明 |
 |---|---|---|

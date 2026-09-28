@@ -54,7 +54,7 @@ fi
 SRC_DST=(
   "egret_wubi_py.schema.yaml|egret_wubi_py.schema.yaml"
   "egret_wubi_py.dict.yaml|egret_wubi_py.dict.yaml"
-  "egret_wubi_py_wubi.dict.yaml|egret_wubi_py_wubi.dict.yaml"
+  "egret_wubi.dict.yaml|egret_wubi.dict.yaml"
   "lua/dynamic_translator.lua|lua/dynamic_translator.lua"
   "lua/lm_rerank.lua|lua/lm_rerank.lua"
   "data/gram/lm_rerank.tsv|lm_rerank.tsv"

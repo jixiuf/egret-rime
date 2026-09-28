@@ -57,7 +57,7 @@ def main():
     # 1. 词库
     print("\n【1】词库  dicts/egret_wubi_py/  （每档同时含五笔码与拼音码）")
     active = ""
-    for w in ("egret_wubi_py.dict.yaml", "egret_wubi_py_wubi.dict.yaml"):
+    for w in ("egret_wubi_py.dict.yaml", "egret_wubi.dict.yaml"):
         p = os.path.join(REPO, w)
         if os.path.exists(p):
             m = re.search(r"egret_wubi_py_(?:words|wubi_words|pinyin_words)_(core|base|full)",

@@ -10,7 +10,7 @@ octagram 语法模型（gram）混流组句。传统结构五笔库保证简码/
 
 ```
 engine.translators (dynamic_translator lua 调度):
-  first  table_translator@egret_wubi_py_wubi   传统库: 简码/全码/词组显式码, 确定性
+  first  table_translator@egret_wubi   传统库: 简码/全码/词组显式码, 确定性
   then   table_translator@custom_phrase        用户词组
   then   script_translator@translator          混合库: 五笔字词 + 拼音音节 + gram 组句
   last   type=completion 补全候选(沉底)

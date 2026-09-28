@@ -4,7 +4,7 @@
 
 涉及文件：
     egret_wubi_py.dict.yaml        混合库（读音层）：字表 + 五笔词 + 拼音字/词
-    egret_wubi_py_wubi.dict.yaml   传统库（形码层）：字表 + 五笔词 + 用户词组
+    egret_wubi.dict.yaml   传统库（形码层）：字表 + 五笔词 + 用户词组
 
 同时把历史直引（wb86_wangxiang_cn_dicts/base.small、
 egret_wubi_py_pinyin_base_small）归一为分档文件，之后切档只改后缀。
@@ -24,7 +24,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 
-WRAPPERS = ["egret_wubi_py.dict.yaml", "egret_wubi_py_wubi.dict.yaml"]
+WRAPPERS = ["egret_wubi_py.dict.yaml", "egret_wubi.dict.yaml"]
 TIERS = ("core", "base", "full")
 
 # 历史直引 -> 分档文件（首次切档时归一）
@@ -37,7 +37,7 @@ LEGACY = {
 # 已分档的三种词表：把 (_core|_base|_full) 换成目标档
 TIERED = [
     r"dicts/egret_wubi_py/egret_wubi_py_words",
-    r"dicts/egret_wubi_py/egret_wubi_py_wubi_words",
+    r"dicts/egret_wubi_py/egret_wubi_words",
     r"dicts/egret_wubi_py/egret_wubi_py_pinyin_words",
 ]
 

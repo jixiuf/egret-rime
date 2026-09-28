@@ -113,8 +113,8 @@ translator:
 
 ```yaml
 wubi_py_wubi:
-  dictionary: egret_wubi_py_wubi
-  prism: egret_wubi_py_wubi
+  dictionary: egret_wubi
+  prism: egret_wubi
   enable_charset_filter: true     # 只出限定字符集字（配合 charset filter）
   enable_sentence: true           # 词组拼句（走 poet + grammar）
   sentence_over_completion: false # 整句优先于补全
@@ -123,7 +123,7 @@ wubi_py_wubi:
   max_phrase_length: 4            # 造词最长词长
   max_homographs: 1               # 同码词去重阈值
   enable_user_dict: true
-  user_dict: egret_wubi_py_wubi.user.dict
+  user_dict: egret_wubi.user.dict
   db_class: userdb                # 必须 userdb；tabledb 只读、调频失效
   enable_correction: false
 ```

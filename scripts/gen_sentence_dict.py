@@ -41,7 +41,7 @@ def main():
 
     # 每字的**最短码**（取字符表里最短的那个五笔码）
     best={}
-    for src in ("egret_wubi_py_wubi_chars.dict.yaml","egret_wubi_py_chars.dict.yaml"):
+    for src in ("egret_wubi_chars.dict.yaml","egret_wubi_py_chars.dict.yaml"):
         for ch,code,_ in rows(os.path.join(D,src)):
             if len(ch)!=1: continue
             c=code.split(",")[0].lower()
