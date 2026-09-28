@@ -11,12 +11,8 @@ __pycache__/
 *.pyc
 dist/
 
-# --- 词库生成产物（可由 refresh.sh --from dict 一键重建，不入 git）---
-# 三档词表：混合库五笔词 / 拼音词 / 传统库五笔词
-dicts/egret_wubi_py/egret_wubi_py_words_*.dict.yaml
-dicts/egret_wubi_py/egret_wubi_py_pinyin_words_*.dict.yaml
-dicts/egret_wubi_py/egret_wubi_words_*.dict.yaml
-!dicts/egret_wubi_py/egret_wubi_words.dict.yaml
-# 拼音词表中间产物（gen_pinyin_words.py 生成，再喂给 gen_dict_tiers.py）
+# --- 词库：**输入法实际用到的词典一律入 git**（部署与用户拿到的就是它们）---
+# 只有「纯中间产物」（不被任何 schema/wrapper import，仅喂给生成器）才不入 git：
 dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small.dict.yaml
+dicts/egret_wubi_py/egret_wubi_force_end.dict.yaml.tmp
 dicts/egret_wubi_py/egret_wubi_force_end.dict.yaml

@@ -60,7 +60,7 @@ def cal(src_name, dst_name, cap, drop_syllable_collision=False):
                 if line.rstrip()=="...": st=True
                 continue
             q=line.rstrip("\n").split("\t")
-            if len(q)>=3 and len(q[0])==1 and q[2].isdigit() and '\u4e00'<=q[0]<='\u9fff':
+            if len(q)>=3 and len(q[0])==1 and q[2].isdigit() and ord(q[0])>=0x3400:
                 n_tot+=1
                 if q[0] not in LM:
                     if drop_syllable_collision and q[1].lower() in SYL:

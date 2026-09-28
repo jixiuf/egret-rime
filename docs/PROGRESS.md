@@ -630,8 +630,11 @@ jintiande → 今天的 / 今天 wygd   de → 胡 de
 - **删除**：`egret_wubi_wubi_words_{core,base,full}`（改名笔误，无人引用）
 - **生成器修正**：`gen_dict_tiers.py` 传统库改为 `kind=words + prefix=egret_wubi`
   → 产出 `egret_wubi_words_{tier}`（与 wrapper 的 import 一致）
-- **移出 git**（`.gitignore`，工作区文件保留）：三族分档词表 9 个（~33MB）
-  + 拼音词表中间产物 `egret_wubi_py_pinyin_base_small`（1.2MB）
+- **移出 git**（`.gitignore`，工作区文件保留）：拼音词表中间产物
+  `egret_wubi_py_pinyin_base_small`（1.2MB，只喂给 gen_dict_tiers，不被任何 schema import）
+  > ❗ **政策修正（用户指出）**：**只要是输入法实际用到的词典（被 schema/wrapper import 的）
+  > 一律入 git** —— 部署与用户拿到的就是它们。所以三族分档词表 9 个 + egret_wubi_force_end
+  > **全部加回 git**；只有「纯中间产物」不入 git。
 - **仍入 git**（源数据）：字表层、`egret_wubi_words.dict.yaml`（86 造词码源）、
   `wb86_wangxiang_cn_dicts/*`、`wubi86/*`、`*_8105`、用户短语、整句词库（需语料，重建成本高）
 
@@ -679,6 +682,13 @@ ben  →  1. 𨸐 (它的五笔码就是 ben，混合库 weight=1)   2. 本(858)
 - 语料**未出现**的字 → 压到最低（五笔表 cap=1；拼音表 cap=60），保留输出能力
 - 实测待压低的量：混合库 2,586 条 / 传统库 1,651 条 / 拼音表 1,526 条
   （现有字表里 91% 的罕见字已经是权重 1，剩下这 ~1.4k 条才是"不一致"的部分）
+
+**⑤ 本轮踩的两个坑（重要）**
+1. `gen_char_weights.py` 的字符范围判断带了 `'\u4e00'<=c<='\u9fff'`（基本区）
+   → **扩展 A/B 的 4.3 万字全被跳过** ✗（所以 𨸐=ben 从未被处理）→ 已改为 `ord(c)>=0x3400`
+2. **把 33k 条生僻字拼音放进「混合库」会打乱分段** ✗（`qktnqnr` 直接无候选、黄金掉到
+   14/20）→ 生僻字拼音只应进**纯拼音方案** `egret_py`，**不进组句词典** ✗
+   （组句词典的拼写集合每变一次，分段结果就变一次，见 §4.19 的设计）
 
 **为什么本次未接入**：接入时我把 wrapper 的 import 行改坏了（挤掉 force_end 行 →
 逗号失效 ✗），且 ③ 未解决（`ben` 仍出 𨸐）→ **已全部回滚到绿色状态**
