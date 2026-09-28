@@ -154,6 +154,11 @@ for i in "${!STAGES[@]}"; do
       else
         ok "权重回归: 关闭（保持仓库内词库原值；实测 log1000 会破黄金用例）"
       fi
+      # 拼音词表：原方案依赖缺失的万象 base.small.dict.yaml（上游已迁移），
+      # 现改用 pypinyin 从仓库内五笔词表现场标注 —— 实测质量等价（同为 26%），
+      # 且让整条 dict 管线可复现（见 docs/PROGRESS.md）
+      "$PY" "$ROOT/scripts/gen_pinyin_words.py" --tier "$TIER" >>"$RUNLOG" 2>&1 \
+        && ok "拼音词表已生成（pypinyin 标注，可复现）" || warn "拼音词表生成失败"
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
