@@ -230,6 +230,52 @@ sudo emerge -1 '=app-i18n/librime-1.17.0'     # 同时重建 lua / octagram 插�
 4. 判定候选类型要用 `c:get_dynamic_type()`（返回 "Sentence"/"Phrase"）；
    `c.type` 在部分版本对句子返回小写 "sentence"，不可靠。
 
+### 4.10b 部署到 host-mac（macOS + Squirrel，已实装并验证）
+
+**环境**：macOS 15.7.4 / arm64，Squirrel（2026-09-28 升级后内置 librime **1.17.0**，
+升级前是 1.16.0），ssh 走本机 agent 转发：`jixiuf@localhost:8092`
+（端口是 mac 侧 RemoteForward 来的）。Rime 用户目录 `~/Library/Rime`
+（原本 yaml/dicts/lua/opencc 全软链到 `~/vmacs/rime`）。
+
+**脚本**：`scripts/deploy_host-mac.sh`（参照 host-linux_direct，按用户要求直接部署到
+`~/Library/Rime`、写成实体文件）
+
+1. 整目录备份 → `~/rime-backup-<时间戳>.tar.gz`（软链按软链存，回滚只需 `--rollback`）
+2. 根级软链实体化（`cp -aL`；`*.gram` 与 `sync` 保持软链）——含 `dicts/ lua/ opencc/`
+3. 覆盖 24 个运行时文件（含**全部 15 个** egret_wubi_py 词库，旧环境还缺其中 11 个）
+4. `"$SQUIRREL/Contents/MacOS/rime_deployer" --build ~/Library/Rime \
+     /Library/Input\ Methods/Squirrel.app/Contents/SharedSupport ~/Library/Rime/build`
+5. **默认不重启 Squirrel**（用户要求：文件到位即可）；`--restart` 才重启
+6. 自检：在 `~/.egret-check` 里跑 `~/repos/librime/build/bin/rime_api_console`（1.17），
+   不动 `~/Library/Rime/build`（避免与 Squirrel 前端的 build 产物互相干扰）
+
+**验证（Squirrel 升到 librime 1.17.0 后，1.17 console 8/8 通过）**：`e→有` / `q→我` /
+`yi→就` / `tffu→等` / `khlg→中国` / `jintiandetianqizenmeyang→今天的天气怎么样` /
+`wojintianmeiyoukong→我今天没有空` / `wokanshiqiaomai→我看是荞麦`；
+另、`ckwan→台湾`、`taiwan→台湾`、`q→我` 单跑也过（**`ckwan→台湾` 是 1.17 才有的效果**——
+1.16 时整句只 1 个候选，LM 重排无从下手，会出「台万」）。
+
+**踩坑**：
+1. **Squirrel 升级前内置 librime 1.16.0 < 1.17** → 新架构（LM 只重排）长句只有 1 个
+   候选，重排不生效（与 §4.10 的 host-linux 同因）；脚本会显式告警。升到 1.17.0 后
+   自动变成“可生效”，无需改方案。判据：`strings librime.1.dylib | grep -c max_sentences`。
+2. **macOS 没有 GNU `timeout`**：写了个 `run_timeout`（后台 + 看门狗）。看门狗子 shell
+   必须 `>/dev/null 2>&1`，否则它持有命令替换的管道写端 → `OUT=$(run_timeout ...)`
+   会一直等到看门狗超时才返回（表现为“脚本卡住”，实测卡 10+ 分钟）。
+   （另、macOS bash 3.2 把 `$SL（` 里的全角括号当成变量名字符 → `unbound variable`，
+   变量后紧跟中文一律写成 `${SL}`。）
+3. **用户目录里的 key_bindings.yaml 会遮蔽新版 Squirrel 的共享版**：新版
+   `SharedSupport/default.yaml` 有 `selector: __include: key_bindings:/rotate_candidate_with_tab`，
+   而 `~/Library/Rime/key_bindings.yaml`（旧副本，缺该键）优先 → `error building config: default`，
+   `build/default.yaml` 停留在旧版（方案列表仍正常，但新 Squirrel 的默认改动不生效）。
+   修法：用 `SharedSupport/key_bindings.yaml` 覆盖用户副本（diff 验证过旧副本无独有内容）。
+4. 自检不要直接在 `~/Library/Rime` 里跑 1.17 console：会在 Squirrel 的 build 上重建，
+   可能留下与 1.16 不兼容的产物。用 scratch 目录 + 软链用户文件（build 用 scratch 自己的）。
+5. 首次在全新 scratch 目录里 deploy 可能报 `[deploy] failure`，再跑一次（或显式
+   `rime_deployer --build`）即可；`build` 目录保留着就是热重建，别每次 `rm -rf`。
+6. 备份体积：软链实体化后整目录 tar 约 144MB（含 dicts 副本）；`*.gram`（≈290MB）不入包。
+   `--keep-links` 则不实体化，写入会穿透软链落到 `~/vmacs/rime`。
+
 ### 4.11 ⭐ LM 只重排、不参与分词（**纯 Lua 实现，不改 librime**）
 
 **最终方案**：把 LM 从 librime 搬到 Lua 层。librime 只按词库权重分词，LM 只对整句候选重排。

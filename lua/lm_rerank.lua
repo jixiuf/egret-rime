@@ -13,7 +13,7 @@
 
 local M = {}
 
-local MAX_N = 4                 -- 最多用到的 n-gram 长度
+local MAX_N = 6                 -- 最多用到的 n-gram 长度（与生成器一致）
 local MISS_PENALTY = -20000     -- 连 unigram 都没有时的兜底罚分
 local LOG_TOTAL = nil           -- log(总字数)*1000，来自 .meta；用于 unigram 概率
 
@@ -130,6 +130,37 @@ end
 
 
 --- 调试：打印整句候选及其 LM 分数（由 dynamic_translator 按配置开启）
+--- 给一段文本按**给定上下文**打分（供 py_composer 在搜索中使用）。
+function M.score_segment(context, text)
+    if not tab or not text or text == "" then return 0 end
+    local ctx = {}
+    for _, cp in utf8.codes(context or "") do ctx[#ctx + 1] = utf8.char(cp) end
+    local total = 0
+    for _, cp in utf8.codes(text) do
+        local ch = utf8.char(cp)
+        local best
+        for L = 4, 2, -1 do
+            if #ctx >= L - 1 then
+                local tail = table.concat(ctx, "", #ctx - (L - 1) + 1, #ctx)
+                local v, vp = tab[tail .. ch], tab[tail]
+                if v and vp then
+                    local c = v - vp
+                    if not best or c > best then best = c end
+                end
+            end
+        end
+        local u = tab[ch]
+        local pu = u and (u - LOG_TOTAL) or MISS_PENALTY
+        -- 返回"上下文增益"：条件概率相对 unigram 的提升。
+        -- 这样逐字累加不会随句长单调增长，可与词的一元 LM 相加。
+        local gain = best and (best - pu) or 0
+        total = total + gain
+        ctx[#ctx + 1] = ch
+        if #ctx > 8 then table.remove(ctx, 1) end
+    end
+    return total
+end
+
 --- 限制“展示”的整句数量：重排后只留前 keep 个在首位，
 -- 其余整句挪到候选流尾部（仍可翻页找到，但不污染首屏）。
 -- 为何需要：max_sentences 开大是为了给重排足够候选，但直接展示会让

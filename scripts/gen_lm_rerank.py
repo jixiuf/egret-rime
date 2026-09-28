@@ -36,16 +36,21 @@ def main():
         rime_paths.GRAM_DIR, "zh-hans-egret.2_6gram.tsv"))
     ap.add_argument("--out", default=os.path.join(
         rime_paths.GRAM_DIR, "lm_rerank.tsv"))
-    ap.add_argument("--top2", type=int, default=300_000)
-    ap.add_argument("--top3", type=int, default=200_000)
-    ap.add_argument("--top4", type=int, default=100_000)
+    # 扩容：5/6gram 是"跨词搭配"的关键证据（如 P(理|钟经) 类三元组）,
+    # 而旧版只到 4gram 且总量仅 60 万条，大量格子被丢弃
+    ap.add_argument("--top2", type=int, default=600_000)
+    ap.add_argument("--top3", type=int, default=600_000)
+    ap.add_argument("--top4", type=int, default=400_000)
+    ap.add_argument("--top5", type=int, default=200_000)
+    ap.add_argument("--top6", type=int, default=100_000)
     args = ap.parse_args()
 
     if not os.path.exists(args.src):
         sys.exit(f"缺少 n-gram 聚合数据: {args.src}\n"
                  f"先跑 scripts/corpus/gram.sh 生成")
 
-    want = {2: args.top2, 3: args.top3, 4: args.top4}
+    want = {2: args.top2, 3: args.top3, 4: args.top4,
+            5: args.top5, 6: args.top6}
     heaps = {n: [] for n in want}          # 每个长度维护 top-K 小顶堆
     char_count = {}                        # 1-gram 频次（从 2gram 前缀累加）
 
@@ -93,7 +98,7 @@ def main():
         f.write(f"entries={kept}\n")
         f.write(f"total_chars={total_chars}\n")
     print(f"输入 {total:,} 条 → 输出 {kept:,} 条（含 1gram {len(char_count):,}）")
-    for n in (2, 3, 4):
+    for n in (2, 3, 4, 5, 6):
         got = sum(1 for k, _ in rows if len(k) == n)
         print(f"  {n}gram: {got:,}")
     print(f"表: {args.out}  {os.path.getsize(args.out)/2**20:.1f} MB")

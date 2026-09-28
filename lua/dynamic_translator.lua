@@ -65,6 +65,47 @@ function dynamic.init(env)
         end
     end
 
+    -- 纯 Lua 的拼音搜索器：让 LM 参与剪枝（而不是只做事后重排，见 lua/py_composer.lua）
+    -- 注意：翻译器侧插入自建候选会被引擎在输入中途提交（实测把 jintiande 切成
+    -- jinti|ande），所以默认关闭；正式路径走 lua_filter（见 lua/compose_filter.lua）
+    env.lm_compose = config:get_bool(env.name_space .. "/lm_compose_translator")
+    if env.lm_compose then
+        local ok, cmod = pcall(require, "py_composer")
+        if ok and cmod then
+            local dir = rime_api.get_user_data_dir()
+            local ok2, info = cmod.load(dir)
+            if ok2 then
+                env.composer = cmod
+                log.warning("[dynamic_translator] py_composer 就绪 " .. tostring(info))
+            else
+                log.warning("[dynamic_translator] py_composer 载入失败: " .. tostring(info))
+            end
+        else
+            log.warning("[dynamic_translator] py_composer 模块缺失")
+        end
+    end
+
+    -- 可行性探针：验证能否按音节串查词典并拿到权重
+    if config:get_bool(env.name_space .. "/lm_probe") then
+        local st = Component.Translator(env.engine, "", script_translator_name)
+        if st and st.dict then
+            for _, code in ipairs({"taiwan", "tai wan", "wo men", "women", "ck iy", "ckiy", "ck,f0 iy,ox", "tai1wan"}) do
+                local it = st.dict:lookup_words(code, true, 5)
+                local n = 0
+                if it then
+                    for e in it:iter() do
+                        n = n + 1
+                        log.error(string.format("[PROBE] %-10s -> %s w=%s", code,
+                            tostring(e.text), tostring(e.weight)))
+                    end
+                end
+                if n == 0 then log.error("[PROBE] " .. code .. " -> (无)") end
+            end
+        else
+            log.error("[PROBE] script_translator 或 dict 不可用")
+        end
+    end
+
     env.first_translator = first_translator_name
         and Component.Translator(env.engine, "", first_translator_name) or nil
     env.table_translator = Component.Translator(env.engine, "", table_translator_name)
@@ -113,8 +154,40 @@ function dynamic.func(input, seg, env)
         end
     end
     collect(env.script_translator:query(input, seg), script_cands, false)
+
+    -- 纯拼音长输入：用小 Lua 搜索器（LM 参与剪枝）的结果置顶，
+    -- librime 自己的候选全部保留在后面（不影响五笔/混流路径）
+    -- 只在「整段输入」时用自建搜索器：引擎会按 tag 把输入切成片段调用翻译器，
+    -- 若对片段做整句搜索，候选项只覆盖片段 → 首候选全烂（实测 0/160）
+    -- 先摘掉 librime 自己的整句候选：实测「我们的候选 + librime 整句候选」共存时
+    -- 引擎会在中途提交（输入被切成 jinti|ande 两段），置顶也就失效
+    if env.composer and env.lm_rerank and #input >= 4 and input:match("^[a-z]+$") then
+        local kept = {}
+        for _, c in ipairs(script_cands) do
+            if c:get_dynamic_type() ~= "Sentence" then kept[#kept + 1] = c end
+        end
+        script_cands = kept
+    end
+    if env.composer and env.lm_rerank and env.engine.context.input == input
+       and #input >= 4 and input:match("^[a-z]+$") then
+        local ok, res = pcall(env.composer.compose, input, env.lm,
+                              env.compose_beam or 8, env.compose_want or 2)
+        if ok and res and #res > 0 then
+            for i = #res, 1, -1 do
+                if res[i].text ~= "" then
+                    table.insert(script_cands, 1,
+                                 Candidate("compose", seg.start, seg._end,
+                                           res[i].text, ""))
+                end
+            end
+            log.error(string.format("[LMDBG] seg=%s ctx=%s [%s,%s] compose#1=%s",
+                input, tostring(env.engine.context.input),
+                tostring(seg.start), tostring(seg._end), res[1].text))
+        end
+    end
     -- LM 只重排：把整句候选按 n-gram 表打分重排（不改变与其它候选的分组关系）
     if env.lm_rerank and env.lm then
+        if env.lm_debug then env.lm.debug(script_cands, "PRE:" .. input) end
         env.lm.rerank_sentences(script_cands)
         -- 重排后只把最佳整句留在首位，其余整句挪到尾部（避免首屏全是一字之差的整句）
         env.lm.limit_sentences(script_cands, env.lm_keep_sentences or 1)

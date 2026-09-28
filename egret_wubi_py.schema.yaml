@@ -81,6 +81,7 @@ engine:
   # 长词优先 (即wq 后 第4个词的长度必然大于第1个候选,即提升部分长词到第4，5个选项)
   # 见下面 long_word_filter 相关配置
     - simplifier@emoji                              # Emoji 彩色or 黑白
+    - lua_filter@*compose_filter   # LM 搜索器结果改写整句候选
     - lua_filter@*long_word_filter
     - lua_filter@*reduce_emoji_filter   # 按需启用，作用是降低Emoji在候选项中的位置排序(顺序要求：Emoji > 降低排序)
     - charset_filter                   # 默认隐藏CJK扩展区生僻字(2026-09实测: 否则混合库权重1的
@@ -99,6 +100,11 @@ dynamic_translator:
   lm_rerank: true
   lm_rerank_table: lm_rerank.tsv
   lm_rerank_debug: false
+  lm_probe: false
+  lm_compose: false
+  lm_compose_translator: false
+  compose_beam: 8
+  compose_want: 2
   lm_keep_sentences: 1        # 首屏只留 1 个整句，其余挪到尾部
 
 # ---- 传统五笔库（简码表+全码+词组显式码，每码唯一条目）----
@@ -154,7 +160,7 @@ custom_phrase:
 translator:
   always_make_sentences: true    # 实验: 精确词匹配也让 grammar 参与裁决
   # LM 重排需要多个“按权重排序”的整句候选；这两个值越大候选越多（也越慢）
-  max_sentences: 20
+  max_sentences: 300
   sentence_cutoff_threshold: 0.5
   dictionary: egret_wubi_py
   prism: egret_wubi_py

@@ -82,6 +82,26 @@ def log_norm(counts):
             for w, c in counts.items()}
 
 
+def make_log_mapper(freq, floor_count=1):
+    """把权重改成与 LM 表同一尺度的 log(1+count)*1000。
+
+    为什么这样最好（全局视角）：
+      - LM 分数就是 log(count) 尺度；词典权重原来被归一化到 0-1000，
+        两者量纲不同 → 无法融合、也无法比较
+      - log 尺度天然满足"两个词权重差 = 它们的对数概率比"，正是组句该用的量
+      - 语料没命中的词给 0（最低），不会凭空获得权重
+    """
+    import math
+
+    def map_weight(word, old):
+        c = freq.get(word)
+        if c is None:
+            return 0
+        return max(0, int(round(math.log(1 + c) * 1000)))
+
+    return map_weight
+
+
 def make_mapper(freq, band, unknown_band):
     lo, hi = band
     ulo, uhi = unknown_band
@@ -169,6 +189,9 @@ def main():
     ap.add_argument("--unknown-band", default="100,300",
                     help="语料未命中词（长尾）的权重区间")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--scale", choices=["band", "log1000"], default="band",
+                    help="band=归一到 0-1000（旧）；log1000=log(1+count)*1000"
+                         "（与 LM 同尺度，推荐）")
     ap.add_argument("--char-scale", type=float, default=1.0,
                     help="拼音字表缩放系数（默认 1.0=不动；0.35 与五笔字表一致）")
     ap.add_argument("--char-cap", type=int, default=0,
@@ -184,11 +207,16 @@ def main():
 
     counts = load_freq(args.freq)
     freq = log_norm(counts)
+    globals()["counts"] = counts
     print(f"词频来源: {args.freq}")
     print(f"  {len(counts)} 词（最高频次 {max(counts.values()) if counts else 0}）")
     print(f"映射: 命中 {band[0]}~{band[1]}（按语料 log-norm）  "
           f"未命中 {uband[0]}~{uband[1]}（按万象权重的相对序）")
-    mapper = make_mapper(freq, band, uband)
+    if args.scale == "log1000":
+        mapper = make_log_mapper(counts)
+        print("映射: log(1+count)*1000（与 LM 表同尺度）")
+    else:
+        mapper = make_mapper(freq, band, uband)
 
     files = sorted({f for pat in PATTERNS for f in glob.glob(pat)})
     if not files:

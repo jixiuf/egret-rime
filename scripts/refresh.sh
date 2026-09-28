@@ -150,8 +150,11 @@ for i in "${!STAGES[@]}"; do
         && ok "n-gram 统计完成" || warn "gram 失败（见日志）"
       if [ -s "$ROOT/data/gram/zh-hans-egret.2_6gram.tsv" ]; then
         "$PY" "$ROOT/scripts/gen_lm_rerank.py" >>"$RUNLOG" 2>&1 \
-          && ok "Lua 重排表已生成（data/gram/lm_rerank.tsv）" \
-          || warn "重排表生成失败"
+          && ok "Lua LM 表已生成（data/gram/lm_rerank.tsv）" \
+          || warn "LM 表生成失败"
+        "$PY" "$ROOT/scripts/gen_py_tables.py" --tier "$TIER" >>"$RUNLOG" 2>&1 \
+          && ok "Lua 搜索器词表已生成（py_words/py_syllables）" \
+          || warn "词表生成失败"
       fi
       ;;
     artifacts)
