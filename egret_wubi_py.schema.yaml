@@ -127,7 +127,7 @@ egret_wubi:
   enable_completion: true
   initial_quality: 1000        # 置顶（词典内同码词组按权重排序）
   db_class: userdb             # 用户词典必须 userdb(LevelDB) 才能造词/调频; tabledb 只读!
-  user_dict: egret_wubi_py_wubi.user.dict   # 名字故意不改：保住用户已有造词/调频记录（build/egret_wubi_py_wubi.user.dict.userdb）
+  user_dict: egret_wubi.user.dict   # 2026-09 随整族改名；部署脚本会把旧 userdb 迁移过来，见 deploy_*.sh
   # 造词取码规则(与词库生成规则一致): 2字=2+2, 3字=2+1+1, 4字=1x4, 5字+=2+1+1
   encoder:
     rules:
