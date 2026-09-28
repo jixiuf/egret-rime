@@ -53,7 +53,6 @@ for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
   [ -e "$f" ] || continue
   SRC_DST+=("dicts/egret_wubi_py/$(basename "$f")|dicts/egret_wubi_py/$(basename "$f")")
 done
-done
 
 for pair in "${SRC_DST[@]}"; do
   s="${pair%%|*}"
