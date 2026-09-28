@@ -38,32 +38,13 @@ echo "==> agent socket: $SOCK"
 
 # 要部署的文件：源(仓库内) | 目标(Rime 目录相对路径)
 SRC_DST=()
-# 目标是把对端做成「自包含」：把我们这套运行时文件整体放过去，不再依赖 vmacs。
-# 组成：
-#   1) 本仓库顶层方案与配置（user.yaml 是用户态，不覆盖）
-#   2) lua/ 全部组件
-#   3) dicts/egret_wubi_py/ 全部词库（字表 common/ext、强制结束符、三档词表、整句、用户短语）
-#   4) opencc/ 简繁数据
-#   5) data/gram/ 下运行时需要的表：整句词典的 .gram、LM 重排表、拼音音节表等
-for f in "$ROOT"/*.yaml; do
-  b="$(basename "$f")"
-  case "$b" in user.yaml) continue ;; esac
-  SRC_DST+=("$b|$b")
-done
-for f in "$ROOT"/lua/*.lua; do
-  SRC_DST+=("lua/$(basename "$f")|lua/$(basename "$f")")
-done
-for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
-  SRC_DST+=("dicts/egret_wubi_py/$(basename "$f")|dicts/egret_wubi_py/$(basename "$f")")
-done
-for f in "$ROOT"/opencc/*; do
-  [ -e "$f" ] || continue
-  SRC_DST+=("opencc/$(basename "$f")|opencc/$(basename "$f")")
-done
-for f in "$ROOT"/data/gram/*.gram "$ROOT"/data/gram/*.tsv "$ROOT"/data/gram/*.meta "$ROOT"/data/gram/*.txt; do
-  [ -e "$f" ] || continue
-  SRC_DST+=("data/gram/$(basename "$f")|$(basename "$f")")
-done
+# 运行时清单由 scripts/deploy_bundle.sh --list 提供（唯一来源）。
+# 为什么不再自己 glob：曾经 glob "data/gram/*.tsv" 把 632MB 的
+# zh-hans-egret.2_6gram.tsv（gram 训练中间产物）也部署出去了。
+while IFS='|' read -r s d; do
+  [ -n "$s" ] || continue
+  SRC_DST+=("$s|$d")
+done < <(bash "$ROOT/scripts/deploy_bundle.sh" --list)
 for pair in "${SRC_DST[@]}"; do
   s="${pair%%|*}"
   [ -e "$ROOT/$s" ] || { echo "  ! 缺少 $ROOT/$s"; exit 1; }

@@ -157,33 +157,13 @@ if [ "$CHECK_ONLY" = 1 ]; then
 fi
 
 # --- 要部署的文件：源(仓库内) | 目标(Rime 目录相对路径) ---------------------
-SRC_DST=(
-  "egret.common.yaml|egret.common.yaml"
-  "egret_wubi_py.schema.yaml|egret_wubi_py.schema.yaml"
-  "egret_wubi_py.dict.yaml|egret_wubi_py.dict.yaml"
-  "egret_wubi.schema.yaml|egret_wubi.schema.yaml"
-  "egret_py.schema.yaml|egret_py.schema.yaml"
-  "egret_py.dict.yaml|egret_py.dict.yaml"
-  "egret_wubi.dict.yaml|egret_wubi.dict.yaml"
-  "data/gram/lm_rerank.tsv|lm_rerank.tsv"
-  "data/gram/lm_rerank.meta|lm_rerank.meta"
-)
-# 全部 lua 组件：schema 里 lua_translator/lua_filter 引用的模块
-# （dynamic_translator / lm_rerank / compose_filter / py_composer 等）。
-# 曾经只同步 2 个 → 新增 compose_filter.lua/py_composer.lua 后远端缺文件、
-# 自检全 ✗，所以改成 lua/*.lua 全量同步。
-for f in "$ROOT"/lua/*.lua; do
-  [ -e "$f" ] || continue
-  b="lua/$(basename "$f")"
-  SRC_DST+=("$b|$b")
-done
-# 全部 egret_wubi_py 词库（三档 × 三库 + 字表/用户词组，共 15 个）
-for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
-  [ -e "$f" ] || continue
-  b="dicts/egret_wubi_py/$(basename "$f")"
-  SRC_DST+=("$b|$b")
-done
-
+SRC_DST=()
+# 运行时清单由 scripts/deploy_bundle.sh --list 提供（唯一来源，含顶层方案/配置、
+# lua、dicts/egret_wubi_py 全部词库、opencc、lm_rerank 表）。
+while IFS='|' read -r s d; do
+  [ -n "$s" ] || continue
+  SRC_DST+=("$s|$d")
+done < <(bash "$ROOT/scripts/deploy_bundle.sh" --list)
 for pair in "${SRC_DST[@]}"; do
   s="${pair%%|*}"
   [ -e "$ROOT/$s" ] || { echo "  ! 缺少 $ROOT/$s"; exit 1; }

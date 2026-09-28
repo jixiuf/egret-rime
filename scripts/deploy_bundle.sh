@@ -24,30 +24,46 @@ NAME="egret-rime-runtime-$STAMP"
 STAGE="$DIST/$NAME"
 WITH_GRAM=0
 [ "${1:-}" = "--with-gram" ] && WITH_GRAM=1
+LIST_ONLY=0
+[ "${1:-}" = "--list" ] && LIST_ONLY=1
+
+# 运行时清单：这是**唯一来源**，deploy_host-linux_direct.sh / deploy_host-mac.sh 都从
+# 这里取，避免各自 glob 时把中间产物也打进去（曾把 632MB 的
+# data/gram/zh-hans-egret.2_6gram.tsv 当运行文件部署出去）。
+# 输出格式: 仓库内路径|目标相对路径
+manifest() {
+  for f in "$ROOT"/*.yaml; do
+    b="$(basename "$f")"; [ "$b" = user.yaml ] && continue   # 用户态，不覆盖
+    echo "$b|$b"
+  done
+  for f in "$ROOT"/lua/*.lua; do echo "lua/$(basename "$f")|lua/$(basename "$f")"; done
+  for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
+    echo "dicts/egret_wubi_py/$(basename "$f")|dicts/egret_wubi_py/$(basename "$f")"
+  done
+  for f in "$ROOT"/opencc/*; do
+    [ -e "$f" ] || continue
+    echo "opencc/$(basename "$f")|opencc/$(basename "$f")"
+  done
+  # 纯 Lua 的 LM 重排表（必需）。只带这两个，不带同目录的 gram 中间产物。
+  [ -f "$ROOT/data/gram/lm_rerank.tsv" ]  && echo "data/gram/lm_rerank.tsv|lm_rerank.tsv"
+  [ -f "$ROOT/data/gram/lm_rerank.meta" ] && echo "data/gram/lm_rerank.meta|lm_rerank.meta"
+  [ "$WITH_GRAM" = 1 ] && [ -f "$ROOT/data/gram/zh-hans-egret.gram" ] \
+    && echo "data/gram/zh-hans-egret.gram|zh-hans-egret.gram"
+  return 0
+}
+
+if [ "$LIST_ONLY" = 1 ]; then manifest; exit 0; fi
 
 mkdir -p "$STAGE"
 rm -rf "$STAGE"/*
 
-echo "==> 收集运行时产物"
-# 1) 方案配置
-cp -a "$ROOT"/*.yaml "$STAGE/"
-# 2) 词库：只带运行时需要的 egret_wubi_py/（dicts/ 下的 wb86_wangxiang 等是源数据，不带）
-mkdir -p "$STAGE/dicts"
-cp -a "$ROOT/dicts/egret_wubi_py" "$STAGE/dicts/"
-# 3) lua 脚本 / opencc
-cp -a "$ROOT/lua" "$STAGE/"
-cp -a "$ROOT/opencc" "$STAGE/"
-# 4) LM 重排表（纯 Lua 的 n-gram 表，必需）
-if [ -f "$ROOT/data/gram/lm_rerank.tsv" ]; then
-  cp -a "$ROOT/data/gram/lm_rerank.tsv" "$STAGE/"
-  cp -a "$ROOT/data/gram/lm_rerank.meta" "$STAGE/" 2>/dev/null || true
-else
-  echo "  ! 缺少 data/gram/lm_rerank.tsv（先跑 scripts/gen_lm_rerank.py）"
-fi
-# 5) 可选的 librime gram（新架构不需要；仅当你要关掉 lm_rerank 时才用）
-if [ "$WITH_GRAM" = 1 ]; then
-  cp -a "$ROOT/data/gram/zh-hans-egret.gram" "$STAGE/" 2>/dev/null || true
-fi
+echo "==> 收集运行时产物（清单见 manifest()，与部署脚本共用）"
+while IFS='|' read -r src dst; do
+  [ -n "$src" ] || continue
+  mkdir -p "$STAGE/$(dirname "$dst")"
+  cp -a "$ROOT/$src" "$STAGE/$dst" || echo "  ! 拷贝失败: $src"
+done < <(manifest)
+[ -f "$ROOT/data/gram/lm_rerank.tsv" ] || echo "  ! 缺少 data/gram/lm_rerank.tsv（先跑 scripts/gen_lm_rerank.py）"
 
 # 6) 安装脚本
 cat > "$STAGE/install.sh" <<'INSTALL'
