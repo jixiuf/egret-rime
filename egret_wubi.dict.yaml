@@ -18,7 +18,7 @@ encoder:
     - length_in_range: [5, 10]
       formula: "AaAbYaZa"
 import_tables:
-  - dicts/egret_wubi_py/egret_wubi_chars
+  - dicts/egret_wubi_py/egret_wubi_chars_common
   - dicts/egret_wubi_py/egret_wubi_force_end   # 强制结束符 <码>,（生成产物）
   - dicts/egret_wubi_py/egret_wubi_words_base
   - dicts/egret_wubi_py/egret_wubi_py_sentence   # 高频整句（五笔短码→整句，见 gen_sentence_dict.py）

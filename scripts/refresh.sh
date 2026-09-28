@@ -164,6 +164,11 @@ for i in "${!STAGES[@]}"; do
       # 这类混流输入组不出正确句子（详见 docs/PROGRESS.md §4.19）。源数据在仓库内，幂等。
       "$PY" "$ROOT/scripts/gen_jianma_spellings.py" >>"$RUNLOG" 2>&1 \
         && ok "简码拼写已补入混合库（混流组句的关键）" || warn "简码拼写补入失败"
+      # 字表分层：common（语料出现过 + 有拼音的基本区字）默认 import；
+      # ext（其余 10.9 万扩展区汉字，占原表 87%）不默认加载，用户一行 patch 开启。
+      # 必须在 gen_jianma_spellings 之后（它会给字表补拼写）。见 docs/PROGRESS.md §4.23
+      "$PY" "$ROOT/scripts/gen_char_layers.py" >>"$RUNLOG" 2>&1 \
+        && ok "字表已分层（common 默认 / ext 可选）" || warn "字表分层失败"
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
