@@ -37,6 +37,22 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 RUNLOG="$LOG/refresh-$STAMP.log"
 mkdir -p "$LOG"
 
+# ── 已调好的管线参数（改动请写在这里，保证 refresh.sh 可完整复现）─────────────
+# TIER          词典档位: core|base|full（base=6.3万词，实测 full 无额外收益）
+# LM_TOPK_*     Lua LM 表各阶条数（190 万条 2-6gram，实测比 60 万条 +5pp 完全命中）
+# REWEIGHT     词权重回归: off（默认，保持万象原值）| band | log1000
+#   ⚠ 实测 log1000 会打破字表/词表平衡（黄金 20/20 → 17/20），故默认 off；
+#     要重做必须整链重标定 + 用 make test 标定，见 docs/PROGRESS.md
+# CHAR_SHIFT    配合 log1000 的字表下移量（log*1000 尺度）
+TIER="${TIER:-base}"
+REWEIGHT="${REWEIGHT:-off}"
+CHAR_SHIFT="${CHAR_SHIFT:-0}"
+LM_TOPK_2="${LM_TOPK_2:-600000}"
+LM_TOPK_3="${LM_TOPK_3:-600000}"
+LM_TOPK_4="${LM_TOPK_4:-400000}"
+LM_TOPK_5="${LM_TOPK_5:-200000}"
+LM_TOPK_6="${LM_TOPK_6:-100000}"
+
 JOBS="${JOBS:-3}"
 NICE="${NICE:-15}"
 TIER="${TIER:-base}"
@@ -127,21 +143,30 @@ for i in "${!STAGES[@]}"; do
         && ok "词频重扫完成" || warn "重扫失败（见日志；分片已保留）"
       ;;
     dict)
-      log "阶段 dict：权重回归 + 分档 + 方案词库生成（档位 $TIER）"
-      if [ -s "$ROOT/data/corpus/freq/recount_full.txt" ]; then
+      log "阶段 dict：分档 + 方案词库生成（档位 $TIER，权重回归 REWEIGHT=$REWEIGHT）"
+      git -C "$ROOT" checkout -- dicts/ 2>/dev/null || true   # 从干净词库出发，保证可复现
+      if [ "$REWEIGHT" != "off" ] && [ -s "$ROOT/data/corpus/freq/recount_full.txt" ]; then
+        local extra=""
+        [ "$REWEIGHT" = "log1000" ] && extra="--char-from-lm $ROOT/data/gram/lm_rerank.tsv --char-shift $CHAR_SHIFT"
         "$PY" "$ROOT/scripts/reweight_from_corpus.py" \
-          --freq "$ROOT/data/corpus/freq/recount_full.txt" >>"$RUNLOG" 2>&1 \
-          && ok "词权重已按语料回归到 0-1000" || warn "权重回归失败"
+          --freq "$ROOT/data/corpus/freq/recount_full.txt" --scale "$REWEIGHT" $extra \
+          >>"$RUNLOG" 2>&1 && ok "词权重已按语料回归（$REWEIGHT）" || warn "权重回归失败"
       else
-        warn "无重扫词频，跳过权重回归"
+        ok "权重回归: 关闭（保持仓库内词库原值；实测 log1000 会破黄金用例）"
       fi
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "已切到 $TIER 档" || warn "切档失败"
-      if [ "${SKIP_GEN:-0}" != 1 ]; then
+      # 注意：gen_wubi_py_unified_dicts.py 依赖 dicts/wangxiang_cn_dicts/base.small
+      # 等**本仓库没有的外部源数据**（来自原仓库），跑不通 → 默认跳过。
+      # 即：字符表层（chars/pinyin_8105/wubi_chars）按"入库源数据"处理，
+      # 由 gen_dict_tiers.py 从仓库内数据派生的分档词表层才是可复现的。
+      if [ "${SKIP_GEN:-1}" != 1 ]; then
         "$PY" "$ROOT/scripts/gen_wubi_py_unified_dicts.py" >>"$RUNLOG" 2>&1 \
-          && ok "方案词库 gen 完成" || warn "gen 失败（见日志）"
+          && ok "方案词库 gen 完成" || warn "gen 失败（缺外部源数据，属预期）"
+      else
+        ok "跳过 gen_wubi_py_unified_dicts（需外部源数据，字表按入库源数据）"
       fi
       ;;
     gram)
@@ -149,7 +174,9 @@ for i in "${!STAGES[@]}"; do
       bash "$ROOT/scripts/corpus/gram.sh" >>"$RUNLOG" 2>&1 \
         && ok "n-gram 统计完成" || warn "gram 失败（见日志）"
       if [ -s "$ROOT/data/gram/zh-hans-egret.2_6gram.tsv" ]; then
-        "$PY" "$ROOT/scripts/gen_lm_rerank.py" >>"$RUNLOG" 2>&1 \
+        "$PY" "$ROOT/scripts/gen_lm_rerank.py" \
+          --top2 "$LM_TOPK_2" --top3 "$LM_TOPK_3" --top4 "$LM_TOPK_4" \
+          --top5 "$LM_TOPK_5" --top6 "$LM_TOPK_6" >>"$RUNLOG" 2>&1 \
           && ok "Lua LM 表已生成（data/gram/lm_rerank.tsv）" \
           || warn "LM 表生成失败"
         "$PY" "$ROOT/scripts/gen_py_tables.py" --tier "$TIER" >>"$RUNLOG" 2>&1 \

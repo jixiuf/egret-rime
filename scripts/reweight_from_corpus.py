@@ -194,6 +194,10 @@ def main():
                          "（与 LM 同尺度，推荐）")
     ap.add_argument("--char-scale", type=float, default=1.0,
                     help="拼音字表缩放系数（默认 1.0=不动；0.35 与五笔字表一致）")
+    ap.add_argument("--char-from-lm", default=None,
+                    help="用 LM 表的 1gram 重标字表（log 尺度），配合 --char-shift 调平衡")
+    ap.add_argument("--char-shift", type=int, default=0,
+                    help="字表整体下移量（log*1000 尺度）。字频恒高于词频，需下移才能让词胜出")
     ap.add_argument("--char-cap", type=int, default=0,
                     help="字表权重上限（0=不设；用于压住超高频字碾碎词的情况）")
     ap.add_argument("--words-only", action="store_true",
@@ -233,6 +237,37 @@ def main():
         print(f"新权重: min={news[0]} p50={news[len(news)//2]} max={news[-1]}")
         hit = sum(1 for o, n in stats if n >= band[0])
         print(f"落在语料命中带(>={band[0]})的词: {hit}/{len(stats)}")
+    # 整链 log 重标定：词 = log f(w)*1000，字 = log f(c)*1000 - shift
+    if args.char_from_lm:
+        import math
+        lm = {}
+        for line in open(args.char_from_lm, encoding="utf-8"):
+            k, _, v = line.rstrip("\n").partition("\t")
+            if len(k) == 1 and v.isdigit():
+                lm[k] = int(v)
+        print(f"\n字表 log 重标定（shift={args.char_shift}，unigram {len(lm)} 字）")
+        for path in (CHAR_DICTS + [os.path.join(OUT, "egret_wubi_py_chars.dict.yaml")]):
+            if not os.path.exists(path):
+                continue
+            lines = open(path, encoding="utf-8").read().split("\n")
+            started, out, n = False, [], 0
+            for line in lines:
+                if not started:
+                    out.append(line)
+                    if line.rstrip() == "...":
+                        started = True
+                    continue
+                q = line.split("\t")
+                if len(q) >= 3 and q[2].isdigit() and len(q[0]) == 1:
+                    u = lm.get(q[0])
+                    if u:
+                        q[2] = str(max(0, u - args.char_shift))
+                        n += 1
+                out.append("\t".join(q))
+            if not args.dry_run:
+                open(path, "w", encoding="utf-8").write("\n".join(out))
+            print(f"  {os.path.basename(path):<46} {n:>7} 条重标")
+
     if args.char_scale != 1.0 or args.char_cap:
         if args.words_only:
             print("(--words-only，跳过字表)")

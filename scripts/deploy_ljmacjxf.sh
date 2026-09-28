@@ -53,19 +53,63 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# --- 找一个可用的 agent 转发 socket（本机没有落地私钥）----------------------
-find_agent() {
-  for s in /tmp/ssh-*/agent.* /run/user/"$(id -u)"/gnupg/S.gpg-agent.ssh; do
-    [ -S "$s" ] || continue
-    SSH_AUTH_SOCK="$s" timeout 5 ssh-add -l >/dev/null 2>&1 && { echo "$s"; return 0; }
+# --- 选认证方式：能签名的 agent socket，或本地私钥 ---------------------------
+# 注意：`ssh-add -l` 成功 ≠ 能签名。远端转发进来的 gpg-agent（socket 属主是
+# sshd）通常处于 restricted 模式，或签名时要在远端 pinentry 上确认 → 握手时报
+# "sign_and_send_pubkey: signing failed: agent refused operation"。
+# 所以这里用一次**真实握手**（ssh ... true）来挑认证方式，顺序：
+#   1) 真能签名的 agent socket（本机开着带 agent 转发的 ssh 会话时）
+#   2) 本地落地私钥（EGRET_SSH_KEY → ~/.ssh/id_rsa → vmacs dots/ssh/id_rsa）
+#   3) 都没有时自起一个 ssh-agent 并加载候选私钥
+PORT_OPTS=(-p "$PORT" -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10)
+KEY_CANDIDATES=(
+  "${EGRET_SSH_KEY:-}"
+  "$HOME/.ssh/id_rsa"
+  "/export/vmacs/dots/ssh/id_rsa"
+)
+SSH_ID_ARGS=()
+AUTH_DESC=""
+
+for s in /tmp/ssh-*/agent.* /run/user/"$(id -u)"/gnupg/S.gpg-agent.ssh; do
+  [ -S "$s" ] || continue
+  SSH_AUTH_SOCK="$s" timeout 5 ssh-add -l >/dev/null 2>&1 || continue
+  if SSH_AUTH_SOCK="$s" timeout 20 ssh "${PORT_OPTS[@]}" "$HOST" true >/dev/null 2>&1; then
+    export SSH_AUTH_SOCK="$s"
+    AUTH_DESC="agent socket $s"
+    break
+  fi
+done
+
+if [ -z "$AUTH_DESC" ]; then
+  for k in "${KEY_CANDIDATES[@]}"; do
+    [ -f "$k" ] || continue
+    if timeout 20 ssh "${PORT_OPTS[@]}" -o IdentitiesOnly=yes -i "$k" "$HOST" true >/dev/null 2>&1; then
+      SSH_ID_ARGS=(-i "$k" -o IdentitiesOnly=yes)
+      AUTH_DESC="本地私钥 $k"
+      break
+    fi
   done
-  return 1
-}
-SOCK="$(find_agent)" || {
-  echo "找不到可用的 ssh-agent socket（需要本机开着带 agent 转发的 ssh 会话）"; exit 1; }
-export SSH_AUTH_SOCK="$SOCK"
-SSH="ssh -p $PORT -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10"
-echo "==> agent socket: $SOCK"
+fi
+
+if [ -z "$AUTH_DESC" ]; then
+  echo "==> 没有可用 agent/私钥，自起 ssh-agent 并加载候选私钥"
+  eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
+  for k in "${KEY_CANDIDATES[@]}"; do
+    [ -f "$k" ] || continue
+    ssh-add "$k" >/dev/null 2>&1 || continue
+    if timeout 20 ssh "${PORT_OPTS[@]}" "$HOST" true >/dev/null 2>&1; then
+      AUTH_DESC="新起的 ssh-agent + $k"
+      break
+    fi
+  done
+fi
+
+[ -n "$AUTH_DESC" ] || {
+  echo "找不到可用认证方式（agent 转发/本地私钥握手都失败）：ssh $HOST"; exit 1; }
+echo "==> 认证: $AUTH_DESC（已用真实握手验证）"
+
+SSH="ssh ${PORT_OPTS[*]}${SSH_ID_ARGS[*]+ ${SSH_ID_ARGS[*]}}"
+SCP="scp -P $PORT -o BatchMode=yes -o StrictHostKeyChecking=accept-new${SSH_ID_ARGS[*]+ ${SSH_ID_ARGS[*]}}"
 
 # --- 远端只读探测 -----------------------------------------------------------
 probe() {
@@ -146,8 +190,7 @@ for pair in "${SRC_DST[@]}"; do
 done
 (cd "$STAGE" && tar czf egret-mac.tar.gz egret) || exit 1
 echo "==> 传到 $HOST:/tmp/egret-mac.tar.gz ($(du -h "$STAGE/egret-mac.tar.gz" | cut -f1))"
-scp -P "$PORT" -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
-    "$STAGE/egret-mac.tar.gz" "$HOST:/tmp/" || { rm -rf "$STAGE"; exit 1; }
+$SCP "$STAGE/egret-mac.tar.gz" "$HOST:/tmp/" || { rm -rf "$STAGE"; exit 1; }
 rm -rf "$STAGE"
 
 TS="$(date +%Y%m%d-%H%M%S)"
