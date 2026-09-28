@@ -38,26 +38,21 @@ echo "==> agent socket: $SOCK"
 
 # 要部署的文件：源(仓库内) | 目标(Rime 目录相对路径)
 SRC_DST=(
-  "egret_wubi_py.schema.yaml|egret_wubi_py.schema.yaml"
   "egret_wubi_py.dict.yaml|egret_wubi_py.dict.yaml"
-  "egret_wubi.schema.yaml|egret_wubi.schema.yaml"
   "egret_wubi.dict.yaml|egret_wubi.dict.yaml"
-  "egret_py.schema.yaml|egret_py.schema.yaml"
-  "egret_py.dict.yaml|egret_py.dict.yaml"
-  "egret.common.yaml|egret.common.yaml"
   "data/gram/lm_rerank.tsv|lm_rerank.tsv"
   "data/gram/lm_rerank.meta|lm_rerank.meta"
 )
-# lua 组件与词库都用 glob，别再手写文件名——2026-09 整族改名时手写清单漏了，
-# 拼出 egret_wubi_py_wubi_words_* 这种改名前的路径，部署直接中断。
-for f in "$ROOT"/lua/*.lua; do
-  [ -e "$f" ] || continue
-  SRC_DST+=("lua/$(basename "$f")|lua/$(basename "$f")")
-done
-# 全部 egret_wubi_py 词库（字表 common/ext、强制结束符、三档词表、整句、用户短语）
+# 只部署**数据文件**（词库）。
+# 教训（2026-09）：这个脚本曾经手写文件名，整族改名后拼出 egret_wubi_py_wubi_words_*
+# 直接中断；后来改成 glob 把 lua/*.lua、egret.common.yaml、egret_py.schema.yaml、
+# egret_wubi.schema.yaml 也一起覆盖，结果把 host-linux 原有那套（来自 vmacs，配套的
+# 方案/lua/common）冲掉，fcitx5 里直接打不出中文。对端的方案/lua/common 保持原样，
+# 这里只同步词库数据；要换整套方案请用 deploy_host-mac.sh 那种整目录方式。
 for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
   [ -e "$f" ] || continue
   SRC_DST+=("dicts/egret_wubi_py/$(basename "$f")|dicts/egret_wubi_py/$(basename "$f")")
+done
 done
 
 for pair in "${SRC_DST[@]}"; do
