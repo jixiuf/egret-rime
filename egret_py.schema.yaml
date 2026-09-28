@@ -45,10 +45,15 @@ translator:
   # 不加 grammar：实测全拼路径带 gram 反而更差（13~16% 对 24%），见
   # docs/PROGRESS.md §4.9。本仓库只有混流方案 egret_wubi_py 用 LM 重排。
 
-# 本方案里 ` 用作反查笔画（五笔方案里 ` 才是反查拼音，两者互为反查）。
+# 反查：本方案里 ` 用来反查五笔码（输入 `trwu' 会列出「我们」并附五笔码），
+# 与主方案 egret_wubi_py 的「` 反查拼音」互为对称。
+# 注：上游这里用的是反查笔画，依赖一个 stroke 方案；本仓库没有 stroke 词典，
+# librime 自带数据里也没有，故改用现成的五笔库。
 reverse_lookup:
-  __patch:
-    - egret.common.yaml:reverse_lookup_stroke
+  dictionary: egret_wubi
+  prefix: "`"
+  suffix: "'"
+  tips: 〔五笔〕
 
 engine:
   processors:

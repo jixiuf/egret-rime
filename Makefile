@@ -101,6 +101,10 @@ env-test:
 	@echo "共享数据目录: $(SHARED_DIR)"
 
 # --- 回归测试 ---------------------------------------------------------------
+eval: env-test          ## 跑整句评测（160 句多来源，对标基线 26%）
+	@$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 160 \
+		--gram "egret=$$PWD/data/gram/zh-hans-egret.gram"
+
 test: env-test
 	$(PYTHON) scripts/regression_test.py
 	test -z "$$(git -C $(REPO) status --porcelain user.yaml)" || \
