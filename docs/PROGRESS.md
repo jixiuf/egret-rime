@@ -578,6 +578,42 @@ xietiaotujinsigequanmianzhanlvebuju → 协调推进四个全面战略布局
 **顺带建立测量工具**：`scripts/probe.sh <输入...>` —— 每个输入**连跑两次取第二次**
 （`data/rime-test` 冷部署首跑与热机结果不同，见 §4.18 测量纪律）。
 
+### 4.20 候选显示五笔编码（**原生 reverse_lookup_filter，零 Lua**）
+
+需求：候选里显示该词的**五笔码**（学五笔 / 核对用）。
+
+**做法**：用 librime 原生 `reverse_lookup_filter`（`reverse_lookup_filter.cc`）——
+它拿候选文本去**另一本词典**反查，把命中的码写进注释 ✓ 不需要 Lua。
+配置（参考 `~/vmacs/rime/old/egret_wubi_py.schema.yaml:169` 的成熟写法）：
+
+```yaml
+filters:
+  - reverse_lookup_filter@wubi_comment     # 放在 simplifier@traditionalize 之前（查简体文本）
+wubi_comment:
+  tags: [ abc ]
+  dictionary: egret_wubi_py_wubi   # 反查用它：字含一/二/三级简码与全码，词含标准词组码
+  overwrite_comment: true          # 覆盖其它提示（如补全标记）
+  comment_format:
+    - "xform/[ ].*$//"             # 一个字有多个五笔码时只显示第一个 ★关键技巧
+    - "xform/^/ /"                 # 与候选文本视觉分隔
+```
+
+**效果实测**（`scripts/probe.sh` / console）：
+```
+q         → 我 q            一级简码
+trwu      → 我们 trwu         uwycuklf → 冷部署 / 冷 uwyc
+nihao     → 你好 wqvb        ★ 拼音输入时显示五笔码（学五笔最有用）
+jintiande → 今天的 / 今天 wygd   de → 胡 de
+```
+黄金 **20/20** ✓（注释不影响候选排序）。
+
+**走过的弯路（记录）**：
+1. `spelling_hints`（script_translator 原生）显示的是**输入拼写**——拼音输入时显示拼音 ✗ 不是五笔码，
+   且受码长 `cand.code().size() <= spelling_hints` 限制；
+2. `super_comment.lua`（万象组件）挂上直接崩（0/20），且需要一大坨自定义配置 ✗；
+3. 自写 Lua filter + 反向索引（`set_comment` 对 Phrase 生效 ✓，与 `set_text` 不同）——**能用但没必要**，
+   原生组件已覆盖 ✓（用户明确要求"非必要少用 Lua"）。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |
@@ -597,7 +633,7 @@ xietiaotujinsigequanmianzhanlvebuju → 协调推进四个全面战略布局
 | **F1** | **提升全拼路径**（当前 26%）：词典权重/拼音覆盖/短语——主战场 | C2–C6 | 待 |
 | **G1** | **混合输入体验**：见 `docs/research-mixed-input.md` + §4.18 机制调研 | — | 🔄 |
 | G4 | 关 abbrev（用户明确不做简拼）；`z→在` 来源仍需定位 | — | 待 |
-| G5 | 恢复 `wubi_comment` 候选码提示（最低成本提体验） | — | 待 |
+| G5 | ~~恢复 `wubi_comment` 候选码提示~~ **已完成**（§4.20，原生 reverse_lookup_filter） | — | ✅ |
 | G6 | 大写输入补支持（GTNK/WQ 当前无候选） | — | 待 |
 | G7 | 反查补齐（engine 无 reverse_lookup translator） | — | 待 |
 | G2 | 统一码表搜索器的交付：需自建完整翻译链路（§4.15 四条路被封） | G1 | 待 |

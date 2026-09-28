@@ -81,6 +81,9 @@ engine:
   # 长词优先 (即wq 后 第4个词的长度必然大于第1个候选,即提升部分长词到第4，5个选项)
   # 见下面 long_word_filter 相关配置
     - simplifier@emoji                              # Emoji 彩色or 黑白
+    # 候选注释显示**五笔编码**（原生组件，无需 Lua）：把候选文本拿去反查
+    # 传统五笔库，命中的码写进注释。配置块见文件末尾 wubi_comment:
+    - reverse_lookup_filter@wubi_comment
     - lua_filter@*long_word_filter
     - lua_filter@*reduce_emoji_filter   # 按需启用，作用是降低Emoji在候选项中的位置排序(顺序要求：Emoji > 降低排序)
     - charset_filter                   # 默认隐藏CJK扩展区生僻字(2026-09实测: 否则混合库权重1的
@@ -182,3 +185,13 @@ abc_segmentor:
   extra_tags:
     - reverse_lookup
     # wubi_comment
+
+# 候选注释显示五笔编码（reverse_lookup_filter，librime 原生）
+# 反查词典用传统五笔库（字含一/二/三级简码与全码，词含标准词组码）
+wubi_comment:
+  tags: [ abc ]
+  dictionary: egret_wubi_py_wubi    # 反查用它：字含一/二/三级简码与全码，词含标准词组码
+  overwrite_comment: true           # 覆盖其它提示（如补全标记）
+  comment_format:
+    - "xform/[ ].*$//"              # 一个字有多个五笔码时只显示第一个
+    - "xform/^/ /"                  # 前面留空格，与候选文本视觉分隔
