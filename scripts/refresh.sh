@@ -169,6 +169,16 @@ for i in "${!STAGES[@]}"; do
       # 必须在 gen_jianma_spellings 之后（它会给字表补拼写）。见 docs/PROGRESS.md §4.23
       "$PY" "$ROOT/scripts/gen_char_layers.py" >>"$RUNLOG" 2>&1 \
         && ok "字表已分层（common 默认 / ext 可选）" || warn "字表分层失败"
+      # 整句词库（高频整句 -> 五笔短码序列）。依赖 data/corpus（本地语料，不入 git），
+      # 所以产物要入 git；语料有更新时重跑本步。
+      if [ -d "$ROOT/data/corpus/clean/para" ]; then
+        "$PY" "$ROOT/scripts/gen_sentence_dict.py" --top 60000 >>"$RUNLOG" 2>&1 \
+          && ok "整句词库已生成" || warn "整句词库生成失败"
+      else
+        ok "跳过整句词库（无 data/corpus，用仓库内已有产物）"
+      fi
+      "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
+        && ok "字表已分层（common 默认 / ext 可选）" || warn "字表分层失败"
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \

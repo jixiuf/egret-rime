@@ -40,17 +40,24 @@ echo "==> agent socket: $SOCK"
 SRC_DST=(
   "egret_wubi_py.schema.yaml|egret_wubi_py.schema.yaml"
   "egret_wubi_py.dict.yaml|egret_wubi_py.dict.yaml"
+  "egret_wubi.schema.yaml|egret_wubi.schema.yaml"
   "egret_wubi.dict.yaml|egret_wubi.dict.yaml"
-  "lua/dynamic_translator.lua|lua/dynamic_translator.lua"
-  "lua/lm_rerank.lua|lua/lm_rerank.lua"
+  "egret_py.schema.yaml|egret_py.schema.yaml"
+  "egret_py.dict.yaml|egret_py.dict.yaml"
+  "egret.common.yaml|egret.common.yaml"
   "data/gram/lm_rerank.tsv|lm_rerank.tsv"
   "data/gram/lm_rerank.meta|lm_rerank.meta"
 )
-for t in core base full; do
-  for k in words wubi_words pinyin_words; do
-    p="dicts/egret_wubi_py/egret_wubi_py_${k}_${t}.dict.yaml"
-    SRC_DST+=("$p|$p")
-  done
+# lua 组件与词库都用 glob，别再手写文件名——2026-09 整族改名时手写清单漏了，
+# 拼出 egret_wubi_py_wubi_words_* 这种改名前的路径，部署直接中断。
+for f in "$ROOT"/lua/*.lua; do
+  [ -e "$f" ] || continue
+  SRC_DST+=("lua/$(basename "$f")|lua/$(basename "$f")")
+done
+# 全部 egret_wubi_py 词库（字表 common/ext、强制结束符、三档词表、整句、用户短语）
+for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
+  [ -e "$f" ] || continue
+  SRC_DST+=("dicts/egret_wubi_py/$(basename "$f")|dicts/egret_wubi_py/$(basename "$f")")
 done
 
 for pair in "${SRC_DST[@]}"; do
