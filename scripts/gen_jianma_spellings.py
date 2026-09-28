@@ -52,6 +52,31 @@ def main():
         with open(dst,"a",encoding="utf-8") as f:
             for c,k,w in add: f.write(f"{c}\t{k}\t{w}\n")
     print(f"五笔拼写：权威表 {len(jm)} 条，混合库补入 {len(add)} 条")
+
+    # 强制结束符拼写：<短码>,（上游 comment：「五笔支持长句，3码或1码时需以","结尾」）。
+    # 上游靠 algebra 的 derive 从万象格式（编码里含 ,/; 分隔）派生；我们的词库是简化格式
+    # （如 了=t b/bnh），没有那些形态 → 那几条 derive 从来没生效过。
+    # 这里直接生成显式条目：凡是长度 1~3 的码，都补一条 "<码>,"（用户敲 b, 即强制「b 到底」）。
+    tsrc=os.path.join(D,"egret_wubi_chars.dict.yaml")
+    fout=os.path.join(D,"egret_wubi_force_end.dict.yaml")
+    st=False; have=set(); add2=[]
+    for line in open(tsrc,encoding="utf-8"):
+        if not st:
+            if line.rstrip()=="...": st=True
+            continue
+        q=line.rstrip("\n").split("\t")
+        if len(q)>=3: have.add((q[0],q[1].lower()))
+    for (c,k),w in sorted(jm.items()):
+        if 1 <= len(k) <= 3 and (c, k+",") not in have:
+            add2.append((c,k+",",w))
+    # 写成独立文件（生成产物，不入 git），由 egret_wubi.dict.yaml 的 import_tables 引入
+    with open(fout,"w",encoding="utf-8") as f:
+        f.write("# RIME dictionary\n# 由 scripts/gen_jianma_spellings.py 生成，请勿手改\n"
+                "# 强制结束符拼写：<短码>,（1~3 码字）。用户敲 b, / ktn, 即强制「该码到此为止」。\n\n"
+                "name: egret_wubi_force_end\nversion: \"2026.09.29\"\nsort: by_weight\n"
+                "use_preset_vocabulary: false\ncolumns:\n  - text\n  - code\n  - weight\n...\n")
+        for c,k,w in add2: f.write(f"{c}\t{k}\t{w}\n")
+    print(f"强制结束符 <码>, 写出 {len(add2)} 条 -> {os.path.basename(fout)}")
     return 0
 
 if __name__=="__main__": sys.exit(main())

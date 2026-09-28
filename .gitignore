@@ -19,3 +19,4 @@ dicts/egret_wubi_py/egret_wubi_words_*.dict.yaml
 !dicts/egret_wubi_py/egret_wubi_words.dict.yaml
 # 拼音词表中间产物（gen_pinyin_words.py 生成，再喂给 gen_dict_tiers.py）
 dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small.dict.yaml
+dicts/egret_wubi_py/egret_wubi_force_end.dict.yaml
