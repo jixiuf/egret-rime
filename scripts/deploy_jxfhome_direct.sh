@@ -37,23 +37,33 @@ SSH="ssh -p $PORT -o BatchMode=yes"
 echo "==> agent socket: $SOCK"
 
 # 要部署的文件：源(仓库内) | 目标(Rime 目录相对路径)
-SRC_DST=(
-  "egret_wubi_py.dict.yaml|egret_wubi_py.dict.yaml"
-  "egret_wubi.dict.yaml|egret_wubi.dict.yaml"
-  "data/gram/lm_rerank.tsv|lm_rerank.tsv"
-  "data/gram/lm_rerank.meta|lm_rerank.meta"
-)
-# 只部署**数据文件**（词库）。
-# 教训（2026-09）：这个脚本曾经手写文件名，整族改名后拼出 egret_wubi_py_wubi_words_*
-# 直接中断；后来改成 glob 把 lua/*.lua、egret.common.yaml、egret_py.schema.yaml、
-# egret_wubi.schema.yaml 也一起覆盖，结果把 host-linux 原有那套（来自 vmacs，配套的
-# 方案/lua/common）冲掉，fcitx5 里直接打不出中文。对端的方案/lua/common 保持原样，
-# 这里只同步词库数据；要换整套方案请用 deploy_host-mac.sh 那种整目录方式。
+SRC_DST=()
+# 目标是把对端做成「自包含」：把我们这套运行时文件整体放过去，不再依赖 vmacs。
+# 组成：
+#   1) 本仓库顶层方案与配置（user.yaml 是用户态，不覆盖）
+#   2) lua/ 全部组件
+#   3) dicts/egret_wubi_py/ 全部词库（字表 common/ext、强制结束符、三档词表、整句、用户短语）
+#   4) opencc/ 简繁数据
+#   5) data/gram/ 下运行时需要的表：整句词典的 .gram、LM 重排表、拼音音节表等
+for f in "$ROOT"/*.yaml; do
+  b="$(basename "$f")"
+  case "$b" in user.yaml) continue ;; esac
+  SRC_DST+=("$b|$b")
+done
+for f in "$ROOT"/lua/*.lua; do
+  SRC_DST+=("lua/$(basename "$f")|lua/$(basename "$f")")
+done
 for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
-  [ -e "$f" ] || continue
   SRC_DST+=("dicts/egret_wubi_py/$(basename "$f")|dicts/egret_wubi_py/$(basename "$f")")
 done
-
+for f in "$ROOT"/opencc/*; do
+  [ -e "$f" ] || continue
+  SRC_DST+=("opencc/$(basename "$f")|opencc/$(basename "$f")")
+done
+for f in "$ROOT"/data/gram/*.gram "$ROOT"/data/gram/*.tsv "$ROOT"/data/gram/*.meta "$ROOT"/data/gram/*.txt; do
+  [ -e "$f" ] || continue
+  SRC_DST+=("data/gram/$(basename "$f")|$(basename "$f")")
+done
 for pair in "${SRC_DST[@]}"; do
   s="${pair%%|*}"
   [ -e "$ROOT/$s" ] || { echo "  ! 缺少 $ROOT/$s"; exit 1; }
