@@ -20,6 +20,6 @@ encoder:
 import_tables:
   - dicts/egret_wubi_py/egret_wubi_py_wubi_chars
   - dicts/egret_wubi_py/egret_wubi_py_wubi_words_base
-  - dicts/egret_wubi_py/egret_wubi_py_sentence   # 高频整句（五笔短码→整句）
+  - dicts/egret_wubi_py/egret_wubi_py_sentence   # 高频整句（五笔短码→整句，见 gen_sentence_dict.py）
   - dicts/egret_wubi_py/egret_wubi_py_user_phrases
 ...
