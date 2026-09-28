@@ -47,7 +47,10 @@ import_tables:
   # 字表: chars_wubi_py_x035 = chars.dict.yaml 权重×0.35 + 25个一级简码显式条目
   # （缩放使派生五笔短码与拼音音节碰撞时，如 有de,简->de、扔re,n->ren，拼音读音获胜）
   # 生成脚本: scripts/gen_wubi_py_unified_dicts.py
-  - dicts/egret_wubi_py/egret_wubi_py_chars_common   # 字表(五笔码+万象权重×0.35+一级简码)
+  # 字表分两层：common 默认导入；ext（扩展区 10.9 万条，占原表 87%，语料里从未出现）
+  # 不导入，需要时在 egret_wubi_py_ext.custom.yaml 里给 translator/dictionary+ 追加即可。
+  # 分层原因与实测数据见 docs/PROGRESS.md §4.23。
+  - dicts/egret_wubi_py/egret_wubi_py_chars_common   # 字表(五笔码+万象权重x0.35+一级简码)
   - dicts/egret_wubi_py/egret_wubi_py_words_base    # 基础词库(五笔码+万象权重,>450过滤碎片词)
   # - dicts/wb86_cn_dicts/8105     # 旧字表(知频权重，量级与万象不兼容，弃用)
   # - dicts/wb86_cn_dicts/base.small     # 旧基础词库(同上)

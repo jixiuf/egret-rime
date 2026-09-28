@@ -11,8 +11,8 @@ __pycache__/
 *.pyc
 dist/
 
-# --- 词库：**输入法实际用到的词典一律入 git**（部署与用户拿到的就是它们）---
-# 只有「纯中间产物」（不被任何 schema/wrapper import，仅喂给生成器）才不入 git：
+# 词库：输入法实际用到的词典一律入 git（部署和用户拿到的就是它们）。
+# 只有纯中间产物（不被任何 schema/wrapper import，仅喂给生成器）才排除：
 dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small.dict.yaml
 dicts/egret_wubi_py/egret_wubi_force_end.dict.yaml.tmp
 dicts/egret_wubi_py/egret_wubi_force_end.dict.yaml

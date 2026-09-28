@@ -1,7 +1,8 @@
 #   -*- coding: utf-8 -*-
 # 内部辅助 schema：仅为让部署器编译 egret_wubi 词库
 # （egret_wubi_py 的 dependencies 引用依赖时需要依赖方有 schema 文件）。
-# 不要加入 default.custom.yaml 的 schema_list，不要直接使用。
+# 不要加入 default.custom.yaml 的 schema_list，也不要直接选用。
+# 用户可选的三个方案见 default.custom.yaml：egret_wubi_py（混流）、egret_py（全拼）。
 schema:
   schema_id: egret_wubi
   name: "wubi py wubi (internal)"

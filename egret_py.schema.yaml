@@ -35,19 +35,20 @@ translator:
   dictionary: egret_py
   prism: egret_py
   enable_user_dict: true
-  db_class: tabledb            # 拼音侧自学习调频
+  db_class: tabledb            # tabledb 才能自学习调频
   user_dict: egret_py.user.dict
   enable_completion: false
   enable_sentence: true
-  max_sentences: 100           # 注意 librime 会 clamp 到 [1,100]
+  max_sentences: 100           # librime 内部 clamp 到 [1,100]，写更大没用
   max_homophones: 7
   initial_quality: 1
-  # 注：**不加 grammar** —— 实测全拼路径带 gram 反而更差（13~16% vs 24%），
-  # 见 docs/PROGRESS.md §4.9；混流方案（egret_wubi_py）才用 LM 重排。
+  # 不加 grammar：实测全拼路径带 gram 反而更差（13~16% 对 24%），见
+  # docs/PROGRESS.md §4.9。本仓库只有混流方案 egret_wubi_py 用 LM 重排。
 
+# 本方案里 ` 用作反查笔画（五笔方案里 ` 才是反查拼音，两者互为反查）。
 reverse_lookup:
   __patch:
-    - egret.common.yaml:reverse_lookup_stroke   # `+hspnz 反查笔画
+    - egret.common.yaml:reverse_lookup_stroke
 
 engine:
   processors:
@@ -75,7 +76,7 @@ engine:
     - lua_translator@*unicode
   filters:
     - simplifier@emoji
-    - reverse_lookup_filter@wubi_comment   # ★ 打拼音时显示候选的五笔码（学五笔）
+    - reverse_lookup_filter@wubi_comment   # 候选注释里显示该词的五笔码，见文件末 wubi_comment
     - lua_filter@*long_word_filter
     - lua_filter@*reduce_emoji_filter
     - simplifier@traditionalize
