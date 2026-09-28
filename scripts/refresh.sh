@@ -179,7 +179,6 @@ for i in "${!STAGES[@]}"; do
       fi
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "字表已分层（common 默认 / ext 可选）" || warn "字表分层失败"
-      "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "已切到 $TIER 档" || warn "切档失败"
