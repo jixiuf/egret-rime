@@ -50,13 +50,23 @@ function M.func(input, env)
     --   所以正确做法是：**只改写既有候选的文本**，绝不新增。
     local cands = {}
     for cand in input:iter() do cands[#cands + 1] = cand end
-    if composed and cands[1] then
-        -- 注意：librime-lua 的 cand.text=... 只对 SimpleCandidate 生效，
-        -- 对 Sentence/Phrase 是**静默无效**（实测为此排查了很久）。
-        -- 所以必须新造一个 SimpleCandidate；区间沿用首个候选，避免引擎判定
-        -- "整段已消费"而在输入中途提交（实测自造 [0,#input] 会吞首字）。
-        local c0 = cands[1]
-        yield(Candidate("compose", c0.start, c0._end, composed, ""))
+    if composed and #inp >= 5 and #cands > 0 then
+        -- 「共识重排」：我们的搜索器（统一码表，支持五笔/拼音/混流）给出整句后，
+        -- 在既有候选里找**同一个句子**，把它移到最前。
+        -- 关键：只**重排既有候选**（long_word_filter 已证明安全），
+        -- 绝不新增候选、绝不改写文本——那两条路都会让引擎中途提交（见 PROGRESS §4.15）。
+        local r = nil
+        for i, cand in ipairs(cands) do
+            if cand.text:sub(1, #composed) == composed then r = i break end
+        end
+        if M.debug then
+            log.error(string.format("[CF] compose=%s hit=%s n=%d top=%s",
+                composed, tostring(r), #cands, cands[1] and cands[1].text or "-"))
+        end
+        if r and r > 1 then
+            local hit = table.remove(cands, r)
+            table.insert(cands, 1, hit)
+        end
     end
     for _, cand in ipairs(cands) do yield(cand) end
 end

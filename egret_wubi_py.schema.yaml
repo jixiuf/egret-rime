@@ -118,7 +118,7 @@ egret_wubi_py_wubi:
   enable_user_dict: true       # 造词（历史码=传统规则，兼容）
   enable_encoder: true
   encode_commit_history: true
-  enable_sentence: false       # 纯精确码匹配，候选完全确定
+  enable_sentence: false       # 纯精确码匹配，候选完全确定（开启可救五笔整句但会引入拼音垃圾句，见 docs/research-mixed-input.md）
   # 补全能力必须保留(如输入 y 需列出 y 开头的字)。拼音被 wan* 补全污染的
   # 问题改由 dynamic_translator 对 type=completion 的候选降权解决(见 lua)。
   enable_completion: true
