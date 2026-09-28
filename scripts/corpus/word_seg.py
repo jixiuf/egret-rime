@@ -9,7 +9,7 @@ scripts/corpus/gram.sh），语义与 octagram 并不对齐（见 docs/PROGRESS.
 data/gram/zh-hans-egret-word.gram，再做 A/B。
 """
 import glob, os, sys
-HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,os.path.dirname(os.path.dirname(HERE)))
+HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,os.path.dirname(HERE))  # scripts/ 下有 rime_paths.py
 import rime_paths
 import jieba
 
