@@ -159,14 +159,20 @@ for i in "${!STAGES[@]}"; do
       # 且让整条 dict 管线可复现（见 docs/PROGRESS.md）
       "$PY" "$ROOT/scripts/gen_pinyin_words.py" --tier "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "拼音词表已生成（pypinyin 标注，可复现）" || warn "拼音词表生成失败"
+      # ⭐ 把一/二级简码补进**混合库字表**：组句是混合库的 script_translator 在 prism 上做的，
+      # 而「一级简码只在传统库发」会让简码层不在组句的拼写空间里 → qchifanle / qktqn
+      # 这类混流输入组不出正确句子（详见 docs/PROGRESS.md §4.19）。源数据在仓库内，幂等。
+      "$PY" "$ROOT/scripts/gen_jianma_spellings.py" >>"$RUNLOG" 2>&1 \
+        && ok "简码拼写已补入混合库（混流组句的关键）" || warn "简码拼写补入失败"
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "已切到 $TIER 档" || warn "切档失败"
       # 注意：gen_wubi_py_unified_dicts.py 依赖 dicts/wangxiang_cn_dicts/base.small
       # 等**本仓库没有的外部源数据**（来自原仓库），跑不通 → 默认跳过。
-      # 即：字符表层（chars/pinyin_8105/wubi_chars）按"入库源数据"处理，
-      # 由 gen_dict_tiers.py 从仓库内数据派生的分档词表层才是可复现的。
+      # 即：字符表层的**主体**（字/拼音码/五笔全码）按"入库源数据"处理；
+      # 但**简码拼写**已由 gen_jianma_spellings.py 从仓库内派生（上面那步），
+      # 分档词表层由 gen_dict_tiers.py 从仓库内数据派生 —— 组句所需的部分均可复现。
       if [ "${SKIP_GEN:-1}" != 1 ]; then
         "$PY" "$ROOT/scripts/gen_wubi_py_unified_dicts.py" >>"$RUNLOG" 2>&1 \
           && ok "方案词库 gen 完成" || warn "gen 失败（缺外部源数据，属预期）"
