@@ -334,7 +334,8 @@ cd "$CHK" || exit 1
 for c in "e=有" "q=我" "yi=就" "tffu=等" "khlg=中国" \
          "jintiandetianqizenmeyang=今天的天气怎么样" \
          "wojintianmeiyoukong=我今天没有空" \
-         "wokanshiqiaomai=我看是荞麦"; do
+         "wokanshiqiaomai=我看是荞麦" \
+         "qktnqnr=我吃饭" "qchifanle=我吃饭了" "uwycuklf=冷部署" "trwuktnqnr=我们吃饭"; do
   code="${c%%=*}"; want="${c##*=}"
   got="$(printf '%s\n\n' "$code" | "$BIN/rime_api_console" 2>/dev/null \
          | grep -m1 -E '^1\. \[' | sed 's/^1\. \[//;s/\]$//')"
