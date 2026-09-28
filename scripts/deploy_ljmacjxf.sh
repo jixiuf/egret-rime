@@ -294,6 +294,20 @@ esac
 if [ "$NO_CHECK" = 1 ]; then
   echo "  [自检] 跳过（--no-check）"
 else
+  # 词库指纹：确认「混合库字表」带上了 2026-09 的混流修复（简码拼写 + 五笔全码）。
+  # 这三条是修复的标志条目：我 q(一级简码) / 冷 uwyc(全码) / 署 lftj(全码)。
+  # 若不为 3，说明部署链路把旧字表带过来了 → 会出现 qchifanle→色步犯了、uwycuklf→闪充部署。
+  FP="$R/dicts/egret_wubi_py/egret_wubi_py_chars.dict.yaml"
+  if [ -f "$FP" ]; then
+    n="$(awk -F'\t' '($1=="我"&&$2=="q")||($1=="冷"&&$2=="uwyc")||($1=="署"&&$2=="lftj"){n++} END{print n+0}' "$FP")"
+    if [ "$n" = "3" ]; then
+      echo "  [词库指纹] ✓ 混流修复已在远端字表（我q/冷uwyc/署lftj）"
+    else
+      echo "  [词库指纹] ✗ 只命中 $n/3 —— 远端字表是旧的！混流会退化为 色步犯了/闪充部署"
+    fi
+  else
+    echo "  [词库指纹] ! 找不到 $FP"
+  fi
   echo "  [自检] ~/.egret-check 里跑 1.17 console（不动 ~/Library/Rime/build）"
   if [ ! -x "$CONSOLE" ]; then
     echo "        ! 缺 $CONSOLE，跳过"
