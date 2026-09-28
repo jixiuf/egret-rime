@@ -163,11 +163,18 @@ SRC_DST=(
   "egret_wubi_py.dict.yaml|egret_wubi_py.dict.yaml"
   "egret_wubi_py_wubi.schema.yaml|egret_wubi_py_wubi.schema.yaml"
   "egret_wubi_py_wubi.dict.yaml|egret_wubi_py_wubi.dict.yaml"
-  "lua/dynamic_translator.lua|lua/dynamic_translator.lua"
-  "lua/lm_rerank.lua|lua/lm_rerank.lua"
   "data/gram/lm_rerank.tsv|lm_rerank.tsv"
   "data/gram/lm_rerank.meta|lm_rerank.meta"
 )
+# 全部 lua 组件：schema 里 lua_translator/lua_filter 引用的模块
+# （dynamic_translator / lm_rerank / compose_filter / py_composer 等）。
+# 曾经只同步 2 个 → 新增 compose_filter.lua/py_composer.lua 后远端缺文件、
+# 自检全 ✗，所以改成 lua/*.lua 全量同步。
+for f in "$ROOT"/lua/*.lua; do
+  [ -e "$f" ] || continue
+  b="lua/$(basename "$f")"
+  SRC_DST+=("$b|$b")
+done
 # 全部 egret_wubi_py 词库（三档 × 三库 + 字表/用户词组，共 15 个）
 for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
   [ -e "$f" ] || continue
@@ -296,6 +303,13 @@ else
       b="${f##*/}"
       [ "$b" = build ] && continue          # build 用 scratch 自己的
       ln -sfn "$f" "$CHK/$b"
+    done
+    # librime 的 shared_data_dir 默认也是 "."（见 Makefile env-test 注释）：
+    # symbols/default/essay 必须同时存在于用户目录，否则 schema config 构建失败
+    # → 候选为空（自检全 ✗ 的常见假故障）
+    BIN="$HOME/repos/librime/build/bin"
+    for f in default.yaml symbols.yaml essay.txt; do
+      [ -e "$CHK/$f" ] || ln -sfn "$BIN/$f" "$CHK/$f"
     done
     reset_schema() {
       [ -f "$R/user.yaml" ] || return 0

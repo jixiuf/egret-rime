@@ -242,7 +242,8 @@ sudo emerge -1 '=app-i18n/librime-1.17.0'     # 同时重建 lua / octagram 插�
 
 1. 整目录备份 → `~/rime-backup-<时间戳>.tar.gz`（软链按软链存，回滚只需 `--rollback`）
 2. 根级软链实体化（`cp -aL`；`*.gram` 与 `sync` 保持软链）——含 `dicts/ lua/ opencc/`
-3. 覆盖 24 个运行时文件（含**全部 15 个** egret_wubi_py 词库，旧环境还缺其中 11 个）
+3. 覆盖 38 个运行时文件（**全部 15 个** egret_wubi_py 词库 + **全部 `lua/*.lua`**
+   + lm_rerank.tsv/meta + 4 个 yaml）
 4. `"$SQUIRREL/Contents/MacOS/rime_deployer" --build ~/Library/Rime \
      /Library/Input\ Methods/Squirrel.app/Contents/SharedSupport ~/Library/Rime/build`
 5. **默认不重启 Squirrel**（用户要求：文件到位即可）；`--restart` 才重启
@@ -273,6 +274,22 @@ sudo emerge -1 '=app-i18n/librime-1.17.0'     # 同时重建 lua / octagram 插�
    可能留下与 1.16 不兼容的产物。用 scratch 目录 + 软链用户文件（build 用 scratch 自己的）。
 5. 首次在全新 scratch 目录里 deploy 可能报 `[deploy] failure`，再跑一次（或显式
    `rime_deployer --build`）即可；`build` 目录保留着就是热重建，别每次 `rm -rf`。
+6. **认证：`ssh-add -l` 成功 ≠ 能签名**。之前 find_agent 只看 `ssh-add -l`，会选中
+   转发进来的 gpg-agent socket（socket 属主是 sshd，处于 restricted 模式 / 需远端
+   pinentry 确认）→ 握手时 `signing failed: agent refused operation`，scp 直接失败。
+   修法：用**一次真实握手**（`ssh ... true`）挑认证方式，顺序 agent socket → 本地
+   私钥（`EGRET_SSH_KEY` → `~/.ssh/id_rsa` → `/export/vmacs/dots/ssh/id_rsa`）→
+   自起 ssh-agent。本机可用私钥是 vmacs dotfiles 里的那个（与转发 agent 里的同一把，
+   `3072 SHA256:S/+8/2y04…`）；`ssh -i` 直连 `localhost:8092` 通，不需要 agent。
+7. **“自检全 ✗、候选为空”大多不是词库问题**，两个已踩过的原因：
+   a. 部署清单漏了 lua 组件：schema 引用了 `lua_filter@*compose_filter`、
+      `dynamic_translator` 又 `require("py_composer")`，而清单只同步了
+      `dynamic_translator.lua`/`lm_rerank.lua` → 远端 `lua/` 缺文件。现在全量同步
+      `lua/*.lua`。判断：console stderr 里 `module 'compose_filter' not found`。
+   b. console 的 `shared_data_dir` 默认也是 `.`（同 `Makefile` env-test 注释），
+      `~/.egret-check` 里必须同时有 `symbols.yaml/default.yaml/essay.txt`（软链到
+      `~/repos/librime/build/bin/` 即可），否则 `resource could not be loaded: symbols`
+      → schema config 构建失败 → 所有输入都无候选。
 6. 备份体积：软链实体化后整目录 tar 约 144MB（含 dicts 副本）；`*.gram`（≈290MB）不入包。
    `--keep-links` 则不实体化，写入会穿透软链落到 `~/vmacs/rime`。
 
