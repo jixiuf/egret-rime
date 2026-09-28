@@ -477,6 +477,45 @@ xietiaotujinsigequanmianzhanlvebuju → 协调推进四个全面战略布局
 → **现有字表/词表权重是整体手工调好的**，任何单侧或整链改动都会破黄金。
   要重做必须**全链重标定 + 用黄金用例与整句评测联合标定**，不是改参数能了事。
 
+### 4.18 混流机制调研（子代理三路，含 file:line 证据）+ ❗测量纪律
+
+**⭐ 短码序列打不出整句的真正机制**（此前推测有误）：
+`ScriptTranslation::Evaluate` 的 `has_reliable_phrase = has_exact_match_phrase(...)`
+（`script_translator.cc:446/482`）——只要存在一条**覆盖整段输入**的精确词条（系统或用户词），
+**整段直接跳过组句**（`:496-503`）。
+- 实证：生僻字 **㲒** 在 `egret_wubi_py_chars.dict.yaml:1491` 有 `qkt`/`qktn`（weight 1）
+  → 输入 `qktn` 命中它 → 不生成任何整句 → `qktn→㲒`、`trwuqktn→我们㲒`、`qktnqnr→㲒饭`
+- 对照：`trwuktnqnr` 无整串词条 → 正常组出「我们吃饭」✓
+- 热机后 `qktqn→我吃饭`、`qktnqnrb→我吃饭了` **本来就是对的**；失败的是 `qktn`/`qktnqnr`（被 㲒 短路）
+
+**❗❗ 测量纪律（重要，推翻本文档多处旧结论的前提）**：
+`data/rime-test` **冷部署首跑的分段与热机完全不同**（`qktqn` 首跑 `[qk tq n]`→名称嗯，
+热机 `[q ktqn]`→我吃饭）。**任何单跑结论都不可信，必须同一 code 连跑两次取第二次**（呼应陷阱 #9 prism 非确定性）。
+→ 本文档 §4.15/§4.16 里「qktqn→名称嗯」类结论**很可能来自冷态，需复核**。
+
+**参数真相（与直觉相反，均已核到源码）**：
+| 参数 | 实际 |
+|---|---|
+| `translator/max_sentences: 300` | **被 clamp 到 100**（`translator_commons.cc:129`），写 300 无效 |
+| `translator/max_homographs: 7` | 对 script_translator **no-op**（script 不读） |
+| `translator/always_make_sentences: true` | **本仓库 librime 无此实现**（strings 计数 0）→ no-op |
+| `lm_rerank: true` | 它把 `grammar/language` 改成不存在的名字 → `Octagram::Query` 走兜底（`octagram.cc:110`）→ 实际是 **BeamSearch + 固定 -12/词**，**并非真 LM** |
+| `grammar.h:24` 的 `kPenalty=-13.8` | 只在 **grammar 指针为 null** 时生效；本方案指针非空、db_ 为空 → 走 -12 |
+
+**其他实测**：
+- **反查不可用**：recognizer patterns + `reverse_lookup_*` 配置都在，但 engine **没有 reverse_lookup translator**，
+  且 `egret_py` 依赖已剥离 → `` `wo' `` 无候选（`wubi_comment` 也被注释）✗
+- **大写输入是死路**：`GTNK`/`WQ` 候选为空（既不进英文态也不强制五笔）✗
+- **混流裁决偏向五笔读法**：拼音字表被 ×0.35 压低 → `qjintian→旬泌汇`、
+  `wojintianmeiyoukong→伙晃发泄届膛亦咪怀`（正确句退到第 4 位）✗
+- `dictionary_exclude` 排除 10.7 万 weight=1 生僻字**实测无效**（`qktn` 仍出 㲒），已撤回 ✗
+- 单字母 `z` 被 `abbrev` 规则当拼音首字母（→在/这/中）：**用户决策：不做简拼**，
+  故可考虑关闭 `egret.common.yaml:132-135` 的 abbrev（本轮未完成：注释 132-133 后 `z→在` 仍在，
+  需继续定位，暂已还原）
+
+**改进优先级（据调研重排）**：① 恢复候选码提示（`wubi_comment`/`super_comment`）② 关 abbrev（按用户决策）
+③ 拉黑生僻字短路（换有效手段）④ 混流拼音读法权重按场景修正 ⑤ 反查补齐
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |
@@ -494,7 +533,11 @@ xietiaotujinsigequanmianzhanlvebuju → 协调推进四个全面战略布局
 | D2 | gram 配比 AB（自有 : 维基 : 新闻） | 开源语料抽取后 | 待 |
 | E1 | 评测：`eval_gram.py` 句子级 + rime-schema-compare | 首批已完成 §4.10 | 🔄 |
 | **F1** | **提升全拼路径**（当前 26%）：词典权重/拼音覆盖/短语——主战场 | C2–C6 | 待 |
-| **G1** | **混合输入体验**（五笔拼音混流）：见 `docs/research-mixed-input.md` | — | 🔄 |
+| **G1** | **混合输入体验**：见 `docs/research-mixed-input.md` + §4.18 机制调研 | — | 🔄 |
+| G4 | 关 abbrev（用户明确不做简拼）；`z→在` 来源仍需定位 | — | 待 |
+| G5 | 恢复 `wubi_comment` 候选码提示（最低成本提体验） | — | 待 |
+| G6 | 大写输入补支持（GTNK/WQ 当前无候选） | — | 待 |
+| G7 | 反查补齐（engine 无 reverse_lookup translator） | — | 待 |
 | G2 | 统一码表搜索器的交付：需自建完整翻译链路（§4.15 四条路被封） | G1 | 待 |
 | G3 | 整句词库扩容（更大采样/降阈值，覆盖更多高频句） | — | 待 |
 
