@@ -52,8 +52,11 @@ grammar:
   __patch:
     - egret.common.yaml:grammar
 
-# 反查笔画（与上游一致）。依赖一个 stroke 方案/词典，本仓库未随包提供，
-# 装了 stroke 方案后 `` `hspnz' `` 之类才会出候选；本仓库当前是惰性的。
+# 反查笔画（与上游一致）。dictionary: stroke 指 rime 数据包（rime-data/brise）里的
+# 内置 stroke 词典——它既不在 librime 引擎里（我们的构建数据目录只有
+# essay/symbols/luna_pinyin/cangjie5），也不在参考仓库 ~/vmacs/rime 里，
+# 所以当前这条是惰性的。要启用：把 rime-data 的 stroke.dict.yaml 放到用户目录根，
+# 或改指别的词典。
 reverse_lookup:
   __patch:
     - egret.common.yaml:reverse_lookup_stroke

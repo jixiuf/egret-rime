@@ -756,7 +756,9 @@ patch:
 | G2 | 统一码表搜索器的交付：需自建完整翻译链路（§4.15 四条路被封） | G1 | 待 |
 | G3 | 整句词库扩容（更大采样/降阈值，覆盖更多高频句） | — | 待 |
 | G8 | ~~字表校准/生僻字拼音接入~~ **已被 §4.23 分层方案取代** ✅（ext 层不加载 ⇒ 碰撞与挤占自然消失） | — | ✅ |
-| G9 | 查清 𨸐 为何未被音节碰撞规则丢弃（§4.22③） | — | 待 |
+| G9 | ~~查清 𨸐 为何未被丢弃~~ 已查清：校准脚本的字符范围判断漏了扩展区（§4.22）| — | ✅ |
+| G10 | 笔画反查：`dictionary: stroke` 指 rime-data/brise 的内置 stroke 词典，本仓库与 librime 构建数据都没有 → 要启用需引入 rime-data 的 stroke.dict.yaml | — | 待 |
+| G11 | 词级 gram for py：gram.sh 现在是字符 2-6gram；词级需用 jieba 分词后统计（freq.py 已有 jieba），产出 zh-hans-egret-word.gram 再 A/B。librime 的 octagram 本就是词级 collocation | — | 待 |
 
 ## 6. 关键命令速查
 
