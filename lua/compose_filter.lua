@@ -24,6 +24,8 @@ function M.init(env)
                 local t = line:match("^total_tokens=(%d+)$")
                 if t then cp.set_total_tokens(tonumber(t)) end
             end
+            local ln = config:get_int(ns .. "/compose_log_n")
+            if ln and ln > 0 then cp.set_log_n(ln) end
         end
     end
 end
@@ -40,15 +42,23 @@ function M.func(input, env)
             end
         end
     end
-    local used = false
-    for cand in input:iter() do
-        -- 只改写「覆盖整段输入的整句候选」的首个；其余原样放行
-        if composed and not used and cand:get_dynamic_type() == "Sentence" then
-            cand.text = composed
-            used = true
-        end
-        yield(cand)
+    -- 关键认知（实测得来）：
+    --   1) 五笔输入时传统词组精确匹配会让 librime **完全不产生整句候选**
+    --      （script_translator 的 has_reliable_phrase 判断），所以必须主动出手；
+    --   2) 但**新增**候选（无论区间取 [0,#input] 还是沿用别人的）都会让引擎
+    --      以为整段已被消费 → 输入中途提交、首字被吞（实测 的天气怎么样）。
+    --   所以正确做法是：**只改写既有候选的文本**，绝不新增。
+    local cands = {}
+    for cand in input:iter() do cands[#cands + 1] = cand end
+    if composed and cands[1] then
+        -- 注意：librime-lua 的 cand.text=... 只对 SimpleCandidate 生效，
+        -- 对 Sentence/Phrase 是**静默无效**（实测为此排查了很久）。
+        -- 所以必须新造一个 SimpleCandidate；区间沿用首个候选，避免引擎判定
+        -- "整段已消费"而在输入中途提交（实测自造 [0,#input] 会吞首字）。
+        local c0 = cands[1]
+        yield(Candidate("compose", c0.start, c0._end, composed, ""))
     end
+    for _, cand in ipairs(cands) do yield(cand) end
 end
 
 return M

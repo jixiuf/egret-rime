@@ -81,13 +81,14 @@ engine:
   # 长词优先 (即wq 后 第4个词的长度必然大于第1个候选,即提升部分长词到第4，5个选项)
   # 见下面 long_word_filter 相关配置
     - simplifier@emoji                              # Emoji 彩色or 黑白
-    - lua_filter@*compose_filter   # LM 搜索器结果改写整句候选
     - lua_filter@*long_word_filter
     - lua_filter@*reduce_emoji_filter   # 按需启用，作用是降低Emoji在候选项中的位置排序(顺序要求：Emoji > 降低排序)
     - charset_filter                   # 默认隐藏CJK扩展区生僻字(2026-09实测: 否则混合库权重1的
                                        # 𠳙/𨾱等会占拼音输入首屏; 切 extended_charset 选项可显示)
     - simplifier@traditionalize                     # 简繁切换
     - uniquifier                # 去重，比如多个繁体字对应一个简体字，此时可能需要去重
+    # 放在最后：前面的 long_word_filter 会重排候选，若放在它前面，改写会被覆盖
+    - lua_filter@*compose_filter
 
 # ---- 顶层调度：first=传统五笔库，先于混合库，保证简码/全码首候选确定 ----
 dynamic_translator:
@@ -104,6 +105,7 @@ dynamic_translator:
   lm_compose: false
   lm_compose_translator: false
   compose_beam: 8
+  compose_log_n: 0            # >0 时覆盖一元 LM 的 log N（标定用）
   compose_want: 2
   lm_keep_sentences: 1        # 首屏只留 1 个整句，其余挪到尾部
 

@@ -135,6 +135,7 @@ function M.score_segment(context, text)
     if not tab or not text or text == "" then return 0 end
     local ctx = {}
     for _, cp in utf8.codes(context or "") do ctx[#ctx + 1] = utf8.char(cp) end
+    while #ctx > 6 do table.remove(ctx, 1) end   -- 只保留最近 6 字作上下文
     local total = 0
     for _, cp in utf8.codes(text) do
         local ch = utf8.char(cp)

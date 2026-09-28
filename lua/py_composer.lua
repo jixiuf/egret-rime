@@ -14,9 +14,7 @@
 --   - LM 参与剪枝 → 正确路径不会被权重剪掉
 local M = {}
 
-local syl_set = {}
-local by_first = {}
-local MAX_SYL = 6
+local by_key = {}       -- 码前缀 -> 候选条目
 local LOG_N = 20200        -- log(语料总词数)*1000，由 py_meta.txt 覆盖
 
 -- 载入归一化常数
@@ -24,38 +22,37 @@ function M.set_total_tokens(t)
     if t and t > 0 then LOG_N = math.log(t) * 1000 end
 end
 
-function M.load(dir)
-    local f = io.open(dir .. "/py_syllables.txt", "rb")
-    if not f then return false, "py_syllables.txt 缺失" end
-    local ns = 0
-    for line in f:lines() do
-        if line ~= "" then syl_set[line] = true; ns = ns + 1 end
-    end
-    f:close()
+function M.set_log_n(v)
+    if v and v > 0 then LOG_N = v end
+end
 
-    local f2 = io.open(dir .. "/py_words.tsv", "rb")
-    if not f2 then return false, "py_words.tsv 缺失" end
-    local nw = 0
+function M.get_log_n() return LOG_N end
+
+function M.load(dir)
+    -- 统一码表：text <TAB> code <TAB> weight(log 词频) <TAB> kind
+    -- code 既可能是五笔短码（q/ktn/qnr/trwu）也可能是拼音串（ni/shuo/chifan）
+    local f2 = io.open(dir .. "/compose_table.tsv", "rb")
+    if not f2 then return false, "compose_table.tsv 缺失" end
+    local n = 0
     for line in f2:lines() do
-        local w, code, wt = line:match("^(.-)\t(.-)\t(%d+)$")
-        if w then
-            local first = code:match("^[^ ]+")
-            local concat = code:gsub(" ", "")
-            local list = by_first[first]
-            if not list then list = {}; by_first[first] = list end
-            list[#list + 1] = { text = w, concat = concat,
+        local text, code, wt = line:match("^(.-)	(.-)	(%d+)	")
+        if text and #code >= 1 then
+            local key = #code >= 2 and code:sub(1, 2) or code
+            local list = by_key[key]
+            if not list then list = {}; by_key[key] = list end
+            list[#list + 1] = { text = text, code = code,
                                 weight = tonumber(wt) or 0 }
-            nw = nw + 1
+            n = n + 1
         end
     end
     f2:close()
-    for _, list in pairs(by_first) do
+    for _, list in pairs(by_key) do
         table.sort(list, function(a, b)
-            if #a.concat ~= #b.concat then return #a.concat > #b.concat end
+            if #a.code ~= #b.code then return #a.code > #b.code end
             return a.weight > b.weight
         end)
     end
-    return true, string.format("音节 %d / 词条 %d", ns, nw)
+    return true, string.format("码表 %d 条", n)
 end
 
 --- 候选整句搜索。
@@ -74,25 +71,33 @@ function M.compose(input, lm, beam, want)
     for pos = 0, n - 1 do
         local cur = best[pos]
         if cur then
+            local k1 = input:sub(pos + 1, pos + 1)
+            local k2 = input:sub(pos + 1, pos + 2)
             for _, path in ipairs(cur) do
-                for L = math.min(MAX_SYL, n - pos), 1, -1 do
-                    local syl = input:sub(pos + 1, pos + L)
-                    local list = syl_set[syl] and by_first[syl]
+                for _, key in ipairs(k1 == k2 and { k1 } or { k2, k1 }) do
+                    local list = by_key[key]
                     if list then
                         local rest = input:sub(pos + 1)
                         for _, w in ipairs(list) do
-                            if rest:sub(1, #w.concat) == w.concat then
-                                local epos = pos + #w.concat
-                                -- 词的一元语言模型：log P(w) = log f(w) - log N
-                                -- （必须减 log N，否则"切得越碎分越高"：
-                                --   Σlog f 随段数单调增大 → 今天 会输给 进+提案）
+                            if rest:sub(1, #w.code) == w.code then
+                                local epos = pos + #w.code
                                 local lms = lm and lm.score_segment(path.ctx, w.text) or 0
+                                -- 词的一元语言模型：log P(w) = log f(w) - log N
                                 local sc = path.score + (w.weight - LOG_N) + lms
                                 local nb = best[epos]
                                 if not nb then nb = {}; best[epos] = nb end
+                                -- 上下文按**字符**保留（按字节切会截断 UTF-8）
                                 local ctx = path.ctx .. w.text
-                                if #ctx > 6 then ctx = ctx:sub(-6) end
-                                nb[#nb + 1] = { score = sc, text = path.text .. w.text,
+                                local nctx = utf8.len(ctx)
+                                if nctx and nctx > 6 then
+                                    local chars = {}
+                                    for _, cp in utf8.codes(ctx) do
+                                        chars[#chars + 1] = utf8.char(cp)
+                                    end
+                                    ctx = table.concat(chars, "", #chars - 5, #chars)
+                                end
+                                nb[#nb + 1] = { score = sc,
+                                                text = path.text .. w.text,
                                                 ctx = ctx }
                             end
                         end
@@ -100,15 +105,14 @@ function M.compose(input, lm, beam, want)
                 end
             end
         end
-        local nb = best[pos + 1]
-        if nb and #nb > beam then
+        if best[pos + 1] and #best[pos + 1] > beam then
+            local nb = best[pos + 1]
             table.sort(nb, function(a, b) return a.score > b.score end)
-            -- 同位置按文本去重，避免同一句堆满 beam
             local seen, out = {}, {}
-            for _, p in ipairs(nb) do
-                if not seen[p.text] then
-                    seen[p.text] = true
-                    out[#out + 1] = p
+            for _, pp in ipairs(nb) do
+                if not seen[pp.text] then
+                    seen[pp.text] = true
+                    out[#out + 1] = pp
                     if #out >= beam then break end
                 end
             end

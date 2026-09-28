@@ -68,7 +68,11 @@ def main():
                 wt=int(round(math.log(1+c)*1000)) if c else 0
             out.append((w," ".join(toks),wt)); n+=1
     # 总词数（用于一元语言模型归一化 log P(w)=log f(w)-log N）
-    total_tokens=sum(v for k,v in freq.items() if not k.startswith("\x01"))
+    # 一元语言模型的 N = 语料总词数。注意：不能用 recount 的计数之和——它把
+    # **重叠匹配**也累加了（会把 N 放大到 1.5e10，log N 偏大使"少分段"被过度偏袒：
+    # 实测 qktnqnrb 会用 我吃包拯 顶掉 我吃饭了）。用字数/平均词长估算。
+    total_chars=sum(v for k,v in freq.items() if k.startswith("\x01"))
+    total_tokens=int(total_chars / 1.5) if total_chars else 1
     mp=os.path.join(rime_paths.GRAM_DIR,"py_meta.txt")
     with open(mp,"w",encoding="utf-8") as f:
         f.write(f"total_tokens={total_tokens}\n")
