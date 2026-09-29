@@ -19,6 +19,7 @@
   python3 scripts/gen_lm_rerank.py --top2 300000 --top3 200000 --top4 100000
 """
 
+import struct
 import argparse
 import heapq
 import os
@@ -29,6 +30,32 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "corpus"))
 import rime_paths  # noqa: E402
 
+
+def write_bin(tsv, out):
+    """把 TSV 蒸馏成**定长记录**的二进制包，供 Lua 二分查表（不建哈希）。
+
+    格式（全部小端）：
+      0   magic "EGLM1\0\0\0" (8B)
+      8   档数 u8 = 6 + 3B 填充
+      12  每档记录数 u32 × 6           (档 = 1..6 字)
+      36  各档数据依次排列，每条记录 = 键(3L 字节，CJK 一字 3 字节) + 值 u16
+    定长记录让二分可以纯算术定位，不需要偏移索引；键按字节序排序，
+    与 Lua 的字符串比较（逐字节无符号）一致。
+    """
+    by={n:[] for n in range(1,7)}
+    for line in open(tsv,encoding="utf-8"):
+        k,_,v=line.rstrip("\n").partition("\t")
+        if not v.isdigit(): continue
+        kb=k.encode("utf-8")
+        if 1<=len(k)<=6 and len(kb)==3*len(k):
+            by[len(k)].append((kb,min(int(v),65535)))
+    with open(out,"wb") as f:
+        f.write(b"EGLM1\0\0\0"+bytes([6,0,0,0]))
+        for L in range(1,7): f.write(struct.pack("<I",len(by[L])))
+        for L in range(1,7):
+            for kb,v in sorted(by[L]):
+                f.write(kb); f.write(struct.pack("<H",v))
+    print(f"  二进制包: {out} ({os.path.getsize(out)/1048576:.1f} MB, {sum(len(v) for v in by.values()):,} 条)")
 
 def main():
     ap = argparse.ArgumentParser()
@@ -97,6 +124,7 @@ def main():
         f.write(f"top2={args.top2} top3={args.top3} top4={args.top4}\n")
         f.write(f"entries={kept}\n")
         f.write(f"total_chars={total_chars}\n")
+    write_bin(args.out, args.out[:-4] + ".bin")   # 运行时用这个（Lua 二分查表）
     print(f"输入 {total:,} 条 → 输出 {kept:,} 条（含 1gram {len(char_count):,}）")
     for n in (2, 3, 4, 5, 6):
         got = sum(1 for k, _ in rows if len(k) == n)

@@ -44,9 +44,10 @@ manifest() {
     [ -e "$f" ] || continue
     echo "opencc/$(basename "$f")|opencc/$(basename "$f")"
   done
-  # 纯 Lua 的 LM 重排表（必需）。只带这两个，不带同目录的 gram 中间产物。
-  [ -f "$ROOT/data/gram/lm_rerank.tsv" ]  && echo "data/gram/lm_rerank.tsv|lm_rerank.tsv"
+  # LM 重排的运行时文件：.bin（二分查表用）+ .meta（总字数，backoff 归一化用）。
+  # .tsv 只是同一份数据的可读视图，给人排查用，不部署。
   [ -f "$ROOT/data/gram/lm_rerank.meta" ] && echo "data/gram/lm_rerank.meta|lm_rerank.meta"
+  [ -f "$ROOT/data/gram/lm_rerank.bin" ]  && echo "data/gram/lm_rerank.bin|lm_rerank.bin"
   [ "$WITH_GRAM" = 1 ] && [ -f "$ROOT/data/gram/zh-hans-egret.gram" ] \
     && echo "data/gram/zh-hans-egret.gram|zh-hans-egret.gram"
   return 0

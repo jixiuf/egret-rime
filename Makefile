@@ -92,6 +92,7 @@ env-test:
 	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
 	@cp -f $(GRAM_DIR)/lm_rerank.tsv $(GRAM_DIR)/lm_rerank.meta \
+		$(GRAM_DIR)/lm_rerank.bin \
 		$(GRAM_DIR)/py_words.tsv $(GRAM_DIR)/py_syllables.txt \
 		$(GRAM_DIR)/py_meta.txt $(TEST_DIR)/ 2>/dev/null || true
 	@# 先部署出 build/ 产物: 空 build/ 下首次 console 会撞维护竞态(陷阱 #2)

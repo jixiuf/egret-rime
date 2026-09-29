@@ -20,6 +20,44 @@ local LOG_TOTAL = nil           -- log(总字数)*1000，来自 .meta；用于 u
 local tab
 local tried = false
 
+-- 二进制包（scripts/gen_lm_rerank.py 产出）：定长记录 + 二分查表，避免把 190 万条
+-- n-gram 全量灌进 Lua 哈希（那份表 28.5MB，建哈希后常驻可达数百 MB）。
+-- 格式见生成器 write_bin() 的注释：8B magic + 6×u32 计数 + 各档定长记录(键3L字节+u16值)。
+local function load_bin(path)
+    local f = io.open(path, "rb")
+    if not f then return nil end
+    local data = f:read("*a")
+    f:close()
+    if not data or #data < 36 or data:sub(1, 5) ~= "EGLM1" then return nil end
+    local counts, base, off, n = {}, {}, 36, 0
+    for L = 1, 6 do
+        local i = 12 + (L - 1) * 4
+        local c = data:byte(i) + data:byte(i + 1) * 256
+                + data:byte(i + 2) * 65536 + data:byte(i + 3) * 16777216
+        counts[L] = c
+        base[L] = off
+        off = off + c * (3 * L + 2)
+        n = n + c
+    end
+    local proxy = setmetatable({}, { __index = function(_, k)
+        local L = #k / 3
+        if L ~= math.floor(L) or L < 1 or L > 6 then return nil end
+        local cnt, b0, rec = counts[L], base[L], 3 * L + 2
+        local lo, hi = 0, cnt - 1
+        while lo <= hi do
+            local mid = math.floor((lo + hi) / 2)
+            local p = b0 + mid * rec
+            local key = data:sub(p + 1, p + 3 * L)
+            if key == k then
+                local b1, b2 = data:byte(p + 3 * L + 1, p + 3 * L + 2)
+                return b1 + b2 * 256
+            elseif key < k then lo = mid + 1 else hi = mid - 1 end
+        end
+        return nil
+    end })
+    return proxy, n
+end
+
 function M.load(filename)
     if tried then return tab end
     tried = true
@@ -30,16 +68,22 @@ function M.load(filename)
         log.warning("[lm_rerank] 未找到 " .. path .. "，跳过 LM 重排")
         return nil
     end
-    local t = {}
-    local n = 0
+    local t, n = load_bin(path:gsub("%.tsv$", ".bin"))
+    if t then
+        f:close()
+    else
+    local n2 = 0
+    t = {}
     for line in f:lines() do
         local k, v = line:match("^(.-)\t(%d+)$")
         if k then
             t[k] = tonumber(v)
-            n = n + 1
+            n2 = n2 + 1
         end
     end
     f:close()
+    n = n2
+    end
     -- 读取总字数（用于 backoff 的 unigram 概率 P(c) = count(c)/total）
     local mf = io.open(path:gsub("%.tsv$", ".meta"), "rb")
     if mf then
