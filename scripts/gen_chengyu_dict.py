@@ -23,7 +23,7 @@ import rime_paths
 from pypinyin import lazy_pinyin, Style
 
 D=rime_paths.DICTS
-SRC=os.path.join(rime_paths.DICTS,"common","chengyu.dict.yaml")   # 上游 cur 好的成语表（13k 条，含五笔 4 码）
+SRC=os.path.join(rime_paths.DICTS,"chengyu.dict.yaml")   # curated 成语表（13k 条，含五笔 4 码）
 COUNTS=os.path.join(rime_paths.DATA,"gram","zh-hans-egret.2_6gram.tsv")
 OUT=os.path.join(D,"egret_wubi_py_chengyu.dict.yaml")
 MIN_COUNT=int(os.environ.get("MIN_COUNT","1000"))

@@ -1,6 +1,6 @@
 # RIME dictionary
 # 由 scripts/gen_chengyu_dict.py 生成，请勿手改
-# 四字成语（源：dicts/common/chengyu.dict.yaml，五笔 4 码取自该表，拼音码由 pypinyin 标注），共 13,113 条词、26,232 行
+# 四字成语（源：dicts/chengyu.dict.yaml，五笔 4 码取自该表，拼音码由 pypinyin 标注），共 13,113 条词、26,232 行
 
 name: egret_wubi_py_chengyu
 version: "2026.09.29"
