@@ -832,6 +832,26 @@ octagram 学的是**词**搭配，模型与用途不匹配。
 `yjld->刘因`、`hutz->户投资`（走逐字组字，成语未引入，符合设计）；
 黄金 20/20；混流无回归。
 
+### 4.28 词典命名规则定稿 + 待查项
+
+**命名规则（内容决定前缀，来源区分同族多份）**：
+| 前缀 | 含义 | 例 |
+|---|---|---|
+| `egret_wubi_py_*` | 内容同时含五笔与拼音 | `egret_wubi_py_chars{,_common,_ext}`、`egret_wubi_py_user_phrases` |
+| `egret_wubi_*` | 只含五笔 | `egret_wubi_chars*`、`egret_wubi_force_end`、`egret_wubi_chengyu`、`egret_wubi_sentence`、`egret_wubi_words_wb86_*`（86 造词码，源 `_wb86_src`）、`egret_wubi_words_wangxiang_*`（万象逗号码） |
+| `egret_py_*` | 只含拼音 | `egret_py_chars`、`egret_py_words_{core,base,full}`、`egret_py_words_src`、`egret_py_chengyu` |
+| 源文件 | 第三方/人工源 | `chengyu.dict.yaml` |
+
+**万象逗号码与 schema**：`阿爸	bs,kg wq,cb` 这种码由 `algebra_wubi_py_sentence` 处理 ——
+先 `xlit/;,/%@/` 把 `,`/`;` 换成 `%`/`@`（不在输入字母表里），再用 `derive` 派生
+可输入形式（`bskg` 全码、`bs` 前两码…）。所以用户正常敲字母即可，不需要敲逗号。
+**纠正 §4.21 的说法**：那几条逗号 derive 不是"从来没生效"，而是**只对我们的简化格式表无效**
+（86 字表/词表形如 `了 b`），对万象格式表（`_wangxiang_*`）是生效的。
+
+**待查（下轮）**：`scripts/gen_dict_tiers.py` 里 `_wb86_` 那一档的 `name:` 推导
+仍会写出双重前缀（`egret_wubi_words_wb86_wb86_{tier}`），本次是就地手工修正的；
+重跑生成器会再犯，需要修生成器里 name 的构造。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |

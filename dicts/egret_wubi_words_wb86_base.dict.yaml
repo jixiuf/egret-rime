@@ -3,7 +3,7 @@
 # 权重 >= 451（源: dicts/egret_wubi_words_wb86_src.dict.yaml）
 # 传统库五笔词（86 造词码）｜档位 base（≈6.3 万词，默认档）
 
-name: egret_wubi_words_wb86_wb86_base
+name: egret_wubi_words_wb86_base
 version: "2026.09.27"
 sort: by_weight
 use_preset_vocabulary: false

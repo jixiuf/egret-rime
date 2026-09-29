@@ -3,7 +3,7 @@
 # 权重 >= 0（源: dicts/egret_wubi_words_wb86_src.dict.yaml）
 # 传统库五笔词（86 造词码）｜档位 full（≈78 万词，尽量全（长尾交给 gram））
 
-name: egret_wubi_words_wb86_wb86_full
+name: egret_wubi_words_wb86_full
 version: "2026.09.27"
 sort: by_weight
 use_preset_vocabulary: false
