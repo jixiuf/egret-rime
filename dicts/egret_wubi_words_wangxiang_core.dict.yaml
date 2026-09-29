@@ -1,7 +1,7 @@
 # RIME dictionary
 # 由 scripts/gen_dict_tiers.py 生成，请勿手改
 # 权重 >= 571（源: dicts/wb86_wangxiang_cn_dicts/base.dict.yaml）
-# 混合库五笔词（万象逗号码，wx）｜档位 core（≈2.0 万词，日常九成，体积最小）
+# 混合库五笔词（万象逗号码）｜档位 core（≈2.0 万词，日常九成，体积最小）
 
 name: egret_wubi_words_wangxiang_core
 version: "2026.09.27"

@@ -8,7 +8,7 @@
 #   patch。本身是拼音音节的 2 键前缀（yi/de/ren/...）不设五笔
 #   owner：拼音接管；这些字仍可通过三级码补全打出（就=yiy）。
 ---
-name: chars_wubi_py_x035
+name: egret_wubi_py_chars
 version: "2025-09-23"
 sort: by_weight
 ...
