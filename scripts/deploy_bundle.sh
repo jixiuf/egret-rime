@@ -64,7 +64,7 @@ while IFS='|' read -r src dst; do
   mkdir -p "$STAGE/$(dirname "$dst")"
   cp -a "$ROOT/$src" "$STAGE/$dst" || echo "  ! 拷贝失败: $src"
 done < <(manifest)
-[ -f "$ROOT/data/gram/lm_rerank.tsv" ] || echo "  ! 缺少 data/gram/lm_rerank.tsv（先跑 scripts/gen_lm_rerank.py）"
+[ -f "$ROOT/data/gram/lm_rerank.bin" ] || echo "  ! 缺少 data/gram/lm_rerank.bin（先跑 scripts/gen_lm_rerank.py）"
 
 # 6) 安装脚本
 cat > "$STAGE/install.sh" <<'INSTALL'
@@ -94,35 +94,29 @@ echo "目标: $TARGET  (模式: $MODE)"
 mkdir -p "$TARGET"
 BAK="$TARGET/.egret-backup-$(date +%Y%m%d-%H%M%S)"
 NEED_BAK=0
-for f in *.yaml dicts lua opencc lm_rerank.tsv lm_rerank.meta *.gram; do
-  [ -e "$TARGET/$f" ] || [ -L "$TARGET/$f" ] && NEED_BAK=1
+# 按 $SRC 里实际有的东西遍历（包内就是完整运行时清单，别再手写文件名）
+for f in "$SRC"/*; do
+  b="$(basename "$f")"
+  if [ -e "$TARGET/$b" ] || [ -L "$TARGET/$b" ]; then NEED_BAK=1; fi
 done
 if [ "$NEED_BAK" = 1 ]; then
   mkdir -p "$BAK"
-  for f in *.yaml dicts lua opencc lm_rerank.tsv lm_rerank.meta *.gram; do
-    if [ -e "$TARGET/$f" ] || [ -L "$TARGET/$f" ]; then
-      cp -a "$TARGET/$f" "$BAK/" 2>/dev/null || true
+  for f in "$SRC"/*; do
+    b="$(basename "$f")"
+    if [ -e "$TARGET/$b" ] || [ -L "$TARGET/$b" ]; then
+      cp -a "$TARGET/$b" "$BAK/" 2>/dev/null || true
     fi
   done
   echo "已备份原文件到: $BAK"
   echo "  （回滚：把 $BAK/ 里的东西拷回 $TARGET/）"
 fi
 
-for f in *.yaml dicts lua opencc; do
-  [ -e "$SRC/$f" ] || continue
-  rm -rf "$TARGET/$f"
-  if [ "$MODE" = link ]; then ln -sfn "$SRC/$f" "$TARGET/$f"
-  else cp -a "$SRC/$f" "$TARGET/"; fi
+for f in "$SRC"/*; do
+  b="$(basename "$f")"
+  rm -rf "$TARGET/$b"
+  if [ "$MODE" = link ]; then ln -sfn "$SRC/$b" "$TARGET/$b"
+  else cp -a "$SRC/$b" "$TARGET/"; fi
 done
-for f in lm_rerank.tsv lm_rerank.meta; do
-  [ -e "$SRC/$f" ] || continue
-  rm -f "$TARGET/$f"
-  if [ "$MODE" = link ]; then ln -sf "$SRC/$f" "$TARGET/$f"
-  else cp -a "$SRC/$f" "$TARGET/"; fi
-done
-if [ -e "$SRC/zh-hans-egret.gram" ]; then
-  cp -f "$SRC/zh-hans-egret.gram" "$TARGET/" 2>/dev/null || true
-fi
 
 echo
 echo "安装完成。接下来："
@@ -153,7 +147,7 @@ egret-rime 运行时部署包
 
 说明：
 - LM（语言模型）已改为「纯 Lua 重排」：librime 只按词库权重分词，
-  LM 用 lm_rerank.tsv 对整句候选重排。因此**不需要** librime 的 .gram，
+  LM 用 lm_rerank.bin（定长记录 + 二分查表）对整句候选重排。因此**不需要** librime 的 .gram，
   也不需要给 librime 打任何补丁。
 - 词库三档：core(≈2万词) / base(≈6.3万词) / full(≈78万词)，
   改 egret_wubi_py.dict.yaml 的 import_tables 即可切换。
