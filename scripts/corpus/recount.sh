@@ -23,7 +23,7 @@ LOG="$ROOT/data/corpus/log"
 # 分片临时目录默认放仓库内（/tmp 在根盘，只有 ~99G，48G 分片有撑爆风险）
 export TMPDIR="${TMPDIR:-$ROOT/data/corpus/tmp}"
 BIN="$ROOT/third-party/rime-corpus-processing/frequency/target/release/rime-frequency"
-SRC="${1:-$ROOT/dicts/egret_wubi_py_words_full.dict.yaml}"
+SRC="${1:-$ROOT/dicts/egret_wubi_words_wx_full.dict.yaml}"
 NAME="${2:-recount_full}"
 JOBS="${3:-${RECOUNT_JOBS:-6}}"
 

@@ -55,7 +55,7 @@ import_tables:
   # 想用「五笔 4 码」打成语（如 yjld -> 一举两得），把下面这行取消注释即可：
   # 五笔 4 字码是每字首字母，碰撞多（yjld 可对多个成语），故默认不引入。
   # - dicts/egret_wubi_chengyu
-  - dicts/egret_wubi_py_words_base    # 基础词库(五笔码+万象权重,>450过滤碎片词)
+  - dicts/egret_wubi_words_wx_base    # 基础词库(五笔码+万象权重,>450过滤碎片词)
   # - dicts/wb86_cn_dicts/8105     # 旧字表(知频权重，量级与万象不兼容，弃用)
   # - dicts/wb86_cn_dicts/base.small     # 旧基础词库(同上)
   # - dicts/wb86_cn_dicts/ext.small      # 扩展词库
