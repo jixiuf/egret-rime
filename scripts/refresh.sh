@@ -198,6 +198,8 @@ for i in "${!STAGES[@]}"; do
       bash "$ROOT/scripts/corpus/gram.sh" >>"$RUNLOG" 2>&1 \
         && ok "n-gram 统计完成" || warn "gram 失败（见日志）"
       if [ -s "$ROOT/data/gram/zh-hans-egret.2_6gram.tsv" ]; then
+        "$PY" "$ROOT/scripts/gen_chengyu_dict.py" >>"$RUNLOG" 2>&1 \
+          && ok "成语词典已生成" || warn "成语词典生成失败"
         "$PY" "$ROOT/scripts/gen_lm_rerank.py" \
           --top2 "$LM_TOPK_2" --top3 "$LM_TOPK_3" --top4 "$LM_TOPK_4" \
           --top5 "$LM_TOPK_5" --top6 "$LM_TOPK_6" >>"$RUNLOG" 2>&1 \
