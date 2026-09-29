@@ -15,7 +15,9 @@
      拼音用 pypinyin 逐字标注。同一条文本写两行（五笔一行、拼音一行）
   4. 权重沿用其在语料里的频次（log 尺度），与词表同量级
 
-输出: dicts/egret_wubi_py_chengyu.dict.yaml（运行时词典，入 git）
+输出（都是运行时词典，入 git）:
+  dicts/egret_py_chengyu.dict.yaml    拼音码，默认被 egret_wubi_py.dict.yaml 引入
+  dicts/egret_wubi_chengyu.dict.yaml  五笔 4 码，默认不引入（碰撞多），用户按需
 """
 import math, os, re, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
