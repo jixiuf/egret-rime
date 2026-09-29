@@ -821,7 +821,7 @@ octagram 学的是**词**搭配，模型与用途不匹配。
 | 文件 | 内容 | 默认 |
 |---|---|---|
 | `egret_wubi_py_chengyu.dict.yaml` | 拼音码（yijuliangde 等），13,116 行 | **引入**（混合库） |
-| `egret_wubi_py_chengyu_wubi.dict.yaml` | 五笔 4 码（yjld 等），13,116 行 | **不引入**，用户按需 |
+| `egret_wubi_chengyu.dict.yaml` | 五笔 4 码（yjld 等），13,116 行 | **不引入**，用户按需 |
 
 理由：五笔 4 字码是「每字首字母」，碰撞天然多（`yjld` 可对应多个成语），
 放进默认组句空间会打扰普通五笔输入；改成让用户自己决定。

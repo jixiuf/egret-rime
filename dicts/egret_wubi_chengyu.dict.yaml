@@ -2,9 +2,9 @@
 # 由 scripts/gen_chengyu_dict.py 生成，请勿手改
 # 四字成语的**五笔 4 码**（每字首字母，碰撞较多）。
 # 默认不引入；要用就在 egret_wubi_py.dict.yaml 的 import_tables 里
-# 加一行 dicts/egret_wubi_py_chengyu_wubi。
+# 加一行 dicts/egret_wubi_chengyu。
 
-name: egret_wubi_py_chengyu_wubi
+name: egret_wubi_chengyu
 version: "2026.09.29"
 sort: by_weight
 use_preset_vocabulary: false
