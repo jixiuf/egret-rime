@@ -34,6 +34,10 @@ speller:
   __include: egret.common.yaml:wubi_sentence_speller
   # 混流方案关闭自动上屏: auto_select_pattern 为纯五笔4码设计,
   # 拼音音节(如 guan)也会命中导致中途自动跳字
+  # 必须设 0：speller.cc:134 的 AutoSelectAtMaxCodeLength 只检查 max_code_length，
+  # **不看 auto_select**，码长一到就 ConfirmCurrentSelection 上屏（混流：拼音输入可长达十几字母，
+  # 打到第 5 个字母会被截断上屏、余下字母另起一段）。
+  max_code_length: 0
   auto_select: false
   auto_select_pattern: {}
   algebra:
