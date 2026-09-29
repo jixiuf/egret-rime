@@ -18,7 +18,7 @@ bash scripts/refresh.sh --loop 30   # 常驻：每 30 分钟增量刷新（语�
 | 产物 | 位置 | 说明 |
 |---|---|---|
 | 词库（三档） | `dicts/*_words_{core,base,full}.dict.yaml` | 每档**同时含五笔码与拼音码**；权重按语料词频回归到 0-1000 |
-| 86 造词码词库 | `dicts/egret_wubi_words_*.dict.yaml` | 传统库（形码确定性层） |
+| 86 造词码词库 | `dicts/egret_wubi_words_wb86_*.dict.yaml` | 传统库（形码确定性层） |
 | 语言模型 | `data/gram/zh-hans-egret.gram` | 字级 2-6gram，约 59MB |
 | 方案词库包装 | `egret_wubi_py.dict.yaml` / `egret_wubi.dict.yaml` | 由 `--tier` 切换档位 |
 
@@ -42,7 +42,7 @@ egret-rime/
 │                   只拼音 -> egret_py_*（如 egret_wubi_py_chars / egret_wubi_chars / egret_py_words）
 │                 · 入 git：字表层（chars/wubi_chars/pinyin_8105）、五笔词源（egret_wubi_words）、
 │                   外部源（wb86_wangxiang_cn_dicts/*、wubi86/*、*_pinyin_base_small 的源）、用户短语
-│                 · 不入 git（生成产物）：三档词表 egret_wubi_words_wx_* / egret_wubi_words_* /
+│                 · 不入 git（生成产物）：三档词表 egret_wubi_words_wangxiang_* / egret_wubi_words_wb86_* /
 │                   egret_py_words_*（拼音）、拼音词表中间产物 egret_py_words_src
 ├─ scripts/        生成/测试/环境脚本（入 git）
 ├─ docs/           Rime 知识库（入 git）

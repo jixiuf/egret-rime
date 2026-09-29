@@ -30,13 +30,13 @@ TIERS = ("core", "base", "full")
 # 历史直引 -> 分档文件（首次切档时归一）
 LEGACY = {
     r"dicts/wb86_wangxiang_cn_dicts/base\.small\b":
-        "dicts/egret_wubi_words_wx_{tier}",
+        "dicts/egret_wubi_words_wangxiang_{tier}",
     r"dicts/egret_py_words_src\b":
         "dicts/egret_py_words_{tier}",
 }
 # 已分档的三种词表：把 (_core|_base|_full) 换成目标档
 TIERED = [
-    r"dicts/egret_wubi_words_wx",   # 万象逗号码（混流库用）—— 必须排在 86 那份之前
+    r"dicts/egret_wubi_words_wb86_wx",   # 万象逗号码（混流库用）—— 必须排在 86 那份之前
     r"dicts/egret_wubi_words",      # 86 造词码（传统库用）
     r"dicts/egret_py_words",        # 拼音
 ]

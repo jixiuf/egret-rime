@@ -167,7 +167,7 @@ egret_wubi.dict.yaml       # 传统库根包装（手工维护）→ import: wub
 dicts/               # 生成数据（gen_wubi_py_unified_dicts.py 产出）
   egret_wubi_py_chars.dict.yaml    #   混合库五笔字表（ownership: 二级简码 owner 保留 ',' token）
   egret_wubi_chars.dict.yaml # 传统库字表（简码+全码，不过滤 2+2 冲突）
-  egret_wubi_words.dict.yaml # 传统库词组
+  egret_wubi_words_wb86_src.dict.yaml # 传统库词组
   egret_wubi_py_user_phrases.dict.yaml # 手工维护用户词组（tgtj 生不逢时 900）
   egret_py_chars.dict.yaml  # 拼音字表（无调化）
   egret_py_words_src.dict.yaml # 拼音词表（无调化）

@@ -18,8 +18,8 @@
     full  >  0     ≈ 78  万词   尽量全（叠加语料新词后还会增长）
 
 产物（dicts/）：
-    egret_wubi_words_wx_{tier}.dict.yaml         混合库五笔词（万象逗号码，供 script_translator）
-    egret_wubi_words_{tier}.dict.yaml    传统库五笔词（86 造词码，供 table_translator）
+    egret_wubi_words_wangxiang_{tier}.dict.yaml         混合库五笔词（万象逗号码，供 script_translator）
+    egret_wubi_words_wb86_{tier}.dict.yaml    传统库五笔词（86 造词码，供 table_translator）
     egret_py_words_{tier}.dict.yaml  拼音词（无调音节）
 
 切换：`make tier TIER=core|base|full`（改写两个包装 dict 的 import_tables）。
@@ -42,7 +42,7 @@ import rime_paths  # noqa: E402
 DICTS = rime_paths.DICTS
 OUT = DICTS
 SRC_WUBI = os.path.join(DICTS, "wb86_wangxiang_cn_dicts", "base.dict.yaml")
-SRC_WUBI_TRAD = os.path.join(OUT, "egret_wubi_words.dict.yaml")
+SRC_WUBI_TRAD = os.path.join(OUT, "egret_wubi_words_wb86_src.dict.yaml")
 SRC_PINYIN = os.path.join(OUT, "egret_py_words_src.dict.yaml")
 
 # tier -> 最低权重（含）。base 与现状一致：万象 base.small 用的是 > 450
@@ -112,7 +112,7 @@ def main():
         # 只拼音 egret_py_*、五笔+拼音 egret_wubi_py_*
         # 传统库（86 造词码）2016-09 改名为 egret_wubi_*（与 schema/根包装一致，对齐上游）
         ("words_wx", SRC_WUBI, "混合库五笔词（万象逗号码，wx）", "egret_wubi"),
-        ("words", SRC_WUBI_TRAD, "传统库五笔词（86 造词码）", "egret_wubi"),   # 注意 kind 用 words + 前缀 egret_wubi -> egret_wubi_words_{tier}
+        ("words", SRC_WUBI_TRAD, "传统库五笔词（86 造词码）", "egret_wubi"),   # 注意 kind 用 words + 前缀 egret_wubi -> egret_wubi_words_wb86_{tier}
         # 只含拼音 -> egret_py_*（命名规则见 AGENTS.md）
         ("words", SRC_PINYIN, "拼音词（无调音节）", "egret_py"),
     ]

@@ -386,7 +386,7 @@ def gen_wubi_traditional():
     输出（3 个文件）:
       1. dicts/egret_wubi_chars.dict.yaml
          （单字：显式一/二/三级简码 + 全码）
-      2. dicts/egret_wubi_words.dict.yaml
+      2. dicts/egret_wubi_words_wb86_src.dict.yaml
          （词组：显式词码 + 万象权重）
       3. 仓库根 egret_wubi.dict.yaml（薄包装：encoder/rules
          造词规则 + import_tables 引入上述两数据文件 + 用户词组表；
@@ -523,7 +523,7 @@ import_tables:
             "传统五笔字表（一/二/三级简码 + 全码）",
             "（由 ../../egret_wubi.dict.yaml 引入）",
         ]) + "\n".join(char_entries) + "\n")
-    with open(os.path.join(OUT_DIR, "egret_wubi_words.dict.yaml"), "w", encoding="utf-8") as f:
+    with open(os.path.join(OUT_DIR, "egret_wubi_words_wb86_src.dict.yaml"), "w", encoding="utf-8") as f:
         f.write(header("egret_wubi_words", [
             "传统五笔词组（经典 86 版造词码）",
             "（由 ../../egret_wubi.dict.yaml 引入）",

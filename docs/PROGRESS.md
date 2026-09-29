@@ -629,13 +629,13 @@ jintiande → 今天的 / 今天 wygd   de → 胡 de
 **处置**：
 - **删除**：`egret_wubi_wubi_words_{core,base,full}`（改名笔误，无人引用）
 - **生成器修正**：`gen_dict_tiers.py` 传统库改为 `kind=words + prefix=egret_wubi`
-  → 产出 `egret_wubi_words_{tier}`（与 wrapper 的 import 一致）
+  → 产出 `egret_wubi_words_wb86_{tier}`（与 wrapper 的 import 一致）
 - **移出 git**（`.gitignore`，工作区文件保留）：拼音词表中间产物
   `egret_py_words_src`（1.2MB，只喂给 gen_dict_tiers，不被任何 schema import）
   > ❗ **政策修正（用户指出）**：**只要是输入法实际用到的词典（被 schema/wrapper import 的）
   > 一律入 git** —— 部署与用户拿到的就是它们。所以三族分档词表 9 个 + egret_wubi_force_end
   > **全部加回 git**；只有「纯中间产物」不入 git。
-- **仍入 git**（源数据）：字表层、`egret_wubi_words.dict.yaml`（86 造词码源）、
+- **仍入 git**（源数据）：字表层、`egret_wubi_words_wb86_src.dict.yaml`（86 造词码源）、
   `wb86_wangxiang_cn_dicts/*`、`wubi86/*`、`*_8105`、用户短语、整句词库（需语料，重建成本高）
 
 **可复现性已验证**：删光全部 9 个分档表 → `bash scripts/refresh.sh --only dict` 全部重建
