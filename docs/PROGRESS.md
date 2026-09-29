@@ -991,3 +991,22 @@ egret-rime/
 新增语料只需加一行 `open_sources.tsv` 或丢文件到 `data/input/`，不改代码 |
 | 09-27 | 并发默认 jobs=3，负载 <12 可用 6 | 所有阶段 nice 15 + ioprio BE/7 |
 | 09-27 | 分片临时目录放仓库内（`data/corpus/tmp`） | `/tmp` 在根盘仅 99G，48G 分片有撞爆风险 |
+
+### 4.31 词级 gram：放弃 jieba，改走 Rust 词典匹配
+
+**已终止并删除** `scripts/corpus/word_seg.py` 的 jieba 分词任务（跑 10+ 小时、产出 72GB，
+`data/corpus/clean/segged/` 已删，磁盘回到 74%）。理由：
+1. 单进程纯 Python（jieba 约 1-2MB/s），61GB 语料要十几小时；
+2. 更根本：**分词口径不对** —— jieba 用它自己的词典，而 librime octagram 学的是
+   **我们自己词表条目之间**的搭配，口径不一致的 gram 用途有限；
+3. 唯一用途是喂原生 grammar，而那条路已实测 11%（§4.24）。
+
+**下轮做法（约半天）**：仓库里已有 Rust 工具，48GB 两分钟：
+- `third-party/rime-corpus-processing/frequency/`（`rime-frequency`，Aho-Corasick 按词典扫语料，
+  `scripts/corpus/recount.sh` 在用）
+- `third-party/rime-corpus-processing/rime-gram/`（`rime-char-gram-builder`，字符 n-gram，
+  `scripts/corpus/gram.sh` 的 BUILDER）
+**缺的只是一件事**：按词典切分后统计**词** n-gram（不是字符、也不是词频）。
+在那个 Rust 工具里加一个模式：边扫边按词典最长匹配切词、维护词窗口，
+输出 word 2-6gram 计数 → 走现成的 `build_grammar` 得到 `zh-hans-egret-word.gram`，
+最后只在 `egret_py` 上做 A/B（混流那边已证否）。
