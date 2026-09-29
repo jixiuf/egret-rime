@@ -25,6 +25,6 @@ import_tables:
   # 所以直接生成显式条目。见 docs/PROGRESS.md §4.21。
   - dicts/egret_wubi_force_end
   - dicts/egret_wubi_words_base
-  - dicts/egret_wubi_py_sentence   # 高频整句（五笔短码→整句，见 gen_sentence_dict.py）
+  - dicts/egret_wubi_sentence   # 高频整句（五笔短码→整句，见 gen_sentence_dict.py）
   - dicts/egret_wubi_py_user_phrases
 ...

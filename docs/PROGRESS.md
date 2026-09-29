@@ -462,7 +462,7 @@ xietiaotujinsigequanmianzhanlvebuju → 协调推进四个全面战略布局
 既然"新造候选"被引擎封死，但**精确匹配的词条引擎本来就认**（墨奇 rime-wubi-sentence 同思路）
 → 把语料高频整句预计算成「五笔短码序列 → 整句」词条。
 - `scripts/gen_sentence_dict.py`：随机窗口采样统计高频整句（每字取最短码：一/二/三级简码里最短），
-  去重 + log 频次权重 → **6 万条 / 2.2MB** → `dicts/egret_wubi_py_sentence.dict.yaml`，
+  去重 + log 频次权重 → **6 万条 / 2.2MB** → `dicts/egret_wubi_sentence.dict.yaml`，
   并入传统库 `import_tables`
 - **实测机制通**：`owfhtc → 为什么` ✓、`thftclw → 怎么办` ✓；黄金 **20/20** 不受影响
 - **无副作用验证**：装载/不装载该库，eval 前 40 句同为 6/40（那 40 句是 epub 子集本就难）

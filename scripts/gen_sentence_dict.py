@@ -10,7 +10,7 @@
 短码序列：每个字取**最短可用码**（一级/二级/三级/全码里最短的那个），
 这正是用户实际会敲的形式（我=q 吃=ktn 饭=qnr 了=b → qktnqnrb）。
 
-输出: dicts/egret_wubi_py_sentence.dict.yaml
+输出: dicts/egret_wubi_sentence.dict.yaml
 """
 import argparse, collections, math, os, random, re, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
@@ -80,7 +80,7 @@ def main():
         if code in seen: continue
         seen[code]=1; dedup.append((code,s,c))
     cmax=max((c for _,_,c in dedup), default=1)
-    name="egret_wubi_py_sentence"
+    name="egret_wubi_sentence"
     path=os.path.join(D,name+".dict.yaml")
     with open(path,"w",encoding="utf-8") as f:
         f.write(f"# RIME dictionary\n# 由 scripts/gen_sentence_dict.py 生成，请勿手改\n"

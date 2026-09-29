@@ -2,7 +2,7 @@
 # 由 scripts/gen_sentence_dict.py 生成，请勿手改
 # 高频整句 → 五笔短码序列（每字取最短码）；共 59,994 条
 
-name: egret_wubi_py_sentence
+name: egret_wubi_sentence
 version: "2026.09.29"
 sort: by_weight
 use_preset_vocabulary: false
