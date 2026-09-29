@@ -108,11 +108,13 @@ def main():
         sys.exit(f"缺少源文件: {SRC_WUBI}")
 
     jobs = [
-        # (kind, 源, 说明, 文件名前缀)
+        # (kind, 源, 说明, 文件名前缀)  前缀决定命名族：只五笔 egret_wubi_*、
+        # 只拼音 egret_py_*、五笔+拼音 egret_wubi_py_*
         # 传统库（86 造词码）2016-09 改名为 egret_wubi_*（与 schema/根包装一致，对齐上游）
         ("words", SRC_WUBI, "混合库五笔词（万象逗号码）", "egret_wubi_py"),
         ("words", SRC_WUBI_TRAD, "传统库五笔词（86 造词码）", "egret_wubi"),   # 注意 kind 用 words + 前缀 egret_wubi -> egret_wubi_words_{tier}
-        ("pinyin_words", SRC_PINYIN, "拼音词（无调音节）", "egret_wubi_py"),
+        # 只含拼音 -> egret_py_*（命名规则见 AGENTS.md）
+        ("words", SRC_PINYIN, "拼音词（无调音节）", "egret_py"),
     ]
     tiers = list(TIERS) if args.tier == "all" else [args.tier]
 
