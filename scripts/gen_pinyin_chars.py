@@ -10,7 +10,7 @@
 按用户策略给**最低权重**——能打出来，但不与常用字争候选。
 pypinyin 不认识的（29,002 字，多为扩展 B+）自动跳过（打五笔全码仍可出）。
 
-输出（生成产物，不入 git）：dicts/egret_wubi_py_pinyin_extra.dict.yaml
+输出（生成产物，不入 git）：dicts/egret_py_chars_extra.dict.yaml（只含拼音 -> egret_py_*）
 """
 import os, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
@@ -42,12 +42,12 @@ def main():
         if not (syl.isascii() and syl.isalpha()): continue
         if (ch,syl) in seen: continue
         seen.add((ch,syl)); out.append((ch,syl))
-    dst=os.path.join(D,"egret_wubi_py_pinyin_extra.dict.yaml")
+    dst=os.path.join(D,"egret_py_chars_extra.dict.yaml")
     with open(dst,"w",encoding="utf-8") as f:
         f.write("# RIME dictionary\n# 由 scripts/gen_pinyin_chars.py 生成，请勿手改\n"
                 f"# 生僻字拼音（pypinyin 标注；只补「有五笔码但无拼音」的字），共 {len(out):,} 条\n"
                 f"# 权重固定 {W}（最低带）：能打出来，不与常用字争候选\n\n"
-                "name: egret_wubi_py_pinyin_extra\nversion: \"2026.09.29\"\nsort: by_weight\n"
+                "name: egret_py_chars_extra\nversion: \"2026.09.29\"\nsort: by_weight\n"
                 "use_preset_vocabulary: false\ncolumns:\n  - text\n  - code\n  - weight\n...\n")
         for ch,syl in out: f.write(f"{ch}\t{syl}\t{W}\n")
     print(f"补拼音：待补 {len(todo):,} 字，pypinyin 给出 {len(out):,} 条 -> {os.path.basename(dst)}")
