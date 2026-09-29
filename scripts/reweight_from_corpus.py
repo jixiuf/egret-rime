@@ -41,7 +41,7 @@ DEFAULT_FREQ = os.path.join(rime_paths.DATA, "corpus", "freq", "word_freq.tsv")
 # 目标：词表 = OUT 下所有 *words* 分档表 + 传统库词表
 PATTERNS = [
     os.path.join(OUT, "egret_wubi_py_words_*.dict.yaml"),
-    os.path.join(OUT, "egret_wubi_py_pinyin_words_*.dict.yaml"),
+    os.path.join(OUT, "egret_py_words_*.dict.yaml"),
     os.path.join(OUT, "egret_wubi_words_*.dict.yaml"),
 ]
 # 字表：默认只动拼音字表（五笔字表含一/二级简码 owner，不得整体缩放）

@@ -35,7 +35,7 @@ def main():
                     help="语料词频（用来把词权重换成与 LM 同尺度的 log(1+count)*1000）")
     a=ap.parse_args()
     D=rime_paths.DICTS
-    words=os.path.join(D,f"egret_wubi_py_pinyin_words_{a.tier}.dict.yaml")
+    words=os.path.join(D,f"egret_py_words_{a.tier}.dict.yaml")
     chars=os.path.join(D,"egret_py_chars.dict.yaml")
     # 语料词频 -> log 尺度权重（与 lm_rerank 同尺度，便于融合）
     freq={}

@@ -118,7 +118,7 @@ def main():
     for w, code, _ in rows(os.path.join(D, f"egret_wubi_words_{args.tier}.dict.yaml")):
         add(w, code.replace(" ", ""), "wubi")
     # 4) 拼音词
-    for w, code, _ in rows(os.path.join(D, f"egret_wubi_py_pinyin_words_{args.tier}.dict.yaml")):
+    for w, code, _ in rows(os.path.join(D, f"egret_py_words_{args.tier}.dict.yaml")):
         add(w, code.replace(" ", ""), "pinyin")
 
     out.sort(key=lambda x: (x[1], -x[2]))
