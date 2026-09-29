@@ -488,7 +488,7 @@ reverse_lookup_stroke:
   enable_completion: true
   prefix: "`"
   suffix: "'"
-  tips: 〔笔画〕
+  tips: 〔hspnz/一丨丿丶乙〕
   preedit_format:
     - xlit/hspnz/一丨丿丶乙/
 reverse_lookup_pinyin:
