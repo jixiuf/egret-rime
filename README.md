@@ -20,7 +20,7 @@ engine.translators (dynamic_translator lua 调度):
 
 ```
 wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
-  → dicts/egret_wubi_py/*.dict.yaml (传统库字/词 + 混合库字/词 + 拼音字/词)
+  → dicts/*.dict.yaml (传统库字/词 + 混合库字/词 + 拼音字/词)
 ```
 
 权重统一 log-norm 0-1000 刻度；字表 ×0.35 缩放让位拼音/词，膝点 600

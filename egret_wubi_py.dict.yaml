@@ -36,7 +36,7 @@ sort: by_weight
 use_preset_vocabulary: false
 import_tables:
   # - dicts/wubi86/wubi86.word4
-  # - dicts/common/chengyu        # pinyin 简码
+  # - dicts/chengyu        # pinyin 简码
 
 
   # 这里引入的五笔字典（可以用于script_translator的）
@@ -50,9 +50,9 @@ import_tables:
   # 字表分两层：common 默认导入；ext（扩展区 10.9 万条，占原表 87%，语料里从未出现）
   # 不导入，需要时在 egret_wubi_py_ext.custom.yaml 里给 translator/dictionary+ 追加即可。
   # 分层原因与实测数据见 docs/PROGRESS.md §4.23。
-  - dicts/egret_wubi_py/egret_wubi_py_chars_common   # 字表(五笔码+万象权重x0.35+一级简码)
-  - dicts/egret_wubi_py/egret_wubi_py_chengyu   # 四字成语（gen_chengyu_dict.py）
-  - dicts/egret_wubi_py/egret_wubi_py_words_base    # 基础词库(五笔码+万象权重,>450过滤碎片词)
+  - dicts/egret_wubi_py_chars_common   # 字表(五笔码+万象权重x0.35+一级简码)
+  - dicts/egret_wubi_py_chengyu   # 四字成语（gen_chengyu_dict.py）
+  - dicts/egret_wubi_py_words_base    # 基础词库(五笔码+万象权重,>450过滤碎片词)
   # - dicts/wb86_cn_dicts/8105     # 旧字表(知频权重，量级与万象不兼容，弃用)
   # - dicts/wb86_cn_dicts/base.small     # 旧基础词库(同上)
   # - dicts/wb86_cn_dicts/ext.small      # 扩展词库
@@ -62,9 +62,9 @@ import_tables:
   # - dicts/wb86_cn_dicts/others   # 一些杂项 容错音和错字 可以不开
 
 # 有声调
-  - dicts/egret_wubi_py/egret_wubi_py_pinyin_8105  # 拼音字表(无调化副本, 同音异调合并为同一音节)
+  - dicts/egret_wubi_py_pinyin_8105  # 拼音字表(无调化副本, 同音异调合并为同一音节)
   # - dicts/wangxiang_cn_dicts/8105        # 旧带调字表(派生无调拼写会跨音节竞争,弃用)
-  - dicts/egret_wubi_py/egret_wubi_py_pinyin_words_base # 拼音基础词库(无调化副本)
+  - dicts/egret_wubi_py_pinyin_words_base # 拼音基础词库(无调化副本)
   # - dicts/wangxiang_cn_dicts/base.small   # 旧带调词库(弃用)
   # - dicts/wangxiang_cn_dicts/correlation.small
   # - dicts/wangxiang_cn_dicts/chars            #字表，包含了所有带拼音的汉字

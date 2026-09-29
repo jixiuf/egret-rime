@@ -16,7 +16,7 @@
     2. 权重沿用五笔词表（万象）不变——**不动权重平衡**（实测单侧改动会破黄金用例）
 
 输出（**gen_dict_tiers.py 读取的规范名**，再由它派生出各档）：
-    dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small.dict.yaml
+    dicts/egret_wubi_py_pinyin_base_small.dict.yaml
 
 实测（见 docs/PROGRESS.md）：
     仅主读音 == 原万象表（都是 63k 条 / 26% 完全命中）→ 质量无损、依赖可移除
@@ -39,7 +39,7 @@ sys.path.insert(0, os.path.join(HERE, "corpus"))
 import rime_paths  # noqa: E402
 
 DICTS = rime_paths.DICTS
-OUT = os.path.join(DICTS, "egret_wubi_py")
+OUT = DICTS
 SRC = os.path.join(DICTS, "wb86_wangxiang_cn_dicts", "base.dict.yaml")
 TIERS = {"core": 571, "base": 451, "full": 0}
 TIER_DESC = {"core": "≈2万词", "base": "≈6.3万词 默认", "full": "≈78万词"}

@@ -23,7 +23,7 @@ import os, sys, re
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 import rime_paths
 
-D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
+D=rime_paths.DICTS
 RARE_WUBI=1        # 五笔表：未出现字的权重上限（最低）
 RARE_PY=60         # 拼音表：未出现字的权重上限（低于常用字的最低档 ~100+）
 

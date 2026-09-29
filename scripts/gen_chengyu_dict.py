@@ -15,14 +15,14 @@
      拼音用 pypinyin 逐字标注。同一条文本写两行（五笔一行、拼音一行）
   4. 权重沿用其在语料里的频次（log 尺度），与词表同量级
 
-输出: dicts/egret_wubi_py/egret_wubi_py_chengyu.dict.yaml（运行时词典，入 git）
+输出: dicts/egret_wubi_py_chengyu.dict.yaml（运行时词典，入 git）
 """
 import math, os, re, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 import rime_paths
 from pypinyin import lazy_pinyin, Style
 
-D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
+D=rime_paths.DICTS
 SRC=os.path.join(rime_paths.DICTS,"common","chengyu.dict.yaml")   # 上游 cur 好的成语表（13k 条，含五笔 4 码）
 COUNTS=os.path.join(rime_paths.DATA,"gram","zh-hans-egret.2_6gram.tsv")
 OUT=os.path.join(D,"egret_wubi_py_chengyu.dict.yaml")
@@ -76,7 +76,7 @@ def main():
             rows.append((w,"".join(py),v))
     with open(OUT,"w",encoding="utf-8") as f:
         f.write("# RIME dictionary\n# 由 scripts/gen_chengyu_dict.py 生成，请勿手改\n"
-                f"# 四字成语（源：dicts/common/chengyu.dict.yaml，五笔 4 码取自该表，拼音码由 pypinyin 标注），"
+                f"# 四字成语（源：dicts/chengyu.dict.yaml，五笔 4 码取自该表，拼音码由 pypinyin 标注），"
                 f"共 {len(set(r[0] for r in rows)):,} 条词、{len(rows):,} 行\n\n"
                 "name: egret_wubi_py_chengyu\nversion: \"2026.09.29\"\nsort: by_weight\n"
                 "use_preset_vocabulary: false\ncolumns:\n  - text\n  - code\n  - weight\n...\n")

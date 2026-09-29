@@ -30,15 +30,15 @@ TIERS = ("core", "base", "full")
 # 历史直引 -> 分档文件（首次切档时归一）
 LEGACY = {
     r"dicts/wb86_wangxiang_cn_dicts/base\.small\b":
-        "dicts/egret_wubi_py/egret_wubi_py_words_{tier}",
-    r"dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small\b":
-        "dicts/egret_wubi_py/egret_wubi_py_pinyin_words_{tier}",
+        "dicts/egret_wubi_py_words_{tier}",
+    r"dicts/egret_wubi_py_pinyin_base_small\b":
+        "dicts/egret_wubi_py_pinyin_words_{tier}",
 }
 # 已分档的三种词表：把 (_core|_base|_full) 换成目标档
 TIERED = [
-    r"dicts/egret_wubi_py/egret_wubi_py_words",
-    r"dicts/egret_wubi_py/egret_wubi_words",
-    r"dicts/egret_wubi_py/egret_wubi_py_pinyin_words",
+    r"dicts/egret_wubi_py_words",
+    r"dicts/egret_wubi_words",
+    r"dicts/egret_wubi_py_pinyin_words",
 ]
 
 

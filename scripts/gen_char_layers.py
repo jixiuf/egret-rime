@@ -20,7 +20,7 @@ import os, re, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 import rime_paths
 
-D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
+D=rime_paths.DICTS
 
 def load_known():
     lm=set()

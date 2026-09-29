@@ -14,7 +14,7 @@ version: "2026.09.29"
 sort: by_weight
 use_preset_vocabulary: false
 import_tables:
-  - dicts/egret_wubi_py/egret_wubi_py_pinyin_8105        # 字表：8105 常用字，无调音节
-  - dicts/egret_wubi_py/egret_wubi_py_pinyin_words_base  # 词表：按档位（core/base/full）切换
-  - dicts/egret_wubi_py/egret_wubi_py_user_phrases       # 手工维护的短语
+  - dicts/egret_wubi_py_pinyin_8105        # 字表：8105 常用字，无调音节
+  - dicts/egret_wubi_py_pinyin_words_base  # 词表：按档位（core/base/full）切换
+  - dicts/egret_wubi_py_user_phrases       # 手工维护的短语
 ...

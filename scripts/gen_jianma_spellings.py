@@ -25,7 +25,7 @@ import os, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 import rime_paths
 
-D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
+D=rime_paths.DICTS
 
 def main():
     src=os.path.join(D,"egret_wubi_chars.dict.yaml")

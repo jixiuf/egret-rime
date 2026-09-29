@@ -17,7 +17,7 @@
     base  >= 451   ≈ 6.3 万词   现状默认
     full  >  0     ≈ 78  万词   尽量全（叠加语料新词后还会增长）
 
-产物（dicts/egret_wubi_py/）：
+产物（dicts/）：
     egret_wubi_py_words_{tier}.dict.yaml         混合库五笔词（万象逗号码，供 script_translator）
     egret_wubi_words_{tier}.dict.yaml    传统库五笔词（86 造词码，供 table_translator）
     egret_wubi_py_pinyin_words_{tier}.dict.yaml  拼音词（无调音节）
@@ -40,7 +40,7 @@ sys.path.insert(0, HERE)
 import rime_paths  # noqa: E402
 
 DICTS = rime_paths.DICTS
-OUT = os.path.join(DICTS, "egret_wubi_py")
+OUT = DICTS
 SRC_WUBI = os.path.join(DICTS, "wb86_wangxiang_cn_dicts", "base.dict.yaml")
 SRC_WUBI_TRAD = os.path.join(OUT, "egret_wubi_words.dict.yaml")
 SRC_PINYIN = os.path.join(OUT, "egret_wubi_py_pinyin_base_small.dict.yaml")

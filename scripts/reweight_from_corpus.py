@@ -35,7 +35,7 @@ REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import rime_paths  # noqa: E402
 
-OUT = os.path.join(rime_paths.DICTS, "egret_wubi_py")
+OUT = rime_paths.DICTS
 DEFAULT_FREQ = os.path.join(rime_paths.DATA, "corpus", "freq", "word_freq.tsv")
 
 # 目标：词表 = OUT 下所有 *words* 分档表 + 传统库词表

@@ -52,7 +52,7 @@ import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DICTS = os.path.join(os.path.dirname(HERE), "dicts")
-OUT_DIR = os.path.join(DICTS, "egret_wubi_py")  # 本次方案生成的数据文件统一放这里
+OUT_DIR = DICTS  # 本次方案生成的数据文件统一放这里
 SRC_DIR = os.path.join(DICTS, "wb86_wangxiang_cn_dicts")
 ZHIPIN_8105 = os.path.join(DICTS, "wb86_cn_dicts", "8105.dict.yaml")
 WUBI86 = os.path.join(DICTS, "wubi86", "wubi86.dict.yaml")
@@ -213,7 +213,7 @@ def gen_chars():
       - 万象 8105 表（2 键拼音音节集合，拼音前缀不设五笔 owner，
         经 load_pinyin_syllables）
     输出:
-      写 dicts/egret_wubi_py/egret_wubi_py_chars.dict.yaml
+      写 dicts/egret_wubi_py_chars.dict.yaml
       （chars_wubi_py_x035）：
         - owner 字：保留逗号 token（+ 无逗号全码，若不与 2 字词冲突）
         - 被降级字：传统三级码（或全码前 3 位）+ 全码
@@ -343,7 +343,7 @@ def gen_pinyin_toneless(src_rel, out_name):
 
     输入: dicts/ 下指定的万象拼音词库（src_rel 相对 dicts/ 的路径）。
     变换: 所有带调音节 token 无调化（é→e），权重缺省补 1。
-    输出: 写 dicts/egret_wubi_py/{out_name}.dict.yaml。主流程调用两次：
+    输出: 写 dicts/{out_name}.dict.yaml。主流程调用两次：
       - wangxiang_cn_dicts/8105.dict.yaml → egret_wubi_py_pinyin_8105
       - wangxiang_cn_dicts/base.small.dict.yaml → egret_wubi_py_pinyin_base_small
     """
@@ -384,9 +384,9 @@ def gen_wubi_traditional():
       - 知频 8105 表（字权重：log 归一化 0..1000，不缩放）
       - base.small.dict.yaml（词组源，每字需要一个规范全码 canon 取码）
     输出（3 个文件）:
-      1. dicts/egret_wubi_py/egret_wubi_chars.dict.yaml
+      1. dicts/egret_wubi_chars.dict.yaml
          （单字：显式一/二/三级简码 + 全码）
-      2. dicts/egret_wubi_py/egret_wubi_words.dict.yaml
+      2. dicts/egret_wubi_words.dict.yaml
          （词组：显式词码 + 万象权重）
       3. 仓库根 egret_wubi.dict.yaml（薄包装：encoder/rules
          造词规则 + import_tables 引入上述两数据文件 + 用户词组表；
@@ -507,9 +507,9 @@ def gen_wubi_traditional():
     - length_in_range: [5, 10]
       formula: "AaAbYaZa"
 import_tables:
-  - dicts/egret_wubi_py/egret_wubi_chars
-  - dicts/egret_wubi_py/egret_wubi_words
-  - dicts/egret_wubi_py/egret_wubi_py_user_phrases
+  - dicts/egret_wubi_chars
+  - dicts/egret_wubi_words
+  - dicts/egret_wubi_py_user_phrases
 ...
 """
     # 单字与词组分别写入数据文件

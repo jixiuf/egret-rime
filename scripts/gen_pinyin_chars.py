@@ -10,14 +10,14 @@
 按用户策略给**最低权重**——能打出来，但不与常用字争候选。
 pypinyin 不认识的（29,002 字，多为扩展 B+）自动跳过（打五笔全码仍可出）。
 
-输出（生成产物，不入 git）：dicts/egret_wubi_py/egret_wubi_py_pinyin_extra.dict.yaml
+输出（生成产物，不入 git）：dicts/egret_wubi_py_pinyin_extra.dict.yaml
 """
 import os, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 import rime_paths
 from pypinyin import lazy_pinyin, Style
 
-D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
+D=rime_paths.DICTS
 W=60          # 最低权重带（低于常用字；参见 gen_char_weights.py 的校准策略）
 
 def chars(p):

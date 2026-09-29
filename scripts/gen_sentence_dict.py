@@ -10,14 +10,14 @@
 短码序列：每个字取**最短可用码**（一级/二级/三级/全码里最短的那个），
 这正是用户实际会敲的形式（我=q 吃=ktn 饭=qnr 了=b → qktnqnrb）。
 
-输出: dicts/egret_wubi_py/egret_wubi_py_sentence.dict.yaml
+输出: dicts/egret_wubi_py_sentence.dict.yaml
 """
 import argparse, collections, math, os, random, re, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 sys.path.insert(0,os.path.join(HERE,"corpus"))
 import rime_paths
 
-D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
+D=rime_paths.DICTS
 CJK=re.compile(r"[\u4e00-\u9fff]")
 SENT=re.compile(r"[^。！？；]+[。！？]")
 

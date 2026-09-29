@@ -37,8 +37,8 @@ manifest() {
     echo "$b|$b"
   done
   for f in "$ROOT"/lua/*.lua; do echo "lua/$(basename "$f")|lua/$(basename "$f")"; done
-  for f in "$ROOT"/dicts/egret_wubi_py/*.dict.yaml; do
-    echo "dicts/egret_wubi_py/$(basename "$f")|dicts/egret_wubi_py/$(basename "$f")"
+  for f in "$ROOT"/dicts/*.dict.yaml; do
+    echo "dicts/$(basename "$f")|dicts/$(basename "$f")"
   done
   for f in "$ROOT"/opencc/*; do
     [ -e "$f" ] || continue
@@ -128,7 +128,7 @@ esac
 echo "  验证：输入 e → 应出「有」；输入 jintiandetianqizenmeyang → 应出「今天的天气怎么样」"
 echo
 echo "切换词库档位：编辑 $TARGET/egret_wubi_py.dict.yaml 里的 import_tables"
-echo "  （core / base / full 三档，见产物包内 dicts/egret_wubi_py/*_words_*.dict.yaml）"
+echo "  （core / base / full 三档，见产物包内 dicts/*_words_*.dict.yaml）"
 INSTALL
 chmod +x "$STAGE/install.sh"
 

@@ -17,7 +17,7 @@ columns:                         # 可选：定义正文列序（默认 1 text 2
   - weight
   - stem
 import_tables:
-  - dicts/egret_wubi_py/egret_wubi_chars   # 支持子目录！只有这里支持
+  - dicts/egret_wubi_chars   # 支持子目录！只有这里支持
   - dicts/wb86_wangxiang_cn_dicts/base.small
 vocabulary: essay                # 八股文词频表（给无 weight 词组补权）
 use_preset_vocabulary: true      # 同上（旧写法）
@@ -164,7 +164,7 @@ userdb 内键格式：`<text>\t<code>`，值为 `c=频次 d=最后使用日期 t
 ```
 egret_wubi_py.dict.yaml            # 混合库根（根目录；软链）→ import: 五笔字表+五笔词组+拼音字表+拼音词表
 egret_wubi.dict.yaml       # 传统库根包装（手工维护）→ import: wubi_chars + wubi_words + user_phrases；含 encoder/rules
-dicts/egret_wubi_py/               # 生成数据（gen_wubi_py_unified_dicts.py 产出）
+dicts/               # 生成数据（gen_wubi_py_unified_dicts.py 产出）
   egret_wubi_py_chars.dict.yaml    #   混合库五笔字表（ownership: 二级简码 owner 保留 ',' token）
   egret_wubi_chars.dict.yaml # 传统库字表（简码+全码，不过滤 2+2 冲突）
   egret_wubi_words.dict.yaml # 传统库词组

@@ -269,5 +269,5 @@ A 为主。真有需求加 B。C 和 D 不要做全局。
 词库解析按 `字\t码\t权重`，混合库码内 `,` 是备选码分隔（运行时
 xlit 成 `@`），`%` 是第二组，`0` 是短全码标记，统计前先展开。
 冲突定义：同码位（去掉 token 标记后）对应超过一个词条。
-数据源 dicts/egret_wubi_py/ 与 dicts/wb86_wangxiang_cn_dicts/
+数据源 dicts/ 与 dicts/wb86_wangxiang_cn_dicts/
 （2026-09-26 版本）。复算用 python3 读 yaml body 按 \t 切分即可。

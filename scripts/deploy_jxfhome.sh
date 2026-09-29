@@ -62,7 +62,7 @@ SRC_DST=(
 )
 for t in core base full; do
   for k in words wubi_words pinyin_words; do
-    p="dicts/egret_wubi_py/egret_wubi_py_${k}_${t}.dict.yaml"
+    p="dicts/egret_wubi_py_${k}_${t}.dict.yaml"
     SRC_DST+=("$p|$p")
   done
 done

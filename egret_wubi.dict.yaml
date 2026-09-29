@@ -19,13 +19,13 @@ encoder:
       formula: "AaAbYaZa"
 import_tables:
   # 同 egret_wubi_py.dict.yaml：字表分 common/ext 两层，ext 默认不导入（§4.23）
-  - dicts/egret_wubi_py/egret_wubi_chars_common
+  - dicts/egret_wubi_chars_common
   # <短码>, 强制结束符（如 b, / ktn,），由 scripts/gen_jianma_spellings.py 生成。
   # 上游靠 algebra derive 从万象编码格式派生，本仓库词库是简化格式，派生不出来，
   # 所以直接生成显式条目。见 docs/PROGRESS.md §4.21。
-  - dicts/egret_wubi_py/egret_wubi_py_chengyu   # 四字成语（gen_chengyu_dict.py，源 dicts/common/chengyu.dict.yaml）
-  - dicts/egret_wubi_py/egret_wubi_force_end
-  - dicts/egret_wubi_py/egret_wubi_words_base
-  - dicts/egret_wubi_py/egret_wubi_py_sentence   # 高频整句（五笔短码→整句，见 gen_sentence_dict.py）
-  - dicts/egret_wubi_py/egret_wubi_py_user_phrases
+  - dicts/egret_wubi_py_chengyu   # 四字成语（gen_chengyu_dict.py，源 dicts/chengyu.dict.yaml）
+  - dicts/egret_wubi_force_end
+  - dicts/egret_wubi_words_base
+  - dicts/egret_wubi_py_sentence   # 高频整句（五笔短码→整句，见 gen_sentence_dict.py）
+  - dicts/egret_wubi_py_user_phrases
 ...

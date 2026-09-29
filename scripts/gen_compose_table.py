@@ -31,7 +31,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "corpus"))
 import rime_paths  # noqa: E402
 
-D = os.path.join(rime_paths.DICTS, "egret_wubi_py")
+D = rime_paths.DICTS
 GRAM = rime_paths.GRAM_DIR
 FREQ = os.path.join(rime_paths.DATA, "corpus", "freq", "recount_full.txt")
 

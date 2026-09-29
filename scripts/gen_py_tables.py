@@ -34,7 +34,7 @@ def main():
     ap.add_argument("--freq",default=os.path.join(rime_paths.DATA,"corpus","freq","recount_full.txt"),
                     help="语料词频（用来把词权重换成与 LM 同尺度的 log(1+count)*1000）")
     a=ap.parse_args()
-    D=os.path.join(rime_paths.DICTS,"egret_wubi_py")
+    D=rime_paths.DICTS
     words=os.path.join(D,f"egret_wubi_py_pinyin_words_{a.tier}.dict.yaml")
     chars=os.path.join(D,"egret_wubi_py_pinyin_8105.dict.yaml")
     # 语料词频 -> log 尺度权重（与 lm_rerank 同尺度，便于融合）

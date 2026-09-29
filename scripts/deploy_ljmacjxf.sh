@@ -279,7 +279,7 @@ else
   # 词库指纹：确认「混合库字表」带上了 2026-09 的混流修复（简码拼写 + 五笔全码）。
   # 这三条是修复的标志条目：我 q(一级简码) / 冷 uwyc(全码) / 署 lftj(全码)。
   # 若不为 3，说明部署链路把旧字表带过来了 → 会出现 qchifanle→色步犯了、uwycuklf→闪充部署。
-  FP="$R/dicts/egret_wubi_py/egret_wubi_py_chars.dict.yaml"
+  FP="$R/dicts/egret_wubi_py_chars.dict.yaml"
   if [ -f "$FP" ]; then
     n="$(awk -F'\t' '($1=="我"&&$2=="q")||($1=="冷"&&$2=="uwyc")||($1=="署"&&$2=="lftj"){n++} END{print n+0}' "$FP")"
     if [ "$n" = "3" ]; then

@@ -17,7 +17,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "corpus"))
 import rime_paths  # noqa: E402
 
-OUT = os.path.join(rime_paths.DICTS, "egret_wubi_py")
+OUT = rime_paths.DICTS
 GRAM = rime_paths.GRAM_DIR
 TIERS = ("core", "base", "full")
 TIER_DESC = {"core": "≈2万词  日常九成", "base": "≈6.3万词 默认",
@@ -55,7 +55,7 @@ def main():
     print("═" * 78)
 
     # 1. 词库
-    print("\n【1】词库  dicts/egret_wubi_py/  （每档同时含五笔码与拼音码）")
+    print("\n【1】词库  dicts/  （每档同时含五笔码与拼音码）")
     active = ""
     for w in ("egret_wubi_py.dict.yaml", "egret_wubi.dict.yaml"):
         p = os.path.join(REPO, w)
