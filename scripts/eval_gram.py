@@ -38,7 +38,7 @@ TEST_DIR = rime_paths.RIME_TEST_DIR
 SHARED_DIR = rime_paths.RIME_SHARED_DIR
 
 BASE_SMALL = os.path.join(DICTS, "wb86_wangxiang_cn_dicts", "base.small.dict.yaml")
-PINYIN_8105 = os.path.join(DICTS, "egret_wubi_py", "egret_wubi_py_pinyin_8105.dict.yaml")
+PINYIN_8105 = os.path.join(DICTS, "egret_wubi_py", "egret_py_chars.dict.yaml")
 
 # 与 regression_test.py 保持一致的黄金用例（子集：对 LM 有意义的那些）
 GOLDEN = [

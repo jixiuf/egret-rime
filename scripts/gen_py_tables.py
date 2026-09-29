@@ -36,7 +36,7 @@ def main():
     a=ap.parse_args()
     D=rime_paths.DICTS
     words=os.path.join(D,f"egret_wubi_py_pinyin_words_{a.tier}.dict.yaml")
-    chars=os.path.join(D,"egret_wubi_py_pinyin_8105.dict.yaml")
+    chars=os.path.join(D,"egret_py_chars.dict.yaml")
     # 语料词频 -> log 尺度权重（与 lm_rerank 同尺度，便于融合）
     freq={}
     if os.path.exists(a.freq):

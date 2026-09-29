@@ -1,6 +1,6 @@
 # RIME dictionary
 # 由 scripts/gen_dict_tiers.py 生成，请勿手改
-# 权重 >= 0（源: dicts/egret_wubi_py/egret_wubi_words.dict.yaml）
+# 权重 >= 0（源: dicts/egret_wubi_words.dict.yaml）
 # 传统库五笔词（86 造词码）｜档位 full（≈78 万词，尽量全（长尾交给 gram））
 
 name: egret_wubi_words_full

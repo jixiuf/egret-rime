@@ -631,7 +631,7 @@ jintiande → 今天的 / 今天 wygd   de → 胡 de
 - **生成器修正**：`gen_dict_tiers.py` 传统库改为 `kind=words + prefix=egret_wubi`
   → 产出 `egret_wubi_words_{tier}`（与 wrapper 的 import 一致）
 - **移出 git**（`.gitignore`，工作区文件保留）：拼音词表中间产物
-  `egret_wubi_py_pinyin_base_small`（1.2MB，只喂给 gen_dict_tiers，不被任何 schema import）
+  `egret_py_words_src`（1.2MB，只喂给 gen_dict_tiers，不被任何 schema import）
   > ❗ **政策修正（用户指出）**：**只要是输入法实际用到的词典（被 schema/wrapper import 的）
   > 一律入 git** —— 部署与用户拿到的就是它们。所以三族分档词表 9 个 + egret_wubi_force_end
   > **全部加回 git**；只有「纯中间产物」不入 git。

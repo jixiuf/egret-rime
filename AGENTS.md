@@ -41,7 +41,7 @@ egret-rime/
 │                 · 入 git：字表层（chars/wubi_chars/pinyin_8105）、五笔词源（egret_wubi_words）、
 │                   外部源（wb86_wangxiang_cn_dicts/*、wubi86/*、*_pinyin_base_small 的源）、用户短语
 │                 · 不入 git（生成产物）：三档词表 egret_wubi_py_words_* / egret_wubi_words_* /
-│                   egret_wubi_py_pinyin_words_*、拼音词表中间产物 pinyin_base_small
+│                   egret_py_words_*（拼音）、拼音词表中间产物 egret_py_words_src
 ├─ scripts/        生成/测试/环境脚本（入 git）
 ├─ docs/           Rime 知识库（入 git）
 ├─ third-party/    外部依赖源码与构建（不入 git，make setup 可重建）

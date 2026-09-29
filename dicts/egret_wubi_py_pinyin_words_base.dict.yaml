@@ -1,6 +1,6 @@
 # RIME dictionary
 # 由 scripts/gen_dict_tiers.py 生成，请勿手改
-# 权重 >= 451（源: dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small.dict.yaml）
+# 权重 >= 451（源: dicts/egret_py_words_src.dict.yaml）
 # 拼音词（无调音节）｜档位 base（≈6.3 万词，默认档）
 
 name: egret_wubi_py_pinyin_words_base

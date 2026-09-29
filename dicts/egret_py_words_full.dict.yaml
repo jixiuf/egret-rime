@@ -1,12 +1,10 @@
 # RIME dictionary
-# 由 scripts/gen_pinyin_words.py 生成，请勿手改
-# 拼音词表（无调音节）｜档位 base（≈6.3万词 默认）
-# 词与权重沿用五笔词表（不动权重平衡）；
-# 拼音码由 pypinyin 标注，多音字给出多个读音
-# （最多 1 个读音，非主读音权重 ×0.8）
+# 由 scripts/gen_dict_tiers.py 生成，请勿手改
+# 权重 >= 0（源: dicts/egret_wubi_py/egret_py_words_src.dict.yaml）
+# 拼音词（无调音节）｜档位 full（≈78 万词，尽量全（长尾交给 gram））
 
-name: egret_wubi_py_pinyin_base_small
-version: "2026.09.28"
+name: egret_py_words_full
+version: "2026.09.27"
 sort: by_weight
 use_preset_vocabulary: false
 columns:

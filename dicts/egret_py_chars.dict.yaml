@@ -2,7 +2,7 @@
 # wangxiang_cn_dicts/8105.dict.yaml 的无调化副本（token 改写：é->e ...）
 # 同音字/词合并到同一音节 → 顺序确定
 ---
-name: egret_wubi_py_pinyin_8105
+name: egret_py_chars
 version: "2025-09-23"
 sort: by_weight
 ...

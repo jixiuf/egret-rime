@@ -12,9 +12,9 @@
 
 本表把四个词典源合成一张表（词/字 + 可输入的码串 + 权重）：
     egret_wubi_py_chars            五笔码字（含一/二/三级简码与全码，逗号=简码,剩余）
-    egret_wubi_py_pinyin_8105      拼音字（音节）
+    egret_py_chars      拼音字（音节）
     egret_wubi_words_base  五笔词组（86 造词码，单码）
-    egret_wubi_py_pinyin_base_small 拼音词（音节串）
+    egret_py_words_src 拼音词（音节串）
 **权重用我们语料的 log 词频**（与 LM 同尺度，跨码表可比），词表只决定"哪些码能用"。
 
 输出: data/gram/compose_table.tsv   text <TAB> code <TAB> weight <TAB> kind
@@ -112,7 +112,7 @@ def main():
             for f in wubi_forms(code):
                 add(w, f, "wubi")
     # 2) 拼音字
-    for w, code, _ in rows(os.path.join(D, "egret_wubi_py_pinyin_8105.dict.yaml")):
+    for w, code, _ in rows(os.path.join(D, "egret_py_chars.dict.yaml")):
         add(w, code.replace(" ", ""), "pinyin")
     # 3) 五笔词（86 造词码）
     for w, code, _ in rows(os.path.join(D, f"egret_wubi_words_{args.tier}.dict.yaml")):

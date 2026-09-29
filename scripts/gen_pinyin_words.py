@@ -16,7 +16,7 @@
     2. 权重沿用五笔词表（万象）不变——**不动权重平衡**（实测单侧改动会破黄金用例）
 
 输出（**gen_dict_tiers.py 读取的规范名**，再由它派生出各档）：
-    dicts/egret_wubi_py_pinyin_base_small.dict.yaml
+    dicts/egret_py_words_src.dict.yaml
 
 实测（见 docs/PROGRESS.md）：
     仅主读音 == 原万象表（都是 63k 条 / 26% 完全命中）→ 质量无损、依赖可移除
@@ -115,7 +115,7 @@ def main():
         minw = TIERS[tier]
         n = 0
         multi = 0
-        name = ("egret_wubi_py_pinyin_base_small" if tier == "base"
+        name = ("egret_py_words_src" if tier == "base"
                 else f"egret_wubi_py_pinyin_words_{tier}")
         tmp = os.path.join(OUT, name + ".dict.yaml.tmp")
         with open(tmp, "w", encoding="utf-8") as f:

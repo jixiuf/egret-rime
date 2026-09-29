@@ -65,9 +65,9 @@ import_tables:
   # - dicts/wb86_cn_dicts/others   # 一些杂项 容错音和错字 可以不开
 
 # 有声调
-  - dicts/egret_wubi_py_pinyin_8105  # 拼音字表(无调化副本, 同音异调合并为同一音节)
+  - dicts/egret_py_chars  # 拼音字表(无调化副本, 同音异调合并为同一音节)
   # - dicts/wangxiang_cn_dicts/8105        # 旧带调字表(派生无调拼写会跨音节竞争,弃用)
-  - dicts/egret_wubi_py_pinyin_words_base # 拼音基础词库(无调化副本)
+  - dicts/egret_py_words_base # 拼音基础词库(无调化副本)
   # - dicts/wangxiang_cn_dicts/base.small   # 旧带调词库(弃用)
   # - dicts/wangxiang_cn_dicts/correlation.small
   # - dicts/wangxiang_cn_dicts/chars            #字表，包含了所有带拼音的汉字

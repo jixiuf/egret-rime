@@ -169,8 +169,8 @@ dicts/               # 生成数据（gen_wubi_py_unified_dicts.py 产出）
   egret_wubi_chars.dict.yaml # 传统库字表（简码+全码，不过滤 2+2 冲突）
   egret_wubi_words.dict.yaml # 传统库词组
   egret_wubi_py_user_phrases.dict.yaml # 手工维护用户词组（tgtj 生不逢时 900）
-  egret_wubi_py_pinyin_8105.dict.yaml  # 拼音字表（无调化）
-  egret_wubi_py_pinyin_base_small.dict.yaml # 拼音词表（无调化）
+  egret_py_chars.dict.yaml  # 拼音字表（无调化）
+  egret_py_words_src.dict.yaml # 拼音词表（无调化）
 dicts/wb86_wangxiang_cn_dicts/base.small.dict.yaml # 五笔词组（万象权重，>450 过滤）
 ```
 

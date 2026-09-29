@@ -30,7 +30,7 @@ def load_known():
             k,_,v=line.rstrip("\n").partition("\t")
             if len(k)==1 and v.isdigit(): lm.add(k)
     py=set(); st=False
-    for line in open(os.path.join(D,"egret_wubi_py_pinyin_8105.dict.yaml"),encoding="utf-8"):
+    for line in open(os.path.join(D,"egret_py_chars.dict.yaml"),encoding="utf-8"):
         if not st:
             if line.rstrip()=="...": st=True
             continue

@@ -20,7 +20,7 @@ DICTS = rime_paths.DICTS
 REWEIGHTED = (os.environ.get("EGRET_REWEIGHTED")
               or os.path.join(rime_paths.DATA, "freq", "pinyin_reweighted.txt"))
 PINYIN_DICT = os.path.join(DICTS, "egret_wubi_py",
-                           "egret_wubi_py_pinyin_base_small.dict.yaml")
+                           "egret_py_words_src.dict.yaml")
 WUBI_DICT = os.path.join(DICTS, "egret_wubi_py",
                          "egret_wubi_words.dict.yaml")
 

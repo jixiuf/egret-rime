@@ -17,7 +17,7 @@
 输出（**生成产物，不入 git**，由 refresh.sh 的 dict 阶段产生）：
   egret_wubi_py_chars_cal.dict.yaml           混合库字表
   egret_wubi_chars_cal.dict.yaml              传统库字表
-  egret_wubi_py_pinyin_8105_cal.dict.yaml     拼音字表
+  egret_py_chars_cal.dict.yaml     拼音字表
 """
 import os, sys, re
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
@@ -84,7 +84,7 @@ def main():
     # 混合库（组句词典）：额外丢弃生僻字的「五笔码=拼音音节」碰撞拼写
     cal("egret_wubi_py_chars.dict.yaml",          "egret_wubi_py_chars_cal.dict.yaml",          RARE_WUBI, True)
     cal("egret_wubi_chars.dict.yaml",             "egret_wubi_chars_cal.dict.yaml",             RARE_WUBI)
-    cal("egret_wubi_py_pinyin_8105.dict.yaml",    "egret_wubi_py_pinyin_8105_cal.dict.yaml",    RARE_PY)
+    cal("egret_py_chars.dict.yaml",    "egret_py_chars_cal.dict.yaml",    RARE_PY)
     return 0
 
 if __name__=="__main__": sys.exit(main())

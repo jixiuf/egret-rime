@@ -79,7 +79,7 @@ def main():
         print(f" {mark}{t:<6} {TIER_DESC[t]:<18} " + "  ".join(row) +
               f"  {tot:>5.1f}M")
     print("\n  字表（不随档位变）:")
-    for f in ("egret_wubi_py_chars.dict.yaml", "egret_wubi_py_pinyin_8105.dict.yaml"):
+    for f in ("egret_wubi_py_chars.dict.yaml", "egret_py_chars.dict.yaml"):
         p = os.path.join(OUT, f)
         print(f"    {f:<40} {count_entries(p):>8,} 条  {mb(p):>5.1f}M")
 

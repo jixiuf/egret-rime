@@ -32,7 +32,7 @@ def chars(p):
 
 def main():
     mix=chars(os.path.join(D,"egret_wubi_py_chars.dict.yaml")) | chars(os.path.join(D,"egret_wubi_chars.dict.yaml"))
-    py=chars(os.path.join(D,"egret_wubi_py_pinyin_8105.dict.yaml"))
+    py=chars(os.path.join(D,"egret_py_chars.dict.yaml"))
     todo=sorted(mix-py)
     out=[]; seen=set()
     for ch in todo:

@@ -344,8 +344,8 @@ def gen_pinyin_toneless(src_rel, out_name):
     输入: dicts/ 下指定的万象拼音词库（src_rel 相对 dicts/ 的路径）。
     变换: 所有带调音节 token 无调化（é→e），权重缺省补 1。
     输出: 写 dicts/{out_name}.dict.yaml。主流程调用两次：
-      - wangxiang_cn_dicts/8105.dict.yaml → egret_wubi_py_pinyin_8105
-      - wangxiang_cn_dicts/base.small.dict.yaml → egret_wubi_py_pinyin_base_small
+      - wangxiang_cn_dicts/8105.dict.yaml → egret_py_chars
+      - wangxiang_cn_dicts/base.small.dict.yaml → egret_py_words_src
     """
     out = header(out_name, [
         src_rel + " 的无调化副本（token 改写：\u00e9->e ...）",
@@ -537,6 +537,6 @@ import_tables:
 if __name__ == "__main__":
     gen_base_small()
     gen_chars()
-    gen_pinyin_toneless("wangxiang_cn_dicts/8105.dict.yaml", "egret_wubi_py_pinyin_8105")
-    gen_pinyin_toneless("wangxiang_cn_dicts/base.small.dict.yaml", "egret_wubi_py_pinyin_base_small")
+    gen_pinyin_toneless("wangxiang_cn_dicts/8105.dict.yaml", "egret_py_chars")
+    gen_pinyin_toneless("wangxiang_cn_dicts/base.small.dict.yaml", "egret_py_words_src")
     gen_wubi_traditional()
