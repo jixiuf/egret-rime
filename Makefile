@@ -106,7 +106,10 @@ eval: env-test          ## 跑整句评测（160 句多来源，对标基线 26%
 	@$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 160 \
 		--gram "egret=$$PWD/data/gram/zh-hans-egret.gram"
 
-test: env-test
+lint:                     ## 结构与命名一致性检查（秒级，不跑引擎）
+	@$(PYTHON) scripts/check_consistency.py
+
+test: env-test lint
 	$(PYTHON) scripts/regression_test.py
 	test -z "$$(git -C $(REPO) status --porcelain user.yaml)" || \
 		echo "⚠ 仓库 user.yaml 被回写污染, 请检查 (陷阱 #1)"

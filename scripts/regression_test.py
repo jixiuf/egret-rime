@@ -73,6 +73,20 @@ CASES = [
     ("ckiy", "台湾", "传统词组 2+2"),
     # 已知行为: ck+wan 组句因 万850>湾719 权重差 > LM 贡献(~±20), 出「台万」;
     # 逐字选台选湾一次后 userdb 记住 ck+wan=台湾, 之后 ckwan→台湾。不作硬性断言。
+
+    # --- 2026-09 修复项，逐条钉住（这些 bug 当初黄金一条都没拦住）---
+    ("qktqn", "我吃饭", "五笔短码序列组句(简码拼写补进混合库 §4.19)"),
+    ("qktnqnr", "我吃饭", "同上(一/二级简码前缀歧义)"),
+    ("qktnqnrb", "我吃饭了", "同上"),
+    ("qchifanle", "我吃饭了", "五笔一级简码 + 拼音混流(用户报的例子)"),
+    ("uwycuklf", "冷部署", "五笔全码补进混合库(原为 闪充部署 §4.19b)"),
+    ("trwuktnqnr", "我们吃饭", "五笔词 + 短码序列"),
+    ("ronghe", "融合", "speller.cc max_code_length 必须为 0，否则第 5 码自动上屏、余 e 另起一段"),
+    ("b,", "了", "强制结束符 <短码>,（原 algebra 规则对本仓库词库格式无效 §4.21）"),
+    ("ktn,", "吃", "强制结束符(三级码)"),
+    ("ben", "本", "字表分层: 扩展区生僻字不默认加载，否则 ben->𨸐(§4.23)"),
+    ("yijuliangde", "一举两得", "成语·拼音版(默认引入 §4.27)"),
+    ("owfhtc", "为什么", "整句词库(五笔短码->整句 §4.16)"),
 ]
 
 # 已知 LM 级问题: wanxiang 官方模型=才最, 自训 jixiuf gram=都不可能。
@@ -104,14 +118,22 @@ def reset_selected_schema(user_dir):
 
 
 def first_candidate(code, cwd):
-    """跑一次 console, 返回首候选文本(如 '有')。"""
-    p = subprocess.run([LIBRIME_CONSOLE], input=code + "\n\n",
-                       capture_output=True, text=True, cwd=cwd, timeout=120)
-    for line in p.stdout.splitlines():
-        m = re.match(r"1\. \[([^\]]*)\]", line.strip())
-        if m:
-            return m.group(1)
-    return None
+    """返回首候选文本(如 '有')。
+
+    连跑两次取第二次：冷部署后首跑的分段与热机不同（prism 非确定性，
+    见 docs/PROGRESS.md §4.18 测量纪律），单跑结论不可信。
+    """
+    result = None
+    for _ in range(2):
+        p = subprocess.run([LIBRIME_CONSOLE], input=code + "\n\n",
+                           capture_output=True, text=True, cwd=cwd, timeout=120)
+        result = None
+        for line in p.stdout.splitlines():
+            m = re.match(r"1\. \[([^\]]*)\]", line.strip())
+            if m:
+                result = m.group(1)
+                break
+    return result
 
 
 def detect_shared_dir(explicit=None):
