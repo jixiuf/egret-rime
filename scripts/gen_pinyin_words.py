@@ -115,8 +115,10 @@ def main():
         minw = TIERS[tier]
         n = 0
         multi = 0
+        # 命名规则见 AGENTS.md：只含拼音 -> egret_py_*
+        # base 档另存一份"源表"给 gen_dict_tiers 作输入（egret_py_words_src）
         name = ("egret_py_words_src" if tier == "base"
-                else f"egret_wubi_py_pinyin_words_{tier}")
+                else f"egret_py_words_{tier}")
         tmp = os.path.join(OUT, name + ".dict.yaml.tmp")
         with open(tmp, "w", encoding="utf-8") as f:
             f.write(header(name, [

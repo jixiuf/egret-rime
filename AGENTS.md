@@ -38,6 +38,8 @@ bash scripts/refresh.sh --loop 30   # 常驻：每 30 分钟增量刷新（语�
 ```
 egret-rime/
 ├─ dicts/          词库**源数据**（入 git）+ 生成产物（不入 git，refresh.sh 重建）
+│                 · **命名规则**：内容同时含五笔与拼音 -> egret_wubi_py_*；只五笔 -> egret_wubi_*；
+│                   只拼音 -> egret_py_*（如 egret_wubi_py_chars / egret_wubi_chars / egret_py_words）
 │                 · 入 git：字表层（chars/wubi_chars/pinyin_8105）、五笔词源（egret_wubi_words）、
 │                   外部源（wb86_wangxiang_cn_dicts/*、wubi86/*、*_pinyin_base_small 的源）、用户短语
 │                 · 不入 git（生成产物）：三档词表 egret_wubi_py_words_* / egret_wubi_words_* /
