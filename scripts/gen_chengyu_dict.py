@@ -25,7 +25,8 @@ from pypinyin import lazy_pinyin, Style
 D=rime_paths.DICTS
 SRC=os.path.join(rime_paths.DICTS,"chengyu.dict.yaml")   # curated 成语表（13k 条，含五笔 4 码）
 COUNTS=os.path.join(rime_paths.DATA,"gram","zh-hans-egret.2_6gram.tsv")
-OUT=os.path.join(D,"egret_wubi_py_chengyu.dict.yaml")
+OUT=os.path.join(D,"egret_wubi_py_chengyu.dict.yaml")          # 拼音版（默认引入）
+OUT_WB=os.path.join(D,"egret_wubi_py_chengyu_wubi.dict.yaml")  # 五笔 4 码版（不默认引入，用户按需）
 MIN_COUNT=int(os.environ.get("MIN_COUNT","1000"))
 BAD=set("的了是在和我你他她它这那也就都很个着们把被给对从到与及或但而")
 
@@ -66,12 +67,14 @@ def main():
         if len(w)!=4 or not c.isalpha() or len(c)!=4: continue
         if any(not ('\u4e00'<=ch<='\u9fff') for ch in w): continue
         pick.append((w,c,freq.get(w,0)))
-    rows=[]
+    rows=[]; rows_wb=[]
     for w,wb,n in pick:
         py=lazy_pinyin(w, style=Style.NORMAL, errors="ignore")
         v=int(round(math.log(1+n)*100)) if n else 700      # 语料有频次按频次；没有给中庸值 700
         v=max(1,min(v,4000))
-        rows.append((w,wb,v))
+        # 五笔 4 字码是「每字首字母」，碰撞天然多（如 yjld 可对应多个成语），
+        # 故单独一份、默认不引入；要用的用户在 wrapper 的 import_tables 里加一行。
+        rows_wb.append((w,wb,v))
         if len(py)==4 and all(s.isascii() and s.isalpha() for s in py):
             rows.append((w,"".join(py),v))
     with open(OUT,"w",encoding="utf-8") as f:
@@ -81,7 +84,17 @@ def main():
                 "name: egret_wubi_py_chengyu\nversion: \"2026.09.29\"\nsort: by_weight\n"
                 "use_preset_vocabulary: false\ncolumns:\n  - text\n  - code\n  - weight\n...\n")
         for w,c,v in rows: f.write(f"{w}\t{c}\t{v}\n")
-    print(f"成语 {len(pick):,} 条（源 {os.path.basename(SRC)}），写出 {len(rows):,} 行 -> {os.path.basename(OUT)}")
+    with open(OUT_WB,"w",encoding="utf-8") as f:
+        f.write("# RIME dictionary\n# 由 scripts/gen_chengyu_dict.py 生成，请勿手改\n"
+                f"# 四字成语的**五笔 4 码**（每字首字母，碰撞较多）。\n"
+                f"# 默认不引入；要用就在 egret_wubi_py.dict.yaml 的 import_tables 里\n"
+                f"# 加一行 dicts/egret_wubi_py_chengyu_wubi。\n\n"
+                "name: egret_wubi_py_chengyu_wubi\nversion: \"2026.09.29\"\nsort: by_weight\n"
+                "use_preset_vocabulary: false\ncolumns:\n  - text\n  - code\n  - weight\n...\n")
+        for w,c,v in rows_wb: f.write(f"{w}\t{c}\t{v}\n")
+    print(f"成语 {len(pick):,} 条（源 {os.path.basename(SRC)}）")
+    print(f"  拼音版 {len(rows):,} 行 -> {os.path.basename(OUT)}（默认引入）")
+    print(f"  五笔版 {len(rows_wb):,} 行 -> {os.path.basename(OUT_WB)}（不默认引入，用户按需）")
     print("  样例:", "、".join(w for w,_,_ in pick[:8]))
 
 if __name__=="__main__": main()
