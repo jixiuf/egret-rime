@@ -741,7 +741,12 @@ patch:
 |---|---|---|
 | lm_rerank 开（现状） | 20/20 | **41/160 (26%)** |
 | 关 lm_rerank，原生 grammar（但 language 指到 essay 旧模型） | 20/20 | 18/160 (11%) |
+| 关 lm_rerank，原生 grammar = 自训 zh-hans-egret（字级）+ **默认罚分** | 19/20 | 18/160 (11%) |
 | 关 lm_rerank，原生 grammar = 自训 zh-hans-egret + 罚分加重(-30/-30/-40) | **17/20** | 17/160 (11%) |
+
+四格实测完毕（默认罚分那格是最后补的），**原生 grammar 一律 ~11%，且都会掉黄金**（19/20、17/20）。
+真正的差距在于**评分方式**：Lua 重排用的是正经的 n-gram 对数概率求和（§4.11），
+而 librime 的 grammar 是「词 log 权重 − 罚分」，两种算法不是一回事，换模型/调罚分都补不上。
 
 结论：**原生 grammar 目前接不了这个班** —— 即使换成自训 gram 并把
 `collocation/non_collocation/weak_collocation_penalty` 从 -10/-12/-24 加重到 -30/-30/-40，
