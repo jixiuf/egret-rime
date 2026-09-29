@@ -51,7 +51,7 @@ import_tables:
   # 不导入，需要时在 egret_wubi_py_ext.custom.yaml 里给 translator/dictionary+ 追加即可。
   # 分层原因与实测数据见 docs/PROGRESS.md §4.23。
   - dicts/egret_wubi_py_chars_common   # 字表(五笔码+万象权重x0.35+一级简码)
-  - dicts/egret_wubi_py_chengyu   # 四字成语·拼音版（gen_chengyu_dict.py）
+  - dicts/egret_py_chengyu        # 四字成语·拼音版（gen_chengyu_dict.py）
   # 想用「五笔 4 码」打成语（如 yjld -> 一举两得），把下面这行取消注释即可：
   # 五笔 4 字码是每字首字母，碰撞多（yjld 可对多个成语），故默认不引入。
   # - dicts/egret_wubi_chengyu

@@ -25,7 +25,7 @@ from pypinyin import lazy_pinyin, Style
 D=rime_paths.DICTS
 SRC=os.path.join(rime_paths.DICTS,"chengyu.dict.yaml")   # curated 成语表（13k 条，含五笔 4 码）
 COUNTS=os.path.join(rime_paths.DATA,"gram","zh-hans-egret.2_6gram.tsv")
-OUT=os.path.join(D,"egret_wubi_py_chengyu.dict.yaml")          # 拼音版（默认引入）
+OUT=os.path.join(D,"egret_py_chengyu.dict.yaml")               # 拼音版（默认引入）
 OUT_WB=os.path.join(D,"egret_wubi_chengyu.dict.yaml")          # 五笔 4 码版（不默认引入，用户按需）
 MIN_COUNT=int(os.environ.get("MIN_COUNT","1000"))
 BAD=set("的了是在和我你他她它这那也就都很个着们把被给对从到与及或但而")
@@ -81,7 +81,7 @@ def main():
         f.write("# RIME dictionary\n# 由 scripts/gen_chengyu_dict.py 生成，请勿手改\n"
                 f"# 四字成语（源：dicts/chengyu.dict.yaml，五笔 4 码取自该表，拼音码由 pypinyin 标注），"
                 f"共 {len(set(r[0] for r in rows)):,} 条词、{len(rows):,} 行\n\n"
-                "name: egret_wubi_py_chengyu\nversion: \"2026.09.29\"\nsort: by_weight\n"
+                "name: egret_py_chengyu\nversion: \"2026.09.29\"\nsort: by_weight\n"
                 "use_preset_vocabulary: false\ncolumns:\n  - text\n  - code\n  - weight\n...\n")
         for w,c,v in rows: f.write(f"{w}\t{c}\t{v}\n")
     with open(OUT_WB,"w",encoding="utf-8") as f:

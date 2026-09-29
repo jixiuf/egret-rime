@@ -810,7 +810,7 @@ octagram 学的是**词**搭配，模型与用途不匹配。
 **做法**：上游 `~/vmacs/rime/dicts/chengyu.dict.yaml` 有一份 cur 好的成语表
 （13,127 条，已带五笔 4 码，格式 `傲岸不群 aabq`），收进本仓库 `dicts/` 作源。
 `scripts/gen_chengyu_dict.py` 补上拼音码（pypinyin 逐字）与权重（语料 4-gram 频次，
-无频次的给中庸值 700），产出 `egret_wubi_py_chengyu.dict.yaml`（13,116 条 / 26,232 行），
+无频次的给中庸值 700），产出 `egret_py_chengyu.dict.yaml`（13,116 条 / 26,232 行），
 由两个 wrapper 引入，接在 refresh.sh 的 gram 阶段（权重依赖字符 4-gram 计数）。
 
 **为什么不按语料频次筛四字串**：先试过"从 4-gram 计数取高频四字串（count>=1000）"，
@@ -820,7 +820,7 @@ octagram 学的是**词**搭配，模型与用途不匹配。
 **拆成两份（2026-09-29 调整）**：
 | 文件 | 内容 | 默认 |
 |---|---|---|
-| `egret_wubi_py_chengyu.dict.yaml` | 拼音码（yijuliangde 等），13,116 行 | **引入**（混合库） |
+| `egret_py_chengyu.dict.yaml` | 拼音码（yijuliangde 等），13,116 行 | **引入**（混合库） |
 | `egret_wubi_chengyu.dict.yaml` | 五笔 4 码（yjld 等），13,116 行 | **不引入**，用户按需 |
 
 理由：五笔 4 字码是「每字首字母」，碰撞天然多（`yjld` 可对应多个成语），
