@@ -157,6 +157,10 @@ for i in "${!STAGES[@]}"; do
       # 拼音词表：原方案依赖缺失的万象 base.small.dict.yaml（上游已迁移），
       # 现改用 pypinyin 从仓库内五笔词表现场标注 —— 实测质量等价（同为 26%），
       # 且让整条 dict 管线可复现（见 docs/PROGRESS.md）
+      # 未接入的生成器（有意）：gen_char_weights.py / gen_pinyin_chars.py（字表权重校准与
+      # 生僻字拼音，已由 §4.23 的字表分层取代）；gen_compose_table.py（统一码表搜索器，
+      # 只在 dynamic_translator/lm_compose: true 时用，默认关）；gen_eval_set.py（评测集工具，
+      # 不是产品产物）。需要时手动跑。
       "$PY" "$ROOT/scripts/gen_pinyin_words.py" --tier "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "拼音词表已生成（pypinyin 标注，可复现）" || warn "拼音词表生成失败"
       # ⭐ 把一/二级简码补进**混合库字表**：组句是混合库的 script_translator 在 prism 上做的，
