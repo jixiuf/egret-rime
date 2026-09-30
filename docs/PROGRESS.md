@@ -1117,6 +1117,61 @@ yield(nc)
 剩下的唯一障碍是**搜索器本身的准确率**（26%）。把搜索器准确率提上来（模型/码表/beam），
 这条通路就能直接变成收益。这是目前最有价值的方向。
 
+### 4.41 ⭐⭐ 混流多读法落地：用「整段补 tag」让五笔读法在整句中胜出（默认开启）
+
+**先纠一个结构性误解**（本轮踩出来的）：rime 里**段就是「组字/上屏的单位」**，
+段与段是**顺序确认**的，**不会合并成一句话** → 所以"把输入切成多段"必然碎句
+（实测 `nihaoma -> 吗`、`trwuchifan -> 我们`）。同理 `seg:forward()` 会把前面的段
+标记为已确认（候选只剩最后一段），**切段这条路本身是错的** ✗。
+
+**正确的用法**：不切段，只**给整段补一个 tag** —— `add_segment` 对**等长**段是
+**tags 取并集**（`segmentation.cc:98-107`），所以：
+
+```lua
+local ns = Segment(s, e)                 -- 与 abc 段等长
+ns.tags = { ["wubi"] = true }            -- 必须 set 形式
+seg:add_segment(ns)                      -- → tags = {abc, wubi}
+```
+再由**绑定该 tag 的内建 translator** 处理：
+```yaml
+wubi_route:
+  tag: wubi
+  dictionary: egret_wubi       # 传统 86 库（会按五笔读法组句）
+  enable_sentence: true
+  enable_completion: true
+  initial_quality: 1000        # ★ 关键：高于混合库(1)
+```
+**机制（两处独立因果验证）**：`LuaSegmentor` 用我们的统一码表搜索器（`py_composer`，
+现在会返回**每段的读法 kind**：五笔/拼音）判断"整串是五笔读法" → 补 tag →
+`wubi_route` 用 86 库组出五笔读法 → 其 `initial_quality: 1000` 压过混合库(1) → 胜出。
+- 验证 A：**移除** `wubi_route` → `gdrnthtcsu` 回落 `天气怎么素` ✗
+- 验证 B：把它的 `initial_quality` 降到 1 → 同样回落 ✗
+（即 §4.18 记的那条质量差，现在被刻意利用。）
+
+**实测（全部指标，开/关对照）**：
+| 指标 | 关 | 开 |
+|---|---|---|
+| 黄金 make test | 32/32 | **32/32** |
+| 黄金 评测子集 | 20/20 | 20/20 |
+| 混合拼写 20 条 | 6/20 | 6/20 |
+| 整句 160 条 | 43/160 | 43/160 |
+| `gdrnthtcsu` | 天气怎么素 | **天气怎么样** ✓ |
+| 每次 console 耗时 | 3.641s | 3.670s |
+
+**纯收益、零回归**，故默认开启（`mix_segmentor.enabled: true`）。
+
+**踩过的坑（都验证过，别再犯）**：
+1. 段**必须互不重叠且顺序推进**；`forward()` = 确认段，不能用来"拼段"；
+2. 段的 `tags` 必须 **set 形式**（`{[tag]=true}`；数组会 lua 报错）；
+3. 内建 table/script translator **只认 abc** → 自定义 tag 的段必须**同时带 abc**，
+   否则原有链路（拼音组句等）被跳过；
+4. `lua_translator` **完全不支持 tag 配置**（`lua_gears.h:65`），必须在 lua 里
+   `seg:has_tag()` 自检；
+5. `lua_segmentor` 必须排在 `abc_segmentor` 之后、`fallback_segmentor` **之前**
+   （fallback 会终止分段链）；
+6. rime 的 **translation 是单次迭代流**：filter 里 `input:iter()` 只能遍历一遍，
+   否则候选全丢（曾导致方案 0 候选）。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |

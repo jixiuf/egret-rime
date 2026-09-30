@@ -69,6 +69,9 @@ engine:
     - matcher                   # 配合recognizer標識符合特定規則的段落，如網址、反查等，加上特定tag
     - abc_segmentor             # 標識常規的文字段落，加上abc這個tag
     - punct_segmentor           #  標識句讀段落〔鍵入標點符號用〕加上punct這個tag
+    # 混流多读法：搜索器判定"整串五笔读法"时，给整段补 wubi tag（不切段，
+    # 因为 rime 里段就是组字单位，切段会碎句）。见 docs/PROGRESS.md §4.41
+    - lua_segmentor@*mix_segmentor
     - fallback_segmentor
   translators:
     - punct_translator    # 对应下面的punctuator，用来输入标点
@@ -82,6 +85,7 @@ engine:
     #   混合库同时含五笔码与拼音音节 → 句中五笔/拼音混合输入
     # 「`+拼音」反查：打出拼音候选并显示其五笔码（词典 egret_py，见 egret_py.dict.yaml）
     - reverse_lookup_translator@reverse_lookup
+    - table_translator@wubi_route      # 只处理 tag=wubi 的段（五笔读法，quality 1000 置顶）
     - lua_translator@*dynamic_translator
   filters:
   # 长词优先 (即wq 后 第4个词的长度必然大于第1个候选,即提升部分长词到第4，5个选项)
@@ -97,6 +101,7 @@ engine:
     - simplifier@traditionalize                     # 简繁切换
     - uniquifier                # 去重，比如多个繁体字对应一个简体字，此时可能需要去重
     # 放在最后：前面的 long_word_filter 会重排候选，若放在它前面，改写会被覆盖
+    - lua_filter@*dump_cands_filter    # 调试：打印整份候选表（默认关）
     - lua_filter@*compose_filter
 
 # ---- 顶层调度：first=传统五笔库，先于混合库，保证简码/全码首候选确定 ----
@@ -221,3 +226,17 @@ wubi_comment:
 reverse_lookup:
   __patch:
     - egret.common.yaml:reverse_lookup_pinyin
+
+# 混流多读法（§4.41）：搜索器判"整串五笔"时给整段补 wubi tag（不切段）
+mix_segmentor:
+  enabled: true
+  debug: false
+  min_len: 4
+wubi_route:                 # 绑定 tag=wubi 的内建 table_translator（内建组件认 tag，lua 的不认）
+  tag: wubi
+  dictionary: egret_wubi
+  enable_sentence: true
+  enable_completion: true
+  initial_quality: 1000     # 关键：高于混合库(1) → 五笔读法在整句里胜出
+dump_cands_filter:
+  enabled: false

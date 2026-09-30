@@ -35,13 +35,14 @@ function M.load(dir)
     if not f2 then return false, "compose_table.tsv 缺失" end
     local n = 0
     for line in f2:lines() do
-        local text, code, wt = line:match("^(.-)	(.-)	(%d+)	")
+        local text, code, wt, kind = line:match("^(.-)	(.-)	(%d+)	(.-)$")
         if text and #code >= 1 then
             local key = #code >= 2 and code:sub(1, 2) or code
             local list = by_key[key]
             if not list then list = {}; by_key[key] = list end
             list[#list + 1] = { text = text, code = code,
-                                weight = tonumber(wt) or 0 }
+                                weight = tonumber(wt) or 0,
+                                kind = (kind and kind ~= "") and kind or nil }
             n = n + 1
         end
     end
@@ -98,6 +99,8 @@ function M.compose(input, lm, beam, want)
                                 end
                                 nb[#nb + 1] = { score = sc,
                                                 text = path.text .. w.text,
+                                                piece = { prev = path.piece, s = pos, e = epos,
+                                                          kind = w.kind, code = w.code },
                                                 ctx = ctx }
                             end
                         end
@@ -125,7 +128,12 @@ function M.compose(input, lm, beam, want)
     table.sort(fin, function(a, b) return a.score > b.score end)
     local out = {}
     for i = 1, math.min(want, #fin) do
-        out[i] = { text = fin[i].text, score = fin[i].score }
+        local ps, pp = {}, fin[i].piece
+        while pp do
+            table.insert(ps, 1, { s = pp.s, e = pp.e, kind = pp.kind, code = pp.code })
+            pp = pp.prev
+        end
+        out[i] = { text = fin[i].text, score = fin[i].score, pieces = ps }
     end
     return out
 end
