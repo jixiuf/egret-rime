@@ -122,7 +122,13 @@ echo
 echo "  --- 自检（用系统 librime / 真实目录）---"
 for f in /usr/share/rime-data/*; do ln -sfn "$f" "$R/$(basename "$f")"; done
 cd "$R"
-out=$(LD_PRELOAD=/usr/lib64/librime.so.1.16.1 timeout 180 "$C" 2>/dev/null <<< "jintiandetianqizenmeyang
+# 用系统 librime（自动取最高版本）。**不要**像以前那样硬编码 1.16.1：
+# librime < 1.17 时长句只出 1 个候选，LM 重排无从下手，自检会报假故障
+# （实测：preload 1.16.1 时「今天的天气怎么养」，用系统 1.17.0 时「怎么样」）。
+SYS_LIB="$(ls -1 /usr/lib64/librime.so.1.1[7-9]* /usr/lib/librime.so.1.1[7-9]* 2>/dev/null | sort -V | tail -1)"
+[ -z "$SYS_LIB" ] && SYS_LIB="$(ls -1 /usr/lib64/librime.so.1.[0-9]* 2>/dev/null | sort -V | tail -1)"
+echo "        librime: ${SYS_LIB:-（未找到，用 console 自带）}"
+out=$(LD_PRELOAD="$SYS_LIB" timeout 180 "$C" 2>/dev/null <<< "jintiandetianqizenmeyang
 wojintianmeiyoukong
 " | grep -E "^1\. " | sed 's/^1\. \[//;s/\]$//' | tr '\n' ' ')
 echo "        结果: $out"

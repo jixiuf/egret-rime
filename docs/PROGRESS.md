@@ -917,6 +917,21 @@ schema 配置里没有任何引用，deployer 清理时就当无主文件处理�
 **目标机当前状态**：手工 scp 后 bin 已就位（15:18，重建之后，未被再移走），`fcitx5 -r` 即可测。
 另注意：`~/.local/share/fcitx5/rime` 实际是软链到 `$HOME/vmacs/linux/local/share:fcitx5/rime`。
 
+### 4.34b 部署自检的假故障：硬编码 preload librime 1.16.1
+
+部署脚本的自检里写着 `LD_PRELOAD=/usr/lib64/librime.so.1.16.1`，而系统装的是 **1.17.0**。
+按项目自己的结论：**librime < 1.17 时长句只出 1 个候选，LM 重排无从下手** ——
+所以自检报「今天的天气怎么养」是**假故障**，真实运行时（1.17）结果是「怎么样」✓。
+已改为自动挑系统最高版本并打印出来，找不到才回退 console 自带。
+
+**另**：自检还必须在**带 shared data**（`/usr/share/rime-data`）的前提下跑，否则
+`error building config: ...schema` + `failed to include section default:key_binder`
+（§4.7 陷阱），grammar/LM 会静默失效、结果同样不可信。
+
+**部署到 host-linux 的实际结果（用系统 1.17 + shared data 手测）**：
+`ronghe->融合`、`qktnqnr->我吃饭`、`jintiandetianqizenmeyang->今天的天气怎么样`、
+`wojintianmeiyoukong->我今天没有空` —— 全部正确 ✓，LM 表在 `dicts/`（20.2MB）✓。
+
 ### 4.34 ✅ 已解决：LM 表位置 + bin 加载器 off-by-one
 
 **两个独立的 bug 叠在一起**：
