@@ -46,8 +46,10 @@ manifest() {
   done
   # LM 重排的运行时文件：.bin（二分查表用）+ .meta（总字数，backoff 归一化用）。
   # .tsv 只是同一份数据的可读视图，给人排查用，不部署。
-  [ -f "$ROOT/data/gram/lm_rerank.meta" ] && echo "data/gram/lm_rerank.meta|lm_rerank.meta"
-  [ -f "$ROOT/data/gram/lm_rerank.bin" ]  && echo "data/gram/lm_rerank.bin|lm_rerank.bin"
+  [ -f "$ROOT/data/gram/lm_rerank.meta" ] && echo "data/gram/lm_rerank.meta|dicts/lm_rerank.meta"
+  # 放 dicts/ 而不是用户目录根：fcitx 每次重启都会跑一遍部署，deployer 会把根下
+  # 不认识的 .bin 当无主文件移进 trash/（实测每次重启 lm_rerank.bin 都被移走）。
+  [ -f "$ROOT/data/gram/lm_rerank.bin" ]  && echo "data/gram/lm_rerank.bin|dicts/lm_rerank.bin"
   [ "$WITH_GRAM" = 1 ] && [ -f "$ROOT/data/gram/zh-hans-egret.gram" ] \
     && echo "data/gram/zh-hans-egret.gram|zh-hans-egret.gram"
   return 0

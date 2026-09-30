@@ -917,7 +917,30 @@ schema 配置里没有任何引用，deployer 清理时就当无主文件处理�
 **目标机当前状态**：手工 scp 后 bin 已就位（15:18，重建之后，未被再移走），`fcitx5 -r` 即可测。
 另注意：`~/.local/share/fcitx5/rime` 实际是软链到 `$HOME/vmacs/linux/local/share:fcitx5/rime`。
 
-### 4.34 ❗ 未解决：fcitx 每次重启都会把 lm_rerank.bin 移进 trash/
+### 4.34 ✅ 已解决：LM 表位置 + bin 加载器 off-by-one
+
+**两个独立的 bug 叠在一起**：
+
+**(1) fcitx 每次重启都会把 `lm_rerank.bin` 移进 trash/**
+fcitx5-rime 启动时跑一遍部署，deployer 把用户目录**根下**它不认识的 `.bin` 当无主文件清理
+（这张表是 Lua 运行时读的，schema 无引用关系）。缺表 ⇒ dynamic_translator 关掉原生 grammar
+后没有 LM ⇒ 长句出垃圾。
+**修复**：表改放 `dicts/`（deployer 视其为词典源目录，不清理）；`lm_rerank.lua` 依次找
+`dicts/*.bin` → 根 `*.bin` → 旧 `*.tsv`；meta 必须取**同一位置**的（它给 total_chars，
+是重排归一化基线，取错会静默回退兜底值）。
+
+**(2) bin 加载器从引入起就是坏的（off-by-one）**
+头部是 8B magic + 4B + 6×u32 计数 = 36B，Lua 里字符串是 1-based，计数应从**第 13 字节**开始，
+我写成了 12 → 整个索引错位一字节 → **190 万条里 190 万条都查不到** ✗（差分测试：
+TSV 哈希 vs bin 二分，逐键比对才查出来）。症状是 golden 32→29（只有 3 条依赖 LM），
+极难察觉。
+**修复**：`i = 13 + (L-1)*4`。修后差分测试：数值不同 0，查不到 84,033 —— 全是被有意
+丢弃的「含 4 字节字符/ASCII 句界标记($)」的键，候选文本是纯汉字，永不查询，无害。
+另：二分比较改用逐字节 `byte_lt`（Lua 的 `<` 走 strcoll，受 locale 影响，与文件的字节序
+排序假设不一致）。
+
+**验证**：表只在 `dicts/` → 黄金 **32/32**；表在根目录（老布局）→ 也 32/32（向后兼容）。
+
 
 用户指出（关键）：**不只是部署时**，`lm_rerank.bin` 在 **fcitx 每次重启**都会被移进
 `<rime>/trash/` —— 因为 fcitx5-rime 启动时会跑一次部署，而 deployer 会把用户目录根下

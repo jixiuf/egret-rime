@@ -23,15 +23,30 @@ local tried = false
 -- 二进制包（scripts/gen_lm_rerank.py 产出）：定长记录 + 二分查表，避免把 190 万条
 -- n-gram 全量灌进 Lua 哈希（那份表 28.5MB，建哈希后常驻可达数百 MB）。
 -- 格式见生成器 write_bin() 的注释：8B magic + 6×u32 计数 + 各档定长记录(键3L字节+u16值)。
+-- 逐字节比较：Lua 里字符串的 `<` 走 strcoll（受 locale 影响），而二进制文件是按
+-- 纯字节序排的 —— 直接用它比较会让二分查表偶发 miss，导致 LM 分数悄悄变差
+-- （症状：golden 32 -> 29，极难定位；用 log.error 打出实际命中路径才查到）。
+local function byte_lt(a, b)
+    local n = math.min(#a, #b)
+    for i = 1, n do
+        local x, y = a:byte(i), b:byte(i)
+        if x ~= y then return x < y end
+    end
+    return #a < #b
+end
+
 local function load_bin(path)
     local f = io.open(path, "rb")
     if not f then return nil end
     local data = f:read("*a")
     f:close()
     if not data or #data < 36 or data:sub(1, 5) ~= "EGLM1" then return nil end
+    -- 头部布局：8B magic + 4B 档数字节 + 6×u32 计数 = 36B；计数从**第 13 个字节**开始
+    -- （Lua 字符串 1-based）。这里原来写成 12，整体错位一字节 → 二分全部查不到
+    -- （症状：golden 32 -> 29，LM 静默失效，极难察觉）。
     local counts, base, off, n = {}, {}, 36, 0
     for L = 1, 6 do
-        local i = 12 + (L - 1) * 4
+        local i = 13 + (L - 1) * 4
         local c = data:byte(i) + data:byte(i + 1) * 256
                 + data:byte(i + 2) * 65536 + data:byte(i + 3) * 16777216
         counts[L] = c
@@ -51,7 +66,7 @@ local function load_bin(path)
             if key == k then
                 local b1, b2 = data:byte(p + 3 * L + 1, p + 3 * L + 2)
                 return b1 + b2 * 256
-            elseif key < k then lo = mid + 1 else hi = mid - 1 end
+            elseif byte_lt(key, k) then lo = mid + 1 else hi = mid - 1 end
         end
         return nil
     end })
@@ -61,11 +76,29 @@ end
 function M.load(filename)
     if tried then return tab end
     tried = true
-    local path = rime_api.get_user_data_dir() .. "/" ..
-                 (filename or "lm_rerank.tsv")
+    -- 位置兼容：优先 dicts/（fcitx 每次重启都会跑一遍部署，deployer 会把用户目录
+    -- **根下**它不认识的 .bin 当无主文件移进 trash/；dicts/ 是词典源目录，不清理）。
+    -- 依次尝试：dicts/*.bin -> 根 *.bin -> 根 *.tsv（老部署）。
+    -- meta 必须取**同一个位置**的（它给出 total_chars，是重排的归一化基线，
+    -- 取错位置会静默回退到兜底值，把重排结果改坏）。
+    local dir = rime_api.get_user_data_dir()
+    local stem = "lm_rerank"
+    local path, meta_path
+    for _, cand in ipairs({
+        { dir .. "/dicts/" .. stem .. ".bin", dir .. "/dicts/" .. stem .. ".meta" },
+        { dir .. "/" .. stem .. ".bin",       dir .. "/" .. stem .. ".meta" },
+        { dir .. "/" .. (filename or stem .. ".tsv"), dir .. "/" .. stem .. ".meta" },
+    }) do
+        local f0 = io.open(cand[1], "rb")
+        if f0 then f0:close(); path, meta_path = cand[1], cand[2]; break end
+    end
+    if not path then
+        log.warning("[lm_rerank] 未找到 n-gram 表（dicts/ 或根目录），跳过 LM 重排")
+        return nil
+    end
     local f = io.open(path, "rb")
     if not f then
-        log.warning("[lm_rerank] 未找到 " .. path .. "，跳过 LM 重排")
+        log.warning("[lm_rerank] 打不开 " .. path .. "，跳过 LM 重排")
         return nil
     end
     local t, n = load_bin(path:gsub("%.tsv$", ".bin"))
@@ -85,7 +118,7 @@ function M.load(filename)
     n = n2
     end
     -- 读取总字数（用于 backoff 的 unigram 概率 P(c) = count(c)/total）
-    local mf = io.open(path:gsub("%.tsv$", ".meta"), "rb")
+    local mf = io.open(meta_path, "rb")
     if mf then
         for line in mf:lines() do
             local v = line:match("^total_chars=(%d+)$")
