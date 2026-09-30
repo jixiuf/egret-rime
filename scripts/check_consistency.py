@@ -35,6 +35,39 @@ for p in sorted(glob.glob("dicts/*.dict.yaml")):
     if m and m.group(1) != b:
         print(f"  ✗ {b}: name: 是 {m.group(1)}"); err += 1
 
+# 2.5) 脚本/配置里出现的 dicts/X.dict.yaml 必须存在
+#      —— 2026-09 扁平化时 eval_gram.py 漏改（os.path.join 三参数形式），评测工具
+#      直接跑不起来，而当时的 lint 只看 wrapper 的 import，漏了脚本内的路径。
+#      正则要带词边界（否则 wangxiang_cn_dicts/8105 会被误判成 dicts/8105），
+#      并跳过注释与三引号文档串（那里写的是输出名，未必已存在）。
+def _code_lines(path):
+    in_doc = False
+    for i, line in enumerate(open(path, encoding="utf-8", errors="ignore"), 1):
+        st = line.strip()
+        if in_doc:
+            if TRIPLE_D in st or TRIPLE_S in st:
+                in_doc = False
+            continue
+        if st.startswith("#"):
+            continue
+        if st.count(TRIPLE_D) % 2 or st.count(TRIPLE_S) % 2:
+            in_doc = True
+            continue
+        yield i, line
+
+TRIPLE_D = chr(34) * 3   # 三引号（避免在补丁脚本里嵌套）
+TRIPLE_S = chr(39) * 3
+_scan = (glob.glob("scripts/**/*.py", recursive=True) + glob.glob("scripts/**/*.sh", recursive=True)
+         + ["Makefile"] + ["egret_wubi_py.dict.yaml", "egret_wubi.dict.yaml", "egret_py.dict.yaml"])
+for f in _scan:
+    if not os.path.exists(f):
+        continue
+    it = _code_lines(f) if f.endswith(".py") else enumerate(open(f, encoding="utf-8", errors="ignore"), 1)
+    for ln, line in it:
+        for m in re.finditer(r"(?<![\w/])(dicts/[\w/]+)\.dict\.yaml", line):
+            if not os.path.exists(m.group(1) + ".dict.yaml"):
+                print(f"  ✗ {f}:{ln} 引用不存在的 {m.group(1)}"); err += 1
+
 # 3) 语法
 for p in glob.glob("scripts/*.py") + glob.glob("scripts/**/*.py", recursive=True):
     r = subprocess.run([sys.executable, "-c", f"import ast;ast.parse(open({p!r},encoding='utf-8').read())"],
