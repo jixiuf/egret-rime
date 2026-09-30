@@ -153,21 +153,41 @@ Lua 里可直接用的东西（由 librime-lua 注入为全局）：`Candidate`�
 
 ## 6. 还没用、但值得考虑的扩展点
 
-1. **`lua_segmentor`（我们完全没用）** ★ —— 已做原型，摸清 3 条硬事实：
-   - `Segmentation:add_segment` 收的是 **`Segment` 对象**（`Segment(s, e, tag)`），
-     不是 `(start, end, tag)` 三个参数；
-   - **段必须互不重叠**（加了重叠段会破坏分段不变量 → 整个方案**一个候选都没有**）；
-   - segmentor 出错时 `LuaSegmentor::Proceed` 返回 **true**（= "本段我接管了"）
-     → 后面的 `abc_segmentor` 被跳过 → 同样一个候选都没有 ⇒ **必须 pcall 兜住**。
-   - 未验证：`lua_translator` 怎么绑定自定义 tag（试了块里写 `tag:`/`tags:` 都没生效，
-     界面只显示当前段的候选，验证方法也要另想 —— 下轮先读 rime 里 `Translator`
-     取 tag 的地方）。
-   它能**自己决定怎么切段、给每段打什么 tag**，而每个 tag 可以挂不同的 translator。
-   这正是"混流多读法"的干净实现方式：例如把输入切成「五笔码段」与「拼音段」，
-   分别挂 `table_translator` 与 `script_translator`，
-   或在同一段上挂**多个读法假设**的 translator，再由 filter 合并排序。
-   比"往同一套 prism 里塞两种拼写、靠权重裁决"可控得多（§4.37 的结论正是
-   裁决不可控）。
+1. **`lua_segmentor`（我们完全没用）** ★ —— 已把机制与配方摸清（子代理带 file:line 验证，
+   纠正了我先前两条错记）：
+
+   **① 引擎不做 tag 路由**：对每个 segment **无脑调用所有 translator** 的 Query
+   （`engine.cc:215`），是否处理由 translator **自己**看 `segment.HasTag()` 决定。
+   内建 table/script 用 `HasAnyTagIn(tags_)` 自检，`tags_` 来自 `<ns>/tag`（覆盖首个）
+   + `<ns>/tags`（追加），默认 `{"abc"}`（`translator_commons.cc:115-153`）。
+
+   **② `lua_translator` 完全不支持 tag** ✗（`lua_gears.h:65` 无 TagMatching）——
+   块里写 `tag:`/`tags:` 会被**静默忽略**（这就是我原型里探针候选不出现的原因）。
+   必须在 lua 的 `func` 里自己 `seg:has_tag("xxx")` 自检。
+
+   **③ `LuaSegmentor::Proceed` 的返回值语义**：**true = 继续**调用后面的 segmentor，
+   **false = 终止本轮链**（`engine.cc:180-182` 的 `if (!Proceed) break`）。
+   出错时返回 true（`lua_gears.cc:211`），即"继续" —— **不是**我先前记的"接管跳过" ✗。
+
+   **④ 给段打自定义 tag 的正解**：`add_segment` 一个**与当前段等长**的 Segment，
+   并把它的 `tags` 设成 **set 形式**：
+   ```lua
+   local ns = Segment(j, k)
+   ns.tags = { [tag] = true }     -- 必须 set；写成数组 {tag} 会 lua 报错
+   seg:add_segment(ns)            -- 与 abc 段等长 → tags 取并集 {abc, tag}
+   return true                    -- 继续后面的 segmentor
+   ```
+   `add_segment` 的不变量（`segmentation.cc:84-108`）：start 必须等于当前 start（否则丢弃）；
+   更长→覆盖（丢原 tags）；**等长→tags 并集**；更短→忽略。
+   （我先前"加段会破坏分段不变量导致零候选"的结论是错的 ✗ —— 真因是 `tags` 用错了形式 ✗。）
+
+   **⑤ 把一段切成多段**：`pop_back()` → `add_segment(s1)` → `forward()` →
+   `add_segment(s2)` …（首尾相接、不重叠），各段自动被对应 tag 的 translator 处理。
+   这正是混流"多读法"的实现方式：按「五笔码段 / 拼音段」切，分别挂对应的 translator。
+
+   **⑥ 调试方法**：用 `lua_filter` 遍历 `input:iter()` 打印**整份候选表** ——
+   界面只显示当前段的候选，filter 不受此限（我先前就是被这点卡住的 ✗）。
+
 2. **`affix_segmentor` + `reverse_lookup_translator`**：可以给反查加更丰富的语义。
 3. **`history_translator`**：重复上次上屏内容（英文输入习惯），成本极低。
 4. **`single_char_filter`**：某些场景只想要单字时可用。
