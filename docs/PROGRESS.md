@@ -917,6 +917,28 @@ schema 配置里没有任何引用，deployer 清理时就当无主文件处理�
 **目标机当前状态**：手工 scp 后 bin 已就位（15:18，重建之后，未被再移走），`fcitx5 -r` 即可测。
 另注意：`~/.local/share/fcitx5/rime` 实际是软链到 `$HOME/vmacs/linux/local/share:fcitx5/rime`。
 
+### 4.34 ❗ 未解决：fcitx 每次重启都会把 lm_rerank.bin 移进 trash/
+
+用户指出（关键）：**不只是部署时**，`lm_rerank.bin` 在 **fcitx 每次重启**都会被移进
+`<rime>/trash/` —— 因为 fcitx5-rime 启动时会跑一次部署，而 deployer 会把用户目录根下
+**它不认识的 `.bin`** 当无主文件清理（这张表是 Lua 运行时读的，schema 里没有引用关系）。
+
+**症状**：表没了 ⇒ dynamic_translator 关掉原生 grammar 后没有 LM ⇒ 长句出垃圾
+（自检「今天的天气怎么仰卧 / 今天没有空」）。
+
+**已做（不够）**：部署脚本在 `rime_deployer --build` 之后补回（commit 7b0b0a4）。
+但这挡不住"fcitx 重启触发的部署"。
+
+**下一轮要做的（两条路，都需在真机验证）**：
+1. **换位置 + Lua 多路径查找**：把表放 `dicts/`（deployer 当它是词典源、不清理），
+   `lm_rerank.lua` 依次找 `dicts/lm_rerank.bin` → 根 `lm_rerank.bin` → 旧 tsv。
+   *注意：我试过一版，回退顺序写错（回退成 `.tsv` 而不是根目录的 `.bin`），
+   本地黄金掉到 29/32，已回滚 —— 下轮要连本地 `make test` 一起验。*
+2. **改扩展名**：`.bin` 可能正是被当成构建产物的原因，换成如 `lm_rerank.pack` 试试。
+3. 或者接受现状：把"重启 fcitx 后重跑一次部署脚本"写进使用说明。
+
+**当前仓库状态**：已回滚到绿色（黄金 32/32），trash 问题未解决。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |
