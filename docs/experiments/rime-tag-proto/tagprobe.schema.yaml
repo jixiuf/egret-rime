@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+# 最小实验: lua_segmentor 打自定义 tag -> 只认该 tag 的 translator 出候选
+schema:
+  schema_id: tagprobe
+  name: tagprobe
+  version: "1.0"
+  author: [probe]
+  description: |
+    tag routing probe
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 西文 ]
+
+engine:
+  processors:
+    - speller
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - abc_segmentor                 # 先给整段打 "abc"
+    - lua_segmentor@*tagprobe*route_seg   # 再加自定义 tag (等长 -> tags 合并)
+    - lua_segmentor@*tagprobe*split_seg   # 按规则把一段切成两段(V2)
+    - fallback_segmentor
+  translators:
+    # 只认 py tag 的候选 (内建 translator，声明式 tag)
+    - table_translator@py_table
+    # 只认 wubi tag 的候选
+    - table_translator@wubi_table
+    # lua_translator: 配置里的 tag 会被忽略，必须在 func 里自己看 seg.tags
+    - lua_translator@*tagprobe*self_tag_translator
+  filters:
+    # 打印整份候选表
+    - lua_filter@*tagprobe*dump_filter
+
+# 顶层 translator 块：仅是让 rime_deployer 编译 tagprobe.table.bin
+# (deployment_tasks.cc:352 只读 translator/dictionary；engine 未引用它)
+translator:
+  dictionary: tagprobe
+
+speller:
+  alphabet: 'zyxwvutsrqponmlkjihgfedcba'
+  delimiter: " '"
+  max_code_length: 0
+  auto_select: false
+
+# 内建 table_translator 的 tag 声明：translator_commons.cc 读 <name_space>/tag
+py_table:
+  dictionary: tagprobe
+  tag: py
+  enable_completion: false
+  enable_sentence: false
+  enable_user_dict: false
+  initial_quality: 100
+
+wubi_table:
+  dictionary: tagprobe
+  tag: wubi
+  enable_completion: false
+  enable_sentence: false
+  enable_user_dict: false
+  initial_quality: 100

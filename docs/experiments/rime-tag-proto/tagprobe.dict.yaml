@@ -1,0 +1,19 @@
+# Rime dictionary
+---
+name: tagprobe
+version: "1.0"
+sort: by_weight
+use_preset_vocabulary: false
+columns:
+  - text
+  - code
+  - weight
+...
+
+# 词条：code = 输入串，text = 候选
+拼音段命中	py	100
+PY_TABLE_HIT	py	100
+五笔段命中	wubi	100
+WUBI_TABLE_HIT	wubi	100
+五笔半段	wu	100
+拼音半段	pi	100
