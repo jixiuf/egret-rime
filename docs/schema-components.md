@@ -153,7 +153,15 @@ Lua 里可直接用的东西（由 librime-lua 注入为全局）：`Candidate`�
 
 ## 6. 还没用、但值得考虑的扩展点
 
-1. **`lua_segmentor`（我们完全没用）** ★
+1. **`lua_segmentor`（我们完全没用）** ★ —— 已做原型，摸清 3 条硬事实：
+   - `Segmentation:add_segment` 收的是 **`Segment` 对象**（`Segment(s, e, tag)`），
+     不是 `(start, end, tag)` 三个参数；
+   - **段必须互不重叠**（加了重叠段会破坏分段不变量 → 整个方案**一个候选都没有**）；
+   - segmentor 出错时 `LuaSegmentor::Proceed` 返回 **true**（= "本段我接管了"）
+     → 后面的 `abc_segmentor` 被跳过 → 同样一个候选都没有 ⇒ **必须 pcall 兜住**。
+   - 未验证：`lua_translator` 怎么绑定自定义 tag（试了块里写 `tag:`/`tags:` 都没生效，
+     界面只显示当前段的候选，验证方法也要另想 —— 下轮先读 rime 里 `Translator`
+     取 tag 的地方）。
    它能**自己决定怎么切段、给每段打什么 tag**，而每个 tag 可以挂不同的 translator。
    这正是"混流多读法"的干净实现方式：例如把输入切成「五笔码段」与「拼音段」，
    分别挂 `table_translator` 与 `script_translator`，
