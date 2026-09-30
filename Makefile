@@ -108,6 +108,7 @@ eval: env-test          ## 跑整句评测（160 句多来源，对标基线 26%
 
 lint:                     ## 结构与命名一致性检查（秒级，不跑引擎）
 	@$(PYTHON) scripts/check_consistency.py
+	@EGRET_ROOT=$(REPO) lua scripts/check_lm_table.lua
 
 test: env-test lint
 	$(PYTHON) scripts/regression_test.py
