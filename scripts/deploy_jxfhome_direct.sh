@@ -102,6 +102,14 @@ echo "        $(cd egret && find . -type f | wc -l) 个文件已更新"
 echo "  [4/5] 重建（带 shared data）"
 rime_deployer --build "$R" /usr/share/rime-data "$R/build" 2>&1 | grep -icE "error" | sed 's/^/        error 行数: /'
 
+# 重建会把「schema 里没引用、运行时才读」的表挪进 $R/trash/（实测 lm_rerank.bin/.meta
+# 被移走，时间戳与重建同一分钟；它们是 Lua 运行时读的，deployer 看不见引用关系）→ 补回。
+for f in lm_rerank.bin lm_rerank.meta; do
+  if [ -e "/tmp/egret/$f" ]; then
+    cp -f "/tmp/egret/$f" "$R/$f" && echo "        补回 $f（重建后被 deployer 移走的）"
+  fi
+done
+
 echo "  [5/5] 重启 fcitx5（分离 stdio，避免 ssh 挂住）"
 pkill -x fcitx5 2>/dev/null; sleep 2
 setsid fcitx5 -d </dev/null >/dev/null 2>&1
