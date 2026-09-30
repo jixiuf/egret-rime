@@ -98,8 +98,9 @@ KNOWN_LM_CASES = [
 ]
 
 USERDB_DIRS = [
-    "egret_wubi_py.user.dict.userdb",
-    "egret_wubi.user.dict.userdb",
+    "egret_wubi_py.user.dict.userdb",          # custom_phrase（手写短语库，tabledb）
+    "egret_wubi_py_script.user.dict.userdb",   # script 翻译器（可写，会自学习）
+    "egret_wubi.user.dict.userdb",             # 传统五笔库（造词/调频）
 ]
 
 
