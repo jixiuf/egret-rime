@@ -109,9 +109,16 @@ dynamic_translator:
   #   需配合 translator/max_sentences 给出多个整句候选；详见 docs/PROGRESS.md §4.13
   lm_rerank: true
   lm_rerank_table: lm_rerank.tsv
-  lm_rerank_debug: false
+  lm_rerank_debug: true
   lm_probe: false
   lm_compose: false
+  # 是否把搜索器结果**注入为候选**（默认关，见 docs/PROGRESS.md §4.40）：
+  # 机制已跑通（filter 里用 Candidate("sentence",start,end,text,"") 新造候选**可行**，
+  # 此前认为"新增候选会导致中途提交"是构造函数用错导致的误判），
+  # 但搜索器本身只有约 26% 准确率，算错时没有任何外部信号能识别 →
+  # 无条件注入会压掉引擎本来正确的答案（实测黄金 32->30）。
+  # 关掉它时只保留"共识重排"（在既有候选里找同一句并前移，绝对安全）。
+  lm_compose_inject: false
   lm_compose_translator: false
   compose_beam: 8
   compose_log_n: 0            # >0 时覆盖一元 LM 的 log N（标定用）
