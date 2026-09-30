@@ -128,9 +128,18 @@ cd "$R"
 SYS_LIB="$(ls -1 /usr/lib64/librime.so.1.1[7-9]* /usr/lib/librime.so.1.1[7-9]* 2>/dev/null | sort -V | tail -1)"
 [ -z "$SYS_LIB" ] && SYS_LIB="$(ls -1 /usr/lib64/librime.so.1.[0-9]* 2>/dev/null | sort -V | tail -1)"
 echo "        librime: ${SYS_LIB:-（未找到，用 console 自带）}"
-out=$(LD_PRELOAD="$SYS_LIB" timeout 180 "$C" 2>/dev/null <<< "jintiandetianqizenmeyang
-wojintianmeiyoukong
-" | grep -E "^1\. " | sed 's/^1\. \[//;s/\]$//' | tr '\n' ' ')
-echo "        结果: $out"
+# 每条输入**单独跑一次 console**（一次喂多行会让后一行的按键落进前一条还没提交的
+# 组字里，输出中途候选 → 假故障）；且跑两轮取第二轮（重建后首跑有冷启动竞态，
+# 见 docs/PROGRESS.md §4.18 测量纪律）。
+out=""
+for _pass in 1 2; do
+  out=""
+  for _code in jintiandetianqizenmeyang wojintianmeiyoukong; do
+    r=$(LD_PRELOAD="$SYS_LIB" timeout 180 "$C" 2>/dev/null <<< "$_code
+" | grep -m1 -E "^1\. " | sed 's/^1\. \[//;s/\]$//')
+    out="$out$r  "
+  done
+done
+echo "        结果: $out（第 2 轮）"
 for f in /usr/share/rime-data/*; do b=$(basename "$f"); [ -L "$R/$b" ] && [ "$(readlink "$R/$b")" = "$f" ] && rm -f "$R/$b"; done
 REMOTE
