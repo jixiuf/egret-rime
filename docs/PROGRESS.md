@@ -899,6 +899,24 @@ LM 重排在它拿到的候选上已经饱和 —— 继续调排序、权重、
 **顺带修一处测量纪律**：`first_candidate()` 原来是**跑一次**，冷部署首跑与热机结果
 不同（§4.18）→ 改为**连跑两次取第二次**，避免偶发假失败。
 
+### 4.33 部署坑：rime_deployer 重建会把「Lua 运行时读的表」移进 trash/
+
+**现象**：`bash scripts/deploy_host-linux_direct.sh` 部署到 host-linux（Gentoo）后自检结果变形
+（`今天的天气怎么仰卧`、`今天没有空`），且目标机缺 `lm_rerank.bin`。
+
+**根因**：部署流程是「覆盖文件 → rime_deployer 重建」。**重建那一步把这几个文件移进了
+`<rime>/trash/`** —— 时间戳与重建同一分钟（15:17），而它们是 **Lua 在运行时才读**的，
+schema 配置里没有任何引用，deployer 清理时就当无主文件处理。
+（`lm_rerank.tsv` 也一样，只是我们已经不部署它。）
+=> 缺表 → dynamic_translator 把原生 grammar 关掉是指望这张表重排的 → **等于没有 LM**
+   → 长句出垃圾（自检那两条就是这个症状）。
+
+**修复**：`scripts/deploy_host-linux_direct.sh` 在 `rime_deployer --build` **之后**补回
+`lm_rerank.bin` / `lm_rerank.meta`。以后任何"运行时才读、schema 不引用"的文件都要这样处理。
+
+**目标机当前状态**：手工 scp 后 bin 已就位（15:18，重建之后，未被再移走），`fcitx5 -r` 即可测。
+另注意：`~/.local/share/fcitx5/rime` 实际是软链到 `$HOME/vmacs/linux/local/share:fcitx5/rime`。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |
