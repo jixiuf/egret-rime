@@ -1,6 +1,9 @@
 # egret-rime 项目说明（给 agent 的工作入口）
 
-> **接手项目先读 [`docs/PROGRESS.md`](docs/PROGRESS.md)**——活文档，记录当前状态、
+> ⭐ **接手/重启 session 先读 [`docs/HANDOFF.md`](docs/HANDOFF.md)** —— 一页纸的当前架构、
+> 关键数字、**被推翻的旧结论**、组件 API 硬事实、工具清单与待办。
+>
+> **再看 [`docs/PROGRESS.md`](docs/PROGRESS.md)**——活文档，记录当前状态、
 > 后台任务、待办清单、决策记录与踩坑。session 过大/过期后靠它无缝重建上下文；
 > 每完成一个里程碑或启停后台任务，**立即回写该文档**。
 
@@ -19,7 +22,9 @@ bash scripts/refresh.sh --loop 30   # 常驻：每 30 分钟增量刷新（语�
 |---|---|---|
 | 词库（三档） | `dicts/*_words_{core,base,full}.dict.yaml` | 每档**同时含五笔码与拼音码**；权重按语料词频回归到 0-1000 |
 | 86 造词码词库 | `dicts/egret_wubi_words_wb86_*.dict.yaml` | 传统库（形码确定性层） |
-| 语言模型 | `data/gram/zh-hans-egret.gram` | 字级 2-6gram，约 59MB |
+| **语言模型（必需）** | `data/gram/wanxiang-lts-zh-hans.gram` | **词级** gram（万象 LMDG，约 400MB）——引擎原生 octagram 直接用它；**不随仓库分发，需自行下载**（见 README）|
+| 搜索器码表 | `data/gram/compose_table.{tsv,bin}` | 统一码表（五笔+拼音 27 万条）；`.bin` 是运行时读的（契约测试 `scripts/check_compose_table.lua`）|
+| Lua LM 表 | `data/gram/lm_rerank.{bin,meta}` | **只给搜索器内部打分用**（引擎侧已关 `lm_rerank`）|
 | 方案词库包装 | `egret_wubi_py.dict.yaml` / `egret_wubi.dict.yaml` | 由 `--tier` 切换档位 |
 
 全链路：`fetch → extract → clean → freq → dict → gram → artifacts`，
@@ -77,19 +82,21 @@ RIME_SHARED_DIR / RIME_FROST_DIR / RIME_WANXIANG_DIR / EGRET_GRAM_DIR。
 
 ## 验证基线
 
-见 README 回归测试一节。当前基线（17 条黄金用例全过 + 已知 LM 级
-差异单独报告）：
+**黄金用例 33 条全过**（`make test`，含契约测试）；整句(全拼)多来源评测 **160 句**：
+**66/160 (41%)**（用万象词级 gram；旧的 Lua 字级重排只有 27%——见 `docs/PROGRESS.md` §4.44）。
+
+黄金用例要点（33 条含下面这些 + 简码/全码/词组/混句/整句词库/成语/混流多读法）：
 
 e→有 q→我 yi→就 yl→为 kl→另 de→胡 tffu→等 khlg→中国 xciy→经济
 kdyc→顺序 trwu→我们 trwuchifan→我们吃饭 jfwaguangfnrt→时代广场
 tgtj→生不逢时(用户词组) wan→万 taiwan→台湾 ckiy→台湾
 jintiandetianqizenmeyang→今天的天气怎么样
+qktnqnr→我吃饭 qchifanle→我吃饭了 uwycuklf→冷部署
+ronghe→融合(不自动上屏) b,→了 ktn,→吃 ben→本 gdrnthtcsu→天气怎么样
 
-注意: 全新目录首跑(清 userdb + 重建)可能出 wan→蛙嗯(万排第2)，
-这是陷阱#9 prism 非确定性: 同输入不同目录的 prism.bin md5 不同，
-贴脸的 LM 裁决会被翻转(2026-09-26 实测证实，非回归缺陷)。
-判 failure 前先与黄金环境(`data/rime-test`)交叉验证。
-本机复现：`make test`（默认测 data/rime-test，20/20 全过）；
+注意: 全新目录首跑(清 userdb + 重建)可能出 wan→蛙嗯(万排第2)，这是陷阱#9 prism 非确定性；
+判 failure 前先与黄金环境(`data/rime-test`)交叉验证。**加用例前必须先跑一遍确认期望值**（曾凭想象写期望，害自己一次）。
+本机复现：`make test`（默认测 data/rime-test，**33/33 全过**，含契约测试）；
 `make test-rebuild` 清 build+用户词典后重跑。
 jintiandetianqizenmeyang→今天的天气怎么样
 

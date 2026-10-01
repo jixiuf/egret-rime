@@ -23,9 +23,9 @@ wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
   → dicts/*.dict.yaml (传统库字/词 + 混合库字/词 + 拼音字/词)
 ```
 
-权重统一 log-norm 0-1000 刻度；字表 ×0.35 缩放让位拼音/词，膝点 600
-以上恢复真值。gram 用字级 `zh-hans-t-essay-bgc.gram`（已入库）；
-wanxiang-lts 词级 gram 可切换，见 README 下文下载说明。
+权重沿用万象/86 词库原值（字表另有分层：见下）；LM **默认用万象词级 gram**
+`wanxiang-lts-zh-hans.gram`（原生 octagram，约 400MB，需自行下载，见下文）。
+自训的字级 `zh-hans-egret.gram` 仍可选作对照（实测词级明显更好：整句 41% vs 27%）。
 
 ## 部署到 host-linux（Gentoo + fcitx5，已验证）
 
@@ -44,7 +44,7 @@ bash scripts/deploy_host-linux.sh            # 完整部署（自动找 agent so
 所以用「自包含运行时包」的方式交付：
 
 ```bash
-# ① 开发机：打运行时包（18MB，含 yaml/词库/lua/opencc/LM 重排表 + install.sh）
+# ① 开发机：打运行时包（含 yaml/词库/lua/opencc/搜索器码表+LM 表；**不含 gram**）
 make bundle                      # 产出 dist/egret-rime-runtime-<日期>.tar.gz
 
 # ② 把包拷到目标机（微信/网盘/U 盘 均可），然后：
@@ -57,8 +57,10 @@ bash install.sh --link ~/Library/Rime   # 软链模式（以后改本包即生�
 
 安装脚本会先把要覆盖的文件备份到 `<目标>/.egret-backup-<时间戳>/`，回滚只需拷回去。
 
-**重要**：交付包里**不需要** librime 的 `.gram`，也**不需要**给 librime 打任何补丁——
-LM 已改成纯 Lua 重排（见 `docs/PROGRESS.md` §4.13）。
+**重要（2026-10 已改）**：交付包**不带** `.gram`（400MB，请自行下载，见下文），
+但**必须有它**——引擎的语言模型就是 octagram + 万象词级 gram；
+Lua 侧的重排已**关闭**（`dynamic_translator/lm_rerank: false`），Lua 表只剩搜索器自用。
+librime 仍然**不需要打任何补丁**（上游 1.17.0 + 官方 octagram/lua 插件即可）。
 
 验证：输入 `e` 应出「有」，`jintiandetianqizenmeyang` 应出「今天的天气怎么样」。
 
@@ -112,7 +114,7 @@ Linux 按输入法覆盖 TARGET（默认 fcitx5 的 `~/.local/share/fcitx5/rime`
 make deploy TARGET=~/.config/ibus/rime/
 ```
 
-首次部署后需要 wanxiang-lts 词级 gram 时（默认不需要，当前用 essay-bgc）:
+**必须**准备词级 gram（引擎 LM，缺它长句会明显变差）：
 
 ```
 wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/wanxiang-lts-zh-hans.gram
