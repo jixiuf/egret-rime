@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -200,13 +201,23 @@ def switch_gram(user_dir, gram_path, language):
                    capture_output=True, timeout=600)
 
 
+GLOBAL_ARGS = None
+
 def run_suite(user_dir, cases, label):
     hits = []
     if not cases:
         return hits
-    for c in cases:
-        code, expect = c[0], c[1]          # 兼容 (code, expect) 与 (code, word, weight)
-        got = first_candidate(code, user_dir)
+    # 并行跑：每个用例一个 console 进程。串行时大 gram（400MB）每次都要重新加载，
+    # 160 句会跑几十分钟；并行 6 路后几分钟就够（语义不变，仍是一例一进程）。
+    jobs = max(1, getattr(GLOBAL_ARGS, "jobs", 1) or 1)
+    codes = [c[0] for c in cases]
+    if jobs > 1:
+        with ThreadPoolExecutor(max_workers=jobs) as ex:
+            outs = list(ex.map(lambda code: first_candidate(code, user_dir, timeout=120), codes))
+    else:
+        outs = [first_candidate(code, user_dir) for code in codes]
+    for c, code, got in zip(cases, codes, outs):
+        expect = c[1]
         reset_schema(user_dir)
         hits.append((code, expect, got, got == expect))
     ok = sum(1 for h in hits if h[3])
@@ -215,6 +226,7 @@ def run_suite(user_dir, cases, label):
 
 
 def main():
+    global GLOBAL_ARGS
     ap = argparse.ArgumentParser()
     ap.add_argument("--cases", type=int, default=30, help="混合用例条数")
     ap.add_argument("--sentences", type=int, default=0,
@@ -225,7 +237,10 @@ def main():
     ap.add_argument("--gram", action="append", default=None,
                     help="label=path（可重复）")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--jobs", type=int, default=6,
+                    help="并行度：每个用例一个 console 进程；大 gram(400MB) 串行会极慢")
     args = ap.parse_args()
+    GLOBAL_ARGS = args
 
     grams = []
     if args.gram:
