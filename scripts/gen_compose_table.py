@@ -21,6 +21,7 @@
 
 用法: python3 scripts/gen_compose_table.py [--tier base]
 """
+import struct
 import argparse
 import math
 import os
@@ -66,6 +67,32 @@ def wubi_forms(code):
         forms.append(short)
     return forms
 
+
+def write_pack(rows, out):
+    """把码表写成**定长索引 + 变长记录**的二进制包，供 Lua 二分查前缀（不建哈希）。
+
+    格式（全部小端）：
+      0   8B  magic "EGCT1\0\0\0"
+      8   4B  count (u32)
+      12  4B  保留
+      16  4B*count  记录偏移（绝对偏移，按 code 升序）
+      之后         记录：u8 codelen | code | u8 kind | u16 weight | u8 textlen | text
+    kind: 0=wubi 1=pinyin。表本身已按 (code, -weight) 排序，故索引天然有序。
+    """
+    KIND = {"wubi": 0, "pinyin": 1}
+    buf = []; offs = []; off = 16 + 4 * len(rows)   # 滚动偏移（别用 sum(buf)：那是 O(n²)，实测卡死）
+    for text, code, w, kind in rows:                # 已按 code 排序
+        cb = code.encode("utf-8"); tb = text.encode("utf-8")
+        rec = (struct.pack("<B", len(cb)) + cb +
+               struct.pack("<B", KIND.get(kind, 2)) +
+               struct.pack("<H", min(int(w), 65535)) +
+               struct.pack("<B", len(tb)) + tb)
+        offs.append(off); off += len(rec); buf.append(rec)
+    with open(out, "wb") as f:
+        f.write(b"EGCT1\0\0\0" + struct.pack("<I", len(rows)) + struct.pack("<I", 0))
+        for o in offs: f.write(struct.pack("<I", o))
+        for b in buf: f.write(b)
+    print(f"  二进制包: {out} ({os.path.getsize(out)/1048576:.1f} MB, {len(rows):,} 条)")
 
 def main():
     ap = argparse.ArgumentParser()
@@ -126,6 +153,7 @@ def main():
     with open(tmp, "w", encoding="utf-8") as f:
         for text, code, w, kind in out:
             f.write(f"{text}\t{code}\t{w}\t{kind}\n")
+    write_pack(out, args.out[:-4] + ".bin" if args.out.endswith(".tsv") else args.out + ".bin")
     os.replace(tmp, args.out)
     n_wubi = sum(1 for x in out if x[3] == "wubi")
     n_py = len(out) - n_wubi

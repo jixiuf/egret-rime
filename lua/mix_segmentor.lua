@@ -51,16 +51,19 @@ function M.func(seg, env)
         -- 正确用法：**不切段**，只在"整串被判为五笔读法"时，用等长 add_segment
         -- 给整段**补一个 wubi tag**（与 abc 段取并集）→ 绑 wubi 的 translator
         -- 就能在同一候选表里加入五笔读法的候选（其 initial_quality 高，会置顶）。
-        local all_wubi = true
+        -- 判断整串的读法：全五笔 -> 补 wubi；全拼音 -> 补 py（对称）
+        local all_wubi, all_py = true, true
         for _, p in ipairs(best.pieces) do
-            if p.kind ~= "wubi" then all_wubi = false; break end
+            if p.kind ~= "wubi" then all_wubi = false end
+            if p.kind ~= "pinyin" then all_py = false end
         end
-        if not all_wubi or #best.pieces < 2 then return end
+        local tag = all_wubi and "wubi" or (all_py and "py") or nil
+        if not tag or #best.pieces < 2 then return end
         if M.debug then
-            log.error(string.format("[MIXSEG] %s -> %s | 全五笔，给整段补 wubi tag", inp, best.text))
+            log.error(string.format("[MIXSEG] %s -> %s | 整串 %s，补 %s tag", inp, best.text, tag, tag))
         end
         local ns = Segment(s, e)
-        ns.tags = { ["wubi"] = true }
+        ns.tags = { [tag] = true }
         seg:add_segment(ns)          -- 等长 → tags 并集 {abc, wubi}
         return
     end)

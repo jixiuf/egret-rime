@@ -212,6 +212,9 @@ for i in "${!STAGES[@]}"; do
         "$PY" "$ROOT/scripts/gen_py_tables.py" --tier "$TIER" >>"$RUNLOG" 2>&1 \
           && ok "Lua 搜索器词表已生成（py_words/py_syllables）" \
           || warn "词表生成失败"
+        # 统一码表（搜索器/切分器用）：输出 .tsv + .bin（.bin 是运行时读的）
+        "$PY" "$ROOT/scripts/gen_compose_table.py" >>"$RUNLOG" 2>&1 \
+          && ok "统一码表已生成（tsv + bin）" || warn "统一码表生成失败"
       fi
       ;;
     artifacts)

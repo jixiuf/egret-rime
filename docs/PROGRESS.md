@@ -1172,6 +1172,36 @@ wubi_route:
 6. rime 的 **translation 是单次迭代流**：filter 里 `input:iter()` 只能遍历一遍，
    否则候选全丢（曾导致方案 0 候选）。
 
+### 4.42 码表二进制包 + 对称读法标签 + 长句三态验证
+
+**(1) 统一码表改二进制包**（`gen_compose_table.py` 输出 `compose_table.bin`，4.7MB）：
+偏移索引 + 变长记录（按 code 升序）→ Lua 侧二分查前缀；`py_composer` 用**元表代理**
+接住 `by_key[key]`，搜索器循环代码一行未改；优先读 `dicts/compose_table.bin`（同
+lm_rerank 的教训：根下的 .bin 会被 deployer 清进 trash）。
+**契约测试 `scripts/check_compose_table.lua`**（已进 `make lint`）：TSV 参考实现 vs
+包读端，逐前缀比对全部 **270,186 条 → 不一致 0** ✓。
+**它当场抓到两个 bug**：① 我把桶语义写成了真前缀（`b` 返回 7585 条 vs 参考 1 条）；
+② `A and B or C` 优先级导致兜底分支恒定生效（过滤失效）。
+另修 `write_pack` 里的 O(n²) 偏移累加（改成滚动偏移，否则 27 万条卡死）。
+
+**(2) 读法标签对称化**：切分器现在按搜索器判定的读法补 tag —— 整串五笔 → `wubi`，
+整串拼音 → `py`；各绑一个 `initial_quality: 1000` 的内建 translator
+（`table_translator@wubi_route` / `script_translator@py_route`）。
+
+**(3) 长句三态验证**（`scripts/probe_long_sentences.py`，同一批 8 句 A/B）：
+| 类别 | 切分器 OFF | ON |
+|---|---|---|
+| 纯拼音 | 0/8 | 0/8 |
+| 纯五笔 | 1/8 | **2/8** |
+| 混打 | 0/8 | 0/8 |
+样本是 eval 集前 8 句（epub 子集，最难的一批，对应整句评测里 ~15% 的那一档）。
+**失败样例全是近音错字**（`花上小天师门` vs `画上小天使们`）→ 与 §4.37 一致：
+长句主导错误是**同音/近音字选择**，不是拼写或词库缺失。要再进一步得靠
+**词级 LM**（我们搜索器现在只有词的一元 + 字符级上下文增益）。
+
+**接入**：`refresh.sh` gram 阶段现在会跑 `gen_compose_table.py`（此前未接入）；
+`make lint` 加码表契约测试；部署清单与"重建后补回"列表都带上 `compose_table.bin`。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |

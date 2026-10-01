@@ -104,7 +104,7 @@ rime_deployer --build "$R" /usr/share/rime-data "$R/build" 2>&1 | grep -icE "err
 
 # 重建会把「schema 里没引用、运行时才读」的表挪进 $R/trash/（实测 lm_rerank.bin/.meta
 # 被移走，时间戳与重建同一分钟；它们是 Lua 运行时读的，deployer 看不见引用关系）→ 补回。
-for f in lm_rerank.bin lm_rerank.meta; do
+for f in lm_rerank.bin lm_rerank.meta compose_table.bin; do
   src="/tmp/egret/dicts/$f"
   if [ -e "$src" ]; then
     mkdir -p "$R/dicts"

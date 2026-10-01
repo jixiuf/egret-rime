@@ -92,12 +92,13 @@ env-test:
 	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
 	@cp -f $(GRAM_DIR)/lm_rerank.tsv $(GRAM_DIR)/lm_rerank.meta \
-		$(GRAM_DIR)/lm_rerank.bin \
+		$(GRAM_DIR)/lm_rerank.bin $(GRAM_DIR)/compose_table.bin \
 		$(GRAM_DIR)/py_words.tsv $(GRAM_DIR)/py_syllables.txt \
 		$(GRAM_DIR)/py_meta.txt $(TEST_DIR)/ 2>/dev/null || true
 	@# 先部署出 build/ 产物: 空 build/ 下首次 console 会撞维护竞态(陷阱 #2)
 	@$(LIBRIME_BIN)/rime_deployer --build $(TEST_DIR) $(SHARED_DIR) \
 		$(TEST_DIR)/build >/dev/null 2>&1 || true
+	@mkdir -p $(TEST_DIR)/dicts; cp -f $(GRAM_DIR)/compose_table.bin $(GRAM_DIR)/lm_rerank.bin $(TEST_DIR)/dicts/ 2>/dev/null || true
 	@echo "测试用户目录: $(TEST_DIR)"
 	@echo "共享数据目录: $(SHARED_DIR)"
 
@@ -109,6 +110,7 @@ eval: env-test          ## 跑整句评测（160 句多来源，对标基线 26%
 lint:                     ## 结构与命名一致性检查（秒级，不跑引擎）
 	@$(PYTHON) scripts/check_consistency.py
 	@EGRET_ROOT=$(REPO) lua scripts/check_lm_table.lua
+	@EGRET_ROOT=$(REPO) lua scripts/check_compose_table.lua
 
 test: env-test lint
 	$(PYTHON) scripts/regression_test.py
