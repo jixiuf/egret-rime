@@ -54,8 +54,10 @@ manifest() {
   # 不认识的 .bin 当无主文件移进 trash/（实测每次重启 lm_rerank.bin 都被移走）。
   [ -f "$ROOT/data/gram/lm_rerank.bin" ]  && echo "data/gram/lm_rerank.bin|dicts/lm_rerank.bin"
   [ -f "$ROOT/data/gram/compose_table.bin" ] && echo "data/gram/compose_table.bin|dicts/compose_table.bin"
-  [ "$WITH_GRAM" = 1 ] && [ -f "$ROOT/data/gram/zh-hans-egret.gram" ] \
-    && echo "data/gram/zh-hans-egret.gram|zh-hans-egret.gram"
+  # 搜索器要读 py_meta.txt（total_tokens -> LOG_N）；也放 dicts/ 免得被 deployer 清
+  [ -f "$ROOT/data/gram/py_meta.txt" ] && echo "data/gram/py_meta.txt|dicts/py_meta.txt"
+  # 词级 gram（wanxiang-lts-zh-hans.gram, ~400MB）不打包：用户自行下载，
+  # 放到 <rime用户目录>/ 下即可。缺它 = 没有语言模型。见 README。
   return 0
 }
 

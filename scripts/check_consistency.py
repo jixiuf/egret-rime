@@ -68,6 +68,25 @@ for f in _scan:
             if not os.path.exists(m.group(1) + ".dict.yaml"):
                 print(f"  ✗ {f}:{ln} 引用不存在的 {m.group(1)}"); err += 1
 
+# 2.7) lua 运行时读的数据文件，必须在部署清单（deploy_bundle.sh --list）里。
+#      这类漏文件已犯三次（lm_rerank.bin / compose_table.bin / py_meta.txt）——
+#      本地 env-test 会带上它们，所以**只有真实部署**才暴露，必须自动拦。
+try:
+    _mf = subprocess.run(["bash", "scripts/deploy_bundle.sh", "--list"],
+                         capture_output=True, text=True).stdout
+    _dests = {ln.split("|")[1] for ln in _mf.splitlines() if "|" in ln}
+except Exception:
+    _dests = set()
+for _lua in glob.glob("lua/*.lua"):
+    _src = open(_lua, encoding="utf-8", errors="ignore").read()
+    # 注意：代码里既有裸文件名（"py_meta.txt"）也有带路径的（"/dicts/py_meta.txt"），
+    # 所以取 basename 再比对（先前只匹配裸名，导致检查形同虚设）
+    for _m in re.finditer(r'"([^"]+\.(?:txt|meta|bin))"', _src):
+        _fn = os.path.basename(_m.group(1))
+        if _fn in _dests or ("dicts/" + _fn) in _dests:
+            continue
+        print(f"  ✗ {_lua} 运行时读 {_fn}，但部署清单里没有"); err += 1
+
 # 3) 语法
 for p in glob.glob("scripts/*.py") + glob.glob("scripts/**/*.py", recursive=True):
     r = subprocess.run([sys.executable, "-c", f"import ast;ast.parse(open({p!r},encoding='utf-8').read())"],

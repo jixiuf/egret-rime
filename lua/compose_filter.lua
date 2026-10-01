@@ -42,6 +42,23 @@ local function score_text(lm, text)
     return s / cnt
 end
 
+-- 读 py_meta.txt 里的 total_tokens（搜索器的一元归一化常数）。
+-- 先找 dicts/（部署位置）再退回根目录；**缺文件不能抛错**——曾因部署漏这个文件
+-- 导致整个 segmentor 初始化失败（fcitx 日志里 "bad argument #1 to 'lines'"）。
+local function read_py_total(dir)
+    for _, p in ipairs({ dir .. "/dicts/py_meta.txt", dir .. "/py_meta.txt" }) do
+        local f = io.open(p, "r")
+        if f then
+            for line in f:lines() do
+                local t = line:match("^total_tokens=(%d+)$")
+                if t then f:close(); return tonumber(t) end
+            end
+            f:close()
+        end
+    end
+    return nil
+end
+
 function M.init(env)
     local config = env.engine.schema.config
     -- 开关统一由 dynamic_translator 命名空间控制（filter 自己的 ns 读不到）
@@ -58,10 +75,8 @@ function M.init(env)
             M.lm = lm; M.composer = cp
             local dir = rime_api.get_user_data_dir()
             cp.load(dir)
-            for line in io.lines(dir .. "/py_meta.txt") do
-                local t = line:match("^total_tokens=(%d+)$")
-                if t then cp.set_total_tokens(tonumber(t)) end
-            end
+            local tot = read_py_total(dir)
+            if tot then cp.set_total_tokens(tot) end
             local ln = config:get_int(ns .. "/compose_log_n")
             if ln and ln > 0 then cp.set_log_n(ln) end
         end

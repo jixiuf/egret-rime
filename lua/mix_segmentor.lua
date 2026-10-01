@@ -13,6 +13,23 @@
 --   · 出错会中断方案（一个候选都没有），所以全程 pcall 兜底；正常返回 true
 local M = {}
 
+-- 读 py_meta.txt 里的 total_tokens（搜索器的一元归一化常数）。
+-- 先找 dicts/（部署位置）再退回根目录；**缺文件不能抛错**——曾因部署漏这个文件
+-- 导致整个 segmentor 初始化失败（fcitx 日志里 "bad argument #1 to 'lines'"）。
+local function read_py_total(dir)
+    for _, p in ipairs({ dir .. "/dicts/py_meta.txt", dir .. "/py_meta.txt" }) do
+        local f = io.open(p, "r")
+        if f then
+            for line in f:lines() do
+                local t = line:match("^total_tokens=(%d+)$")
+                if t then f:close(); return tonumber(t) end
+            end
+            f:close()
+        end
+    end
+    return nil
+end
+
 function M.init(env)
     local cfg = env.engine.schema.config
     M.enabled = cfg:get_bool("mix_segmentor/enabled")
@@ -27,10 +44,8 @@ function M.init(env)
         local dir = rime_api.get_user_data_dir()
         local okload, info = cp.load(dir)
         if M.debug then log.error("[MIXSEG] 码表: " .. tostring(info)) end
-        for line in io.lines(dir .. "/py_meta.txt") do
-            local t = line:match("^total_tokens=(%d+)$")
-            if t then cp.set_total_tokens(tonumber(t)) end
-        end
+        local tot = read_py_total(dir)
+        if tot then cp.set_total_tokens(tot) end
     end
 end
 

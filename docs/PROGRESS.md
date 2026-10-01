@@ -1303,6 +1303,32 @@ score('画上小天使们') = -30646    score('花上小天师门') = -35748   #
 ```
 ⇒ 把搜索器 beam 的打分换成 `M.score`（§4.43 的选项 2）应能直接修掉这类近音错字。
 
+### 4.46 部署漏文件根治：py_meta.txt + 「运行时文件 vs 部署清单」自动检查
+
+**用户报的错**（真实部署机上）：
+```
+Lua Compoment of initialize error: (module: *mix_segmentor ...):
+mix_segmentor.lua:30: bad argument #1 to 'lines' (py_meta.txt: 没有那个文件或目录)
+```
+根因：搜索器要读 `py_meta.txt`（`total_tokens` → 一元归一化常数 `LOG_N`），
+但**它不在部署清单里** ✗。本地 `make env-test` 会带上它，所以**只有真实部署才暴露**。
+
+**修了三层**：
+1. **代码健壮化**（`mix_segmentor.lua` / `compose_filter.lua`）：抽一个
+   `read_py_total(dir)`，先找 `dicts/py_meta.txt` 再找根目录，**缺文件不再抛错**
+   （回退默认 `LOG_N`）。实测：删掉该文件后 segmentor 正常初始化、`gdrnthtcsu`
+   仍出「天气怎么样」；恢复后黄金 33/33。
+2. **清单补上**：`deploy_bundle.sh` 加 `data/gram/py_meta.txt|dicts/py_meta.txt`；
+   部署脚本"重建后补回"列表也加它。（放 `dicts/` 同前两个，免得被 deployer 清进 trash。）
+3. **根治**：`check_consistency.py` 新增检查 —— **lua 运行时读的数据文件
+   （*.txt/*.meta/*.bin）必须在 `deploy_bundle.sh --list` 里**。
+   这类漏文件已犯三次（lm_rerank.bin / compose_table.bin / py_meta.txt），
+   本地环境测不出来，必须自动拦。**正反两向都验证过**：
+   - 正向：当前清单 ✓ 通过
+   - 反向：临时删掉 py_meta.txt 那行 → lint 报 4 处错误 ✓
+
+**顺带修掉**：`deploy_bundle.sh --list` 里残留的 `WITH_GRAM: 未绑定的变量`（我早前改清单时的残线）。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |
