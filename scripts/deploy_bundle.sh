@@ -22,8 +22,10 @@ DIST="$ROOT/dist"
 STAMP="$(date +%Y%m%d)"
 NAME="egret-rime-runtime-$STAMP"
 STAGE="$DIST/$NAME"
-  # 引擎 LM 用万象词级 gram（原生 grammar）；这是**必需**的运行时文件
-  [ -f "$ROOT/data/gram/wanxiang-lts-zh-hans.gram" ] && echo "data/gram/wanxiang-lts-zh-hans.gram|wanxiang-lts-zh-hans.gram"
+  # 引擎 LM 用的词级 gram **不打包**（400MB，用户自行下载，见下方安装提示）：
+  #   data/gram/wanxiang-lts-zh-hans.gram  ->  <rime 用户目录>/wanxiang-lts-zh-hans.gram
+  # 来源：amzxyz/RIME-LMDG（万象）。缺它时 grammar 加载失败 = 没有 LM，
+  # 长句会明显变差（症状见 docs/PROGRESS.md §4.34）。
 [ "${1:-}" = "--with-gram" ] && WITH_GRAM=1
 LIST_ONLY=0
 [ "${1:-}" = "--list" ] && LIST_ONLY=1
