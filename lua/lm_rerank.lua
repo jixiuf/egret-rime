@@ -217,7 +217,8 @@ function M.score_segment(context, text)
     for _, cp in utf8.codes(text) do
         local ch = utf8.char(cp)
         local best
-        for L = 4, 2, -1 do
+        -- 用满表里的阶数：2-6gram（原为 4，浪费了 5/6gram 的证据）
+        for L = 6, 2, -1 do
             if #ctx >= L - 1 then
                 local tail = table.concat(ctx, "", #ctx - (L - 1) + 1, #ctx)
                 local v, vp = tab[tail .. ch], tab[tail]
