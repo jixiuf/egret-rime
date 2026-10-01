@@ -1,0 +1,4 @@
+source=zh-hans-egret.2_6gram.tsv
+top2=600000 top3=600000 top4=400000
+entries=1906397
+total_chars=1067517513
