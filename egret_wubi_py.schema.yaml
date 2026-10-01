@@ -97,8 +97,10 @@ engine:
     - reverse_lookup_filter@wubi_comment
     - lua_filter@*long_word_filter
     - lua_filter@*reduce_emoji_filter   # 按需启用，作用是降低Emoji在候选项中的位置排序(顺序要求：Emoji > 降低排序)
-    - charset_filter                   # 默认隐藏CJK扩展区生僻字(2026-09实测: 否则混合库权重1的
-                                       # 𠳙/𨾱等会占拼音输入首屏; 切 extended_charset 选项可显示)
+    # 原先这里挂 charset_filter 隐藏 CJK 扩展区生僻字。它在**本仓库 librime 构建**里
+    # 是 no-op 且会刷日志：源码 charset_filter.cc:103-110 —— 只要引用带 namespace，
+    # 既不生效、还每次按键打一条 ERROR。字表分层（§4.23）后扩展区字已不在默认 prism 里，
+    # 这个 filter 冗余，故移除。
     - simplifier@traditionalize                     # 简繁切换
     - uniquifier                # 去重，比如多个繁体字对应一个简体字，此时可能需要去重
     # 放在最后：前面的 long_word_filter 会重排候选，若放在它前面，改写会被覆盖

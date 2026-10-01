@@ -1329,6 +1329,26 @@ mix_segmentor.lua:30: bad argument #1 to 'lines' (py_meta.txt: 没有那个文�
 
 **顺带修掉**：`deploy_bundle.sh --list` 里残留的 `WITH_GRAM: 未绑定的变量`（我早前改清单时的残线）。
 
+### 4.47 删掉冗余的 charset_filter（它一直是 no-op，还每次按键刷 ERROR）
+
+**用户报**：每输入一个字符就刷
+`charset_filter.cc:108] charset parameter is unsupported by basic charset_filter`。
+
+**源码看穿**（`charset_filter.cc:103-110`）：
+```cpp
+if (name_space_.empty() && !context()->get_option("extended_charset"))
+    return New<CharsetFilterTranslation>(...);          // 真正过滤
+if (!name_space_.empty())
+    LOG(ERROR) << "charset parameter is unsupported..."; // 噪声
+return translation;                                      // 不过滤！
+```
+即：**只要这次引用带 namespace（librime 给组件默认都带），它既不生效、还每次按键打一条 ERROR**。
+实测本机同样 7 次/句 → 说明它**一直是 no-op** ✗（此前 §4.23 记的"靠它隐藏 CJK 扩展字"
+其实不对 —— 真正起作用的是**字表分层**：扩展区字根本不在默认 prism 里）。
+
+**处置**：删掉 `egret_wubi_py.schema.yaml` 里的 `charset_filter`（并在原位留注释说明原因）。
+实测：日志 **7 → 0**、黄金 33/33、各用例不变。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |
