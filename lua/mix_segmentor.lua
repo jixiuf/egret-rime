@@ -23,6 +23,7 @@ function M.init(env)
     local ok2, cp = pcall(require, "py_composer")
     if ok1 and ok2 then
         M.lm, M.composer = lm, cp
+        lm.load("lm_rerank.tsv")     -- 搜索器自己的字级表（引擎已改用万象 grammar，见 §4.44）
         local dir = rime_api.get_user_data_dir()
         local okload, info = cp.load(dir)
         if M.debug then log.error("[MIXSEG] 码表: " .. tostring(info)) end

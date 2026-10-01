@@ -90,6 +90,7 @@ env-test:
 		ln -sf $(LIBRIME_BIN)/$$f $(TEST_DIR)/ 2>/dev/null || true; \
 	done
 	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
+	@cp -f $(REPO)/data/gram/wanxiang-lts-zh-hans.gram $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
 	@cp -f $(GRAM_DIR)/lm_rerank.tsv $(GRAM_DIR)/lm_rerank.meta \
 		$(GRAM_DIR)/lm_rerank.bin $(GRAM_DIR)/compose_table.bin \

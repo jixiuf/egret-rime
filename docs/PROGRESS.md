@@ -1237,6 +1237,36 @@ sc = path.score + (w.weight - LOG_N) + lm.score_segment(path.ctx, w.text)
 3. 真要"词级 LM"（词 bigram）需要**词共现数据**，那要对语料做一遍**按词典切分**的统计
    （就是之前放弃的 Rust 路线，见 §4.31）——成本高，先做 1/2。
 
+### 4.44 ⭐⭐⭐ 词级 gram（万象 LMDG）**推翻 §4.24**，成为默认 LM
+
+**用户建议**：「用万象的词 gram 试效果」。实测结果决定性：
+
+| 配置（同一批 40 句 epub 子集） | 完全命中 | 峰值 RSS |
+|---|---|---|
+| 字级 Lua 重排（`lm_rerank`，原默认） | 4/40 (10%) | 141 MB |
+| **万象词级 gram（400MB，原生 grammar）** | **14/40 (35%)** | **128 MB** |
+
+**2.5 倍提升，且更省内存、整层去掉 Lua 重排。**
+
+**这一条推翻了 §4.24 的结论**：当时我判定"原生 grammar 接不了班"（11%），
+其实**是模型问题**（essay / 字级），不是引擎或罚分问题 —— 换成**词级现代语料模型**后
+原生 grammar 直接给出 35%。
+
+**混打不受影响**（用户特别问的）：两种模式下逐条一致 ——
+`wqhao -> 你好`、`wqhaoma -> 你好吗`、`trwuchifan -> 我们吃饭`、`qchifanle -> 我吃饭了`、
+`qktnqnr -> 我吃饭`、`gdrnthtcsu -> 天气怎么样`。原因：混打由**词库/组句**解决，
+grammar 只负责重排；正确候选本来就在。
+
+**已改为默认**：
+- `egret.common.yaml: grammar/language = wanxiang-lts-zh-hans`（词级模型，来源 amzxyz/RIME-LMDG，
+  见 docs/reference-projects.md）
+- `egret_wubi_py.schema.yaml: dynamic_translator/lm_rerank = false`（引擎 LM 交给原生 grammar）
+- Lua 的 `lm_rerank` 表**只为搜索器/切分器内部打分保留**（切分器 init 里显式 `lm.load`）
+- 部署清单：`wanxiang-lts-zh-hans.gram` 列为**必需**运行时文件；部署脚本"重建后补回"也带上它
+
+**注意**：400MB gram 在**测试环境**每次 console 都要重新加载 → 整句评测很慢（这是测试口径
+的问题，真实 fcitx5 常驻只加载一次）。要跑 160 句需耐心或改用常驻进程评测。
+
 ## 5. 待办（按依赖排序）
 
 | # | 任务 | 依赖 | 状态 |

@@ -113,7 +113,8 @@ dynamic_translator:
   # LM 只重排、不参与分词（纯 Lua，不改 librime）：
   #   关掉 grammar 影响 → 分词只按词库权重 → lm_rerank 用紧凑 n-gram 表重排整句
   #   需配合 translator/max_sentences 给出多个整句候选；详见 docs/PROGRESS.md §4.13
-  lm_rerank: true
+  lm_rerank: false           # 关：引擎 LM 交给原生 grammar（万象词级，见 §4.44）；
+                             # 搜索器/切分器仍用自己的字级表（下面 lm_rerank_table）
   lm_rerank_table: lm_rerank.tsv
   lm_rerank_debug: true
   lm_probe: false

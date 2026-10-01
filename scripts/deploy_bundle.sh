@@ -22,7 +22,8 @@ DIST="$ROOT/dist"
 STAMP="$(date +%Y%m%d)"
 NAME="egret-rime-runtime-$STAMP"
 STAGE="$DIST/$NAME"
-WITH_GRAM=0
+  # 引擎 LM 用万象词级 gram（原生 grammar）；这是**必需**的运行时文件
+  [ -f "$ROOT/data/gram/wanxiang-lts-zh-hans.gram" ] && echo "data/gram/wanxiang-lts-zh-hans.gram|wanxiang-lts-zh-hans.gram"
 [ "${1:-}" = "--with-gram" ] && WITH_GRAM=1
 LIST_ONLY=0
 [ "${1:-}" = "--list" ] && LIST_ONLY=1

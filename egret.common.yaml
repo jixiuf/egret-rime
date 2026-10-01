@@ -474,7 +474,10 @@ wubi_sentence_speller:
 #   # ↓ 用户词典格式，tabledb（文本） 或 userdb （二进制）。
 #   db_class: tabledb
 grammar:
-  language: zh-hans-t-essay-bgc
+  # 词级模型（万象 LMDG，200/400MB），原生 grammar 直接用。
+  # 实测（§4.44）：40 句 epub 子集 14/40 (35%)，而字级 Lua 重排只有 4-6/40 (10-15%)，
+  # 且峰值 RSS 更低（128MB vs 141MB）—— 所以默认走这条，Lua 重排关掉。
+  language: wanxiang-lts-zh-hans
   collocation_max_length: 8         #命中的最长词组
   collocation_min_length: 2         #命中的最短词组，搭配词频健全的词库时候应当最小值设为3避开2字高频词
   collocation_penalty: -10          #默认-12 对常见搭配词组施加的惩罚值。较高的负值会降低这些搭配被选中的概率，防止过于频繁地出现某些固定搭配。
