@@ -118,7 +118,7 @@ dynamic_translator:
   lm_rerank: false           # 关：引擎 LM 交给原生 grammar（万象词级，见 §4.44）；
                              # 搜索器/切分器仍用自己的字级表（下面 lm_rerank_table）
   lm_rerank_table: lm_rerank.tsv
-  lm_rerank_debug: true
+  lm_rerank_debug: false        # 调试开关（留 true 会让 mix_segmentor 每次按键打日志）
   lm_probe: false
   lm_compose: false
   # 是否把搜索器结果**注入为候选**（默认关，见 docs/PROGRESS.md §4.40）：
