@@ -195,8 +195,8 @@ translator:
   # 且 user_dict 与 custom_phrase 同名（db_pool 共享，实际类由先创建的 tabledb 决定）
   # → 拼音侧选过的词**不会**升位（2026-09 实测：选第 3 候选后再打同一输入次序不变）。
   # 换独立名字，避免与 custom_phrase 共库。
-  db_class: userdb
-  user_dict: egret_wubi_py_script.user.dict
+  db_class: tabledb
+  user_dict: egret_wubi_py.user.dict
   contextual_suggestions: true
   # 排除部分最常见生僻字。原因见 docs/PROGRESS.md §4.18：librime 在
   # ScriptTranslation::Evaluate 里有一条短路（script_translator.cc:482/496-503），
