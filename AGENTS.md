@@ -94,7 +94,7 @@ jintiandetianqizenmeyang→今天的天气怎么样
 qktnqnr→我吃饭 qchifanle→我吃饭了 uwycuklf→冷部署
 ronghe→融合(不自动上屏) b,→了 ktn,→吃 ben→本 gdrnthtcsu→天气怎么样
 
-注意: 全新目录首跑(清 userdb + 重建)可能出 wan→蛙嗯(万排第2)，这是陷阱#9 prism 非确定性；
+注意: 全新目录首跑(清用户词典 + 重建)可能出 wan→蛙嗯(万排第2)，这是陷阱#9 prism 非确定性；
 判 failure 前先与黄金环境(`data/rime-test`)交叉验证。**加用例前必须先跑一遍确认期望值**（曾凭想象写期望，害自己一次）。
 本机复现：`make test`（默认测 data/rime-test，**33/33 全过**，含契约测试）；
 `make test-rebuild` 清 build+用户词典后重跑。

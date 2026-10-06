@@ -154,14 +154,23 @@ egret-rime 运行时部署包
   bash install.sh --link ~/Library/Rime   # 软链模式（改本包即可生效）
 
 说明：
-- LM（语言模型）已改为「纯 Lua 重排」：librime 只按词库权重分词，
-  LM 用 lm_rerank.bin（定长记录 + 二分查表）对整句候选重排。因此**不需要** librime 的 .gram，
-  也不需要给 librime 打任何补丁。
+- 语言模型：默认用 librime 原生 grammar + **万象词级 gram**
+  （把 wanxiang-lts-zh-hans.gram 放到 Rime 用户目录；约 400MB，**不随包分发**，
+  见文末「语言模型」）。包内另带 lm_rerank.bin（搜索器内部打分用）。
+- 用户词典：三个 user_dict 均为 db_class: tabledb（纯文本），落在 Rime 用户目录根的
+  egret_wubi.user.dict.txt / egret_wubi_py_script.user.dict.txt / egret_wubi_py.user.dict.txt。
+  调频/自学习/造词都生效；可直接看/改/git 管理。
 - 词库三档：core(≈2万词) / base(≈6.3万词) / full(≈78万词)，
   改 egret_wubi_py.dict.yaml 的 import_tables 即可切换。
 - 简繁：方案已有 switches(traditionalization) + opencc s2t，运行时切换。
-- 开关：egret_wubi_py.schema.yaml 里 dynamic_translator/lm_rerank: true|false
-  （false 则回到 librime 自己的 grammar，需要 .gram 文件）
+- 开关：egret_wubi_py.schema.yaml 里 dynamic_translator/lm_rerank（搜索器 Lua 重排，
+  默认 false —— LM 走原生 grammar；lm_compose_* 为搜索器实验开关）
+
+语言模型（必需）
+----------------
+把 wanxiang-lts-zh-hans.gram 放进 Rime 用户目录（与 *.yaml 同级）。
+缺它 = 没有语言模型（整句准确率大幅下降）。
+下载：wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/wanxiang-lts-zh-hans.gram
 EOF
 
 cd "$DIST"

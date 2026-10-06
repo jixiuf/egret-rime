@@ -124,7 +124,7 @@ wubi_py_wubi:
   max_homographs: 1               # 同码词去重阈值
   enable_user_dict: true
   user_dict: egret_wubi.user.dict
-  db_class: userdb                # 必须 userdb；tabledb 只读、调频失效
+  db_class: tabledb                # 本项目取值；userdb(LevelDB)/tabledb(纯文本) 都可写，stabledb 才只读（见 dict-reference.md §3/§7）
   enable_correction: false
 ```
 

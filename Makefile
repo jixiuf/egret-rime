@@ -195,5 +195,6 @@ check:
 	bash scripts/setup_env.sh check
 
 clean-test:
-	rm -rf $(TEST_DIR)/build $(TEST_DIR)/*.userdb
+	rm -rf $(TEST_DIR)/build $(TEST_DIR)/*.userdb \
+		$(TEST_DIR)/egret_wubi.user.dict.txt $(TEST_DIR)/egret_wubi_py_script.user.dict.txt
 	@echo "已清理 $(TEST_DIR) 的 build 与用户词典"

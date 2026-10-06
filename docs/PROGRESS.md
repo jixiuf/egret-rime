@@ -1075,12 +1075,17 @@ bin 读端的 off-by-one（§4.34）当初是靠一个写在 `/tmp` 的差分测
 
 ### 4.39 ⭐ 修好拼音侧的用户词典自学习（原为只读 tabledb）
 
-**问题**：schema 里混合库（script 翻译器）写的是 `db_class: tabledb`，而 **tabledb 只读**
+> ⚠️ **2026-10 更正（见 §4.48）**：本条把根因写成“tabledb 只读”是**错的** ——
+> 只读的是 `stabledb`；`tabledb` 走 `TextDb::Open()`，可写，调频/自学习实测生效。
+> 当时观测到的“选第 3 候选后再打次序不变”未能复现，根因登记有误。
+> 本条的**处置结果**（独立名 `egret_wubi_py_script.user.dict`）仍然保留。
+
+**问题**：schema 里混合库（script 翻译器）写的是 `db_class: tabledb`，当时认为 **tabledb 只读**
 （注释却写着"拼音侧自学习调频"）；且它的 `user_dict` 与 `custom_phrase` **同名**，
-db_pool 共享后实际类由先创建的 tabledb 决定 → **拼音侧选过的词不会升位**。
+db_pool 共享后实际类由先创建的 tabledb 决定。
 
 **实测（修前）**：打 `nihaoma` 有「你好吗/你好/你号码/你」，选第 3 个（你号码）后再打，
-次序**完全不变** ✗ —— 学的东西直接丢。
+次序**完全不变** ✗（后于 §4.48 未能复现）。
 **实测（修后）**：
 ```
 按 3 选中「你号码」-> commit: 你号码
@@ -1091,6 +1096,45 @@ userdb 写入 egret_wubi_py_script.user.dict.userdb（新 .ldb）
 （避免与 custom_phrase 共库）；黄金测试的 USERDB_DIRS 同步补上这个目录，
 避免学习状态泄漏进回归。
 **价值**：这是"越用越顺手"的基础，之前拼音侧一直没生效。
+
+### 4.48 ⭐⭐ 用户词典全部改用 tabledb + 更正「tabledb 只读」
+
+**缘起**：用户要求「use tabledb」。先做实控验证（`data/rime-test`，librime 1.17.0）。
+
+**实测（先破谣）**：把混合库 translator 改成 `tabledb` 后，
+- 清库后打 `nihaoma` → 选第 3（你好嘛）+ 回车 → **新进程**重打 → `1.[你好嘛]` ✓（从第 3 升首位）
+- **同进程**内选完再打也升位 ✓；甚至**同名共库**（tabledb + `egret_wubi_py.user.dict`）也一样生效 ✓
+- 传统库 `tabledb`：`tffu` 选第 2（徒增）→ 重打升首位 ✓；
+  两段组句造词（`trwu` 我们 + `gdrn` 天气 + 回车）→ 写出
+  `我们天气\t^?enc^_qwgr\t0` 到 `egret_wubi.user.dict.txt` ✓
+
+**结论**：`tabledb` **可写**（`text_db.cc TextDb::Open` 置 `readonly_=false`，
+`Update/Erase/MetaUpdate` 仅看 `readonly()`，`Close()` 会 `SaveToFile()`）；
+真只读的只有 `stabledb`（`table_db.h StableDb::Open() → TableDb::OpenReadOnly()`）。
+§4.39 的「只读」是把社区 custom_phrase 配方的 `stabledb` 混成了 `tabledb`。
+
+**决策**：三个 user_dict 全部 `tabledb`（用户指令 + 纯文本/可 git/可直改的优点）：
+
+| 块 | user_dict | 落点 |
+|---|---|---|
+| `egret_wubi`（传统库，造词/调频） | `egret_wubi.user.dict` | `<用户目录>/egret_wubi.user.dict.txt` |
+| `translator`（script，自学习） | `egret_wubi_py_script.user.dict` | `<用户目录>/egret_wubi_py_script.user.dict.txt` |
+| `custom_phrase`（人工短语表） | `egret_wubi_py.user.dict` | `<用户目录>/egret_wubi_py.user.dict.txt` |
+
+**已知代价（接受）**：
+1. 同名共库时学习条目会写进人工库（实测被追加 `你好嘛`/`好嘛`/`你`）→ 故 translator
+   继续用**独立名**；`custom_phrase` 的 txt 保持人工内容（回归 `--clean` **不清**它）。
+2. `TextDb::Close()` **全量重写**整张表；无事务/无 `.old` 备份/无 `userdb_recovery_task`。
+3. `rime_dict_manager` 快照/导出按 userdb 布局工作，tabledb 不再适用；
+   旧的 `build/*.userdb/` 目录切换后不再被读取，可删（或先导出）。
+4. 副作用：名字不同 → db 实例不共享，script 组句看不到其它 translator 的学习条目
+   （§7 里靠同名共享让 `ckwan` 出「台湾」的那条路不再成立）。
+
+**验证**：`make lint` ✓；`python3 scripts/regression_test.py --clean --rebuild` → **黄金 33/33** ✓；
+`rime_deployer --build` 重跑后三个 `*.user.dict.txt` 仍在（只把未知 `.bin` 移进 `trash/`）✓。
+工具同步：`scripts/regression_test.py` 的 `USERDICT_PATHS`（含旧 userdb 路径兼容）、
+`Makefile clean-test`；文档更正见 dict-reference.md §3/§6/§7、deployment-debugging.md #4/#5、
+HANDOFF.md §4 表、librime-source-map.md、schema-config-reference.md。
 
 ### 4.40 ⭐⭐ 交付路线其实通的！§4.15 的"新增候选会被中途提交"是误判
 
@@ -1486,6 +1530,7 @@ egret-rime/
 新增语料只需加一行 `open_sources.tsv` 或丢文件到 `data/input/`，不改代码 |
 | 09-27 | 并发默认 jobs=3，负载 <12 可用 6 | 所有阶段 nice 15 + ioprio BE/7 |
 | 09-27 | 分片临时目录放仓库内（`data/corpus/tmp`） | `/tmp` 在根盘仅 99G，48G 分片有撞爆风险 |
+| 10-06 | **三个 user_dict 全部用 `tabledb`**（用户指令） | 纯文本、可 git、可直改；调频/自学习/造词实测都生效（§4.48）。代价：全量重写、无事务/备份/恢复；translator 用独立名避免污染人工短语库 |
 
 ### 4.31 词级 gram：放弃 jieba，改走 Rust 词典匹配
 

@@ -148,8 +148,12 @@ egret_wubi:
   # 问题改由 dynamic_translator 对 type=completion 的候选降权解决(见 lua)。
   enable_completion: true
   initial_quality: 1000        # 置顶（词典内同码词组按权重排序）
-  db_class: userdb             # 用户词典必须 userdb(LevelDB) 才能造词/调频; tabledb 只读!
-  user_dict: egret_wubi.user.dict   # 2026-09 随整族改名；部署脚本会把旧 userdb 迁移过来，见 deploy_*.sh
+  # 用户词典用 tabledb：纯文本，落在 <rime用户目录>/egret_wubi.user.dict.txt。
+  # 三处 user_dict 统一 tabledb（2026-10 决策），理由与实测见 translator 块注释
+  # 与 docs/dict-reference.md §3/§7。旧版是 build/egret_wubi.user.dict.userdb/
+  # （LevelDB），切换后旧的 LevelDB 目录不再被读取，可自行删除。
+  db_class: tabledb
+  user_dict: egret_wubi.user.dict
   # 造词取码规则(与词库生成规则一致): 2字=2+2, 3字=2+1+1, 4字=1x4, 5字+=2+1+1
   encoder:
     rules:
@@ -175,12 +179,9 @@ custom_phrase:
   initial_quality: 1
   db_class: tabledb
   user_dict: egret_wubi_py.user.dict   # 手工维护的 custom phrase 文本库
-  # 2026-09-25 实测注记: 本块与下方 translator 的 user_dict 同名, librime
-  # db_pool 按名共享同一 db 实例 → 实际后端由创建顺序决定(先创建的 tabledb 胜出)。
-  # 效果: 混流学习(如选台→选湾→上屏)写入本 txt, 且 script 组句能看到
-  # 「湾 wan」user phrase, 从而 ckwan 能出「台湾」——这是当前刻意的共享行为,
-  # 代价是学习条目会写入本手工库(用 rime_dict_manager 清理)。若改为分离名,
-  # script 看不到学习结果, ckwan 永远台万(已实测)。
+  # 2026-09-25 实测: librime db_pool 按 user_dict 名共享同一 db 实例，实际后端由
+  # 创建顺序决定。此前本块与下方 translator 同名 → 混流学习条目直接写进本手工库。
+  # 2026-10 起 translator 改用独立名，本文件只保留人工维护内容。
   spelling_hints: 2
 
 # ---- 混合库 script：五笔+拼音混合分词 + LM 组句（混流核心）----
@@ -191,12 +192,15 @@ translator:
   dictionary: egret_wubi_py
   prism: egret_wubi_py
   enable_user_dict: true
-  # 必须 userdb：tabledb 只读，自学习/调频全丢。此前这里写 tabledb、
-  # 且 user_dict 与 custom_phrase 同名（db_pool 共享，实际类由先创建的 tabledb 决定）
-  # → 拼音侧选过的词**不会**升位（2026-09 实测：选第 3 候选后再打同一输入次序不变）。
-  # 换独立名字，避免与 custom_phrase 共库。
+  # 用户词典统一 tabledb（2026-10 决策，实测见 docs/dict-reference.md §3/§7）。
+  # 事实更正: tabledb **不是只读**（只读的是 stabledb: table_db.cc StableDb::Open
+  # → OpenReadOnly）；tabledb 走 TextDb::Open()，Update/Erase/Close(SaveToFile) 全可用，
+  # 调频与自学习实测生效（选第 3 候选→重打升首位，跨进程/同进程都成立）。
+  # 选 tabledb 的代价: 每次 Close 全量重写整张表（无增量/无事务/无 .old 备份、
+  # 无 userdb_recovery_task），且 rime_dict_manager 快照工具按 userdb 布局工作。
+  # user_dict 用独立名（不与 custom_phrase 共库），避免学习条目污染手工短语文件。
   db_class: tabledb
-  user_dict: egret_wubi_py.user.dict
+  user_dict: egret_wubi_py_script.user.dict
   contextual_suggestions: true
   # 排除部分最常见生僻字。原因见 docs/PROGRESS.md §4.18：librime 在
   # ScriptTranslation::Evaluate 里有一条短路（script_translator.cc:482/496-503），

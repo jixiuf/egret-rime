@@ -107,9 +107,13 @@ printf 'tffu\n\n' | ~/repos/librime/build/bin/rime_api_console
    import_tables 支持。传统五笔库根包装必须在用户目录根。
 3. **一字多音节拼写的 prism 首候选非确定**：词库层 ownership 消歧
    （每个简码拼写只对应唯一音节）。
-4. **用户词典自学习压制修正**：测前清 userdb（`egret_wubi_py.user.dict.userdb`
-   等目录）。
-5. **db_class 必须 userdb**：tabledb 只读，调频/造词全失效。
+4. **用户词典自学习压制修正**：测前清用户词典（`scripts/regression_test.py --clean`；
+   本项目为 tabledb，落点是用户目录根 `egret_wubi.user.dict.txt` /
+   `egret_wubi_py_script.user.dict.txt`；别删手工库 `egret_wubi_py.user.dict.txt`）。
+5. **db_class**：`tabledb` 与 `userdb` **都可写**（调频/造词/自学习都生效，2026-10 实测），
+   只有 `stabledb` 真只读（`StableDb::Open()→OpenReadOnly()`）。本项目三个 user_dict
+   均用 `tabledb`（纯文本、可 git）；代价：每次 Close 全量重写、无事务/备份/恢复，
+   且与 custom_phrase 同名时会写进人工库——故 translator 用独立名。详见 dict-reference.md §3/§7。
 6. **造词规则读自词库头 encoder/rules**，不是 schema；词库头没有 rules
    则造词静默失效。
 7. **import_tables 引用名不可带 .dict.yaml 后缀**；translator/dictionary 同理

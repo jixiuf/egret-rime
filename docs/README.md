@@ -97,5 +97,5 @@ git clone --depth 1 <远程URL> third-party/<名字>
 2. `translator/dictionary`、`prism` 不支持子目录路径（静默失败）；只有词库头部的
    `import_tables` 可以引用子目录下的词表。
 3. 知频(0-1500万)与万象(0-1000)权重量级不可混排 → 会使 LM 组句失效。
-4. 用户词典自学习会以高优先级 user phrase 调频，测试前必须清 userdb。
+4. 用户词典自学习会以高优先级 user phrase 调频，测试前必须清用户词典（用户目录根 `*.user.dict.txt`）。
 5. prism 构建非确定性（同输入不同目录产物不同），接近的 LM 裁决可能被翻转。

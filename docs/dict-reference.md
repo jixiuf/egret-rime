@@ -84,16 +84,33 @@ translator 配置块
   │     ├─ table:  <name>.table.bin    （主表）
   │     ├─ packs:  <n>.multiple.table.bin（附加表）
   │     └─ prism:  <prism>.prism.bin
-  └─ user_dict: <name>.user.dict (db_class: userdb → LevelDB)
+  └─ user_dict: <name>.user.dict
+        ├─ db_class: userdb  → <用户目录>/build/<name>.userdb/（LevelDB，二进制）
+        ├─ db_class: tabledb → <用户目录>/<name>.txt（纯文本，人类可读可编辑）
+        └─ db_class: stabledb→ 同上 .txt，但 OpenReadOnly()，**真只读**
         ├─ user phrase 查询（优先于静态表）
         ├─ 调频（dynamics: dynamics 模块写入 commit 时间戳/频率）
         └─ UnityTableEncoder 运行时造词（\x7fenc\x1f 前缀条目）
 ```
 
 - `Memory`（gear/memory.h）是 translator 与词典生命周期的粘合层。
-- 用户词典三态：`enable_user_dict: false` 完全不建；`db_class: tabledb` 只读；
-  默认 `userdb` 可读可写。**测试前清 userdb**（`rm -rf build/<name>.userdb/`
-  或移走），否则历史上屏会以 user phrase 形式调频，压住词库修正——本项目第 4 号坑。
+- 用户词典三态（**2026-10 更正**：此处原写“`tabledb` 只读”是**错的**，见 §7）：
+  `enable_user_dict: false` 完全不建；`tabledb` 与 `userdb` **都可读可写**
+  （只有 `stabledb` 真只读：`dict/table_db.h` 的 `StableDb::Open() → TableDb::OpenReadOnly()`）；
+  区别只在**落点与读写代价**：
+
+  | db_class | 落点 | 写入行为 | 工具/恢复 |
+  |---|---|---|---|
+  | `userdb` | `build/<name>.userdb/`（LevelDB） | 增量写、事务、`*.userdb.old` 备份 | `userdb_recovery_task` 损坏恢复；`rime_dict_manager` 导出 `*.userdb.txt` 快照 |
+  | `tabledb` | `<用户目录>/<name>.txt`（纯文本） | 可写；`TextDb::Close()` 时**全量重写**整张表 | 人类可读、可 git 管理；无事务/无备份/无恢复 |
+  | `stabledb` | 同上 `.txt` | `Update/Erase/MetaUpdate` 全被 `readonly()` 拒绝 | 官方 custom_phrase 配方用的就是这个 |
+
+  本项目（egret_wubi / egret_wubi_py）**三个 user_dict 全部用 `tabledb`**，落点是
+  用户目录根 `egret_wubi.user.dict.txt` / `egret_wubi_py_script.user.dict.txt` /
+  `egret_wubi_py.user.dict.txt`（最后一个是 custom_phrase）。
+- **测试前清用户词典**（`scripts/regression_test.py --clean`，只清机器会写的两本，
+  不动 custom_phrase），否则历史上屏会以 user phrase 形式调频，压住词库修正
+  ——本项目第 4 号坑。
 
 ## 4. 造词规则（encoder/rules）
 
@@ -124,30 +141,44 @@ formula 坐标语法（algo/encoder.cc）：
 ## 6. 用户词典快照与调试
 
 ```bash
-# 导出 userdb 快照（可读文本）；工具在 build/bin/ 下，构建后才有
-~/repos/librime/build/bin/rime_dict_manager --help   # 查看当前支持的子命令
-# 直接看内容：
-cd <用户目录>/build && strings egret_wubi.user.dict.userdb/*.ldb | head
+# tabledb（本项目当前形态）：直接看、直接改、直接 git
+cd <用户目录>
+tail -20 egret_wubi_py.user.dict.txt      # 格式: phrase<TAB>code<TAB>commits
+# 清空机器自学习的两本（回归测试必做；custom_phrase 那本是人工内容，别删）
+rm -f egret_wubi.user.dict.txt egret_wubi_py_script.user.dict.txt
 
-# 清空某方案用户词典（回归测试必做）
-rm -rf build/egret_wubi.user.dict.userdb build/egret_wubi_py.user.dict.userdb
+# userdb（旧形态）的读法：
+cd <用户目录>/build && strings egret_wubi.user.dict.userdb/*.ldb | head
+rime_dict_manager --help                 # 快照/导入导出（工具在 build/bin/）
 ```
 
-userdb 内键格式：`<text>\t<code>`，值为 `c=频次 d=最后使用日期 t=类型`。
-以 `\x7fenc\x1f` 开头的 text 是自动造词条目。
+tabledb txt 格式（`table_db.cc::rime_table_entry_parser`）：`phrase<TAB>code<TAB>commits`；
+commits 空则当 0。userdb 内键格式：`<text>\t<code>`（tabledb 落盘时 code 后**补一个空格**，
+回读时靠它区分“精确匹配”），值为 `c=频次 d=最后使用日期 t=类型`。
+以 `\x7fenc\x1f` 开头的 text 是自动造词条目（tabledb 里写作 `^?enc^_`）。
 
-## 7. user_dict 共享陷阱（2026-09-25 实测）
+## 7. user_dict 共享陷阱 + “tabledb 只读”的更正（2026-10 实测）
 
 - librime `UserDictionaryComponent::Create(dict_name, db_class)` 用 **db_pool_
   按 user_dict 名共享 db 实例**：多个 translator 的 `user_dict` 同名时，实际
   后端由**创建顺序**决定（先创建者胜出），后创建者的 db_class 被忽略。
-- 本项目 custom_phrase(tabledb) 与 translator(userdb) 同名
-  `egret_wubi_py.user.dict` → 全部落到 tabledb txt。混流学习（选台→选湾→
-  上屏）会写进手工维护的 txt，并顺带产生收益：script 组句能看到「湾 wan」
-  user phrase，使 `ckwan` 组出「台湾」。
-- 若改为不同名（分离 tabledb/userdb），script 看不到学习结果，
-  `ckwan` 永远「台万」（已实测）。当前刻意保持同名共享，学习条目用
-  rime_dict_manager / 手工清理 txt。
+- **更正**：`tabledb` **不是只读**。`tabledb` 走 `TextDb::Open()`（`readonly_=false`），
+  `Update/Erase/MetaUpdate` 只在 `readonly()` 时拒写，`Close()` 还会 `SaveToFile()`。
+  只读的是 `stabledb`（社区 custom_phrase 配方用它，这才是误会的源头）。
+  2026-10 在本机 librime 1.17.0 上实测（`data/rime-test`）：
+  混合库 tabledb 选第 3 候选（你好嘛）再打 → 升首位 ✓；传统库 tabledb 选第 2（徒增）
+  → 升首位 ✓；传统库两段组句（trwu 我们 + gdrn 天气）回车 → 写出
+  `我们天气\t^?enc^_qwgr\t0` 造词条目 ✓。跨进程、同进程都成立。
+  2026-09-25 那条“选第 3 候选后再打次序不变”的观测**未能复现**，当时的根因登记有误。
+- 真正的代价（2026-10 起仍选 tabledb，是权衡后的决定）：
+  **同名共库时学习条目会直接写进人工维护的 custom phrase 文件**（实测被追加
+  `你好嘛`、`好嘛`、`你`）；`Close()` 全量重写整张表；无事务/备份/损坏恢复；
+  `rime_dict_manager` 快照工具按 userdb 布局工作。
+  本项目因此给 translator 用**独立名**（`egret_wubi_py_script.user.dict`），
+  手工短语库 `egret_wubi_py.user.dict` 保持干净。
+- 副作用：名字不同 → db 实例不共享，script 组句**看不到**其它 translator 的学习条目。
+  曾利用同名共享让 `ckwan` 出「台湾」（选台→选湾上屏后 script 能看到「湾 wan」）；
+  分离后这条依赖消失（历史码造词仍走传统库自己的库）。
 
 ## 8. 跨词库造词学习限制（2026-09-25 实测）
 

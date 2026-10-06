@@ -70,7 +70,7 @@ test/                   # gtest 单测——查组件行为细节的好出处
 | `prism.{h,cc}` | .prism.bin 读写：DARTS（libdarts）双数组 trie，拼写→SyllableId 映射 + SpellingMap + alphabet + max_key_length |
 | `reverse_lookup_dictionary.{h,cc}` | .reverse.bin：词 → 码 反查（reverse_lookup_filter/translator、UnityTableEncoder 造词都依赖它） |
 | `user_dictionary.{h,cc}` | 用户词典：查/调频/造词/learn；`LookupWords` 是 user phrase 排序来源 |
-| `db.{h,cc}` / `level_db.{h,cc}` / `table_db.{h,cc}` / `text_db.{h,cc}` | 存储后端。**user_dict 必须 userdb（LevelDB）才能调频/学习**；tabledb 只读 |
+| `db.{h,cc}` / `level_db.{h,cc}` / `table_db.{h,cc}` / `text_db.{h,cc}` | 存储后端。`userdb`(LevelDB) 与 `tabledb`(纯文本 `TextDb`)**两者都可读可写**（Update 仅看 `readonly()`）；**真只读的是 `stabledb`**（`StableDb::Open()→OpenReadOnly()`）。见 dict-reference.md §3/§7 |
 | `user_db_recovery_task.cc` | userdb 损坏恢复 |
 | `user_dict_manager.cc`（lever/） | 导出/导入/合并用户词典快照（.userdb.txt） |
 | `preset_vocabulary.{h,cc}` | 八股文词频表（essay.txt）：编译时给无码词条补权重 |

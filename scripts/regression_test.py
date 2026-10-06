@@ -10,7 +10,7 @@
 用法:
   python3 scripts/regression_test.py            # 默认测 <仓库>/data/rime-test
   python3 scripts/regression_test.py --rebuild  # 先 rm -rf build 重新部署再跑
-  python3 scripts/regression_test.py --clean    # 先清用户词典(userdb)再跑
+  python3 scripts/regression_test.py --clean    # 先清用户词典(调频/自学习归零)再跑
   python3 scripts/regression_test.py --dir ~/Library/Rime   # 测其他环境(macOS)
 
 注意(见 AGENTS.md 陷阱清单):
@@ -72,7 +72,7 @@ CASES = [
     ("taiwan", "台湾", "拼音词组直查(混合库 tai wan 词条)"),
     ("ckiy", "台湾", "传统词组 2+2"),
     # 已知行为: ck+wan 组句因 万850>湾719 权重差 > LM 贡献(~±20), 出「台万」;
-    # 逐字选台选湾一次后 userdb 记住 ck+wan=台湾, 之后 ckwan→台湾。不作硬性断言。
+    # 逐字选台选湾一次后用户词典记住 ck+wan=台湾, 之后 ckwan→台湾。不作硬性断言。
 
     # --- 2026-09 修复项，逐条钉住（这些 bug 当初黄金一条都没拦住）---
     ("qktqn", "我吃饭", "五笔短码序列组句(简码拼写补进混合库 §4.19)"),
@@ -99,10 +99,16 @@ KNOWN_LM_CASES = [
      "黄金句(gram 配比相关, 两个结果均记录)"),
 ]
 
-USERDB_DIRS = [
-    "egret_wubi_py.user.dict.userdb",          # custom_phrase（手写短语库，tabledb）
-    "egret_wubi_py_script.user.dict.userdb",   # script 翻译器（可写，会自学习）
-    "egret_wubi.user.dict.userdb",             # 传统五笔库（造词/调频）
+# 用户词典（2026-10 起全部 db_class: tabledb → 用户目录根纯文本 <name>.txt；
+# 之前是 build/<name>.userdb/ LevelDB 目录。两条路径都列，兼容旧环境。）
+#
+# 只清「机器会写」的两本；custom_phrase（egret_wubi_py.user.dict）**不清**：
+# 它是人工维护的短语表（且历史上一直没被清过），清了会丢用户内容。
+USERDICT_PATHS = [
+    "egret_wubi_py_script.user.dict.userdb",   # 旧: script 翻译器（自学习，LevelDB）
+    "egret_wubi_py_script.user.dict.txt",      # 新: script 翻译器（自学习，纯文本）
+    "egret_wubi.user.dict.userdb",             # 旧: 传统五笔库（造词/调频，LevelDB）
+    "egret_wubi.user.dict.txt",                # 新: 传统五笔库（造词/调频，纯文本）
 ]
 
 
@@ -183,12 +189,15 @@ def main():
     shared_dir = detect_shared_dir(args.shared_dir)
 
     if args.clean:
-        for d in USERDB_DIRS:
-            p = os.path.join(user_dir, d)
-            if os.path.exists(p):
-                import shutil
+        import shutil
+        for rel in USERDICT_PATHS:
+            p = os.path.join(user_dir, rel)
+            if os.path.isdir(p):
                 shutil.rmtree(p)
-                print(f"已清除 {d}")
+                print(f"已清除 {rel}")
+            elif os.path.exists(p):
+                os.remove(p)
+                print(f"已清除 {rel}")
 
     if args.rebuild:
         import shutil
