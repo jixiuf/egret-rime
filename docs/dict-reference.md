@@ -108,6 +108,13 @@ translator 配置块
   本项目（egret_wubi / egret_wubi_py）**三个 user_dict 全部用 `tabledb`**，落点是
   用户目录根 `egret_wubi.user.dict.txt` / `egret_wubi_py_script.user.dict.txt` /
   `egret_wubi_py.user.dict.txt`（最后一个是 custom_phrase）。
+- ⚠️ **坑（2026-10 踩过）**：translator 块**不写 `user_dict` 时**，librime 会用
+  `dictionary` 名派生用户词典名（`user_dictionary.cc UserDictionaryComponent::Create
+  (ticket)` → `Language::get_language_component`），而 `enable_user_dict` 默认 `true`
+  → **加载方案（建组件）时就创建 `<dictionary>.userdb/`**，与是否触发该 translator 无关。
+  本项目的多读法路由块 `wubi_route`/`py_route` 就因此多出了 `egret_wubi.userdb` /
+  `egret_wubi_py.userdb`；现在两块显式复用主翻译器的 tabledb 词库（同名共享）。
+  写新 translator 时：要么显式给 `user_dict`，要么显式 `enable_user_dict: false`。
 - **测试前清用户词典**（`scripts/regression_test.py --clean`，只清机器会写的两本，
   不动 custom_phrase），否则历史上屏会以 user phrase 形式调频，压住词库修正
   ——本项目第 4 号坑。

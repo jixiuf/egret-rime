@@ -76,6 +76,7 @@ engine.segmentors
 | `cand.text=` 只对 `SimpleCandidate` 生效；`cand.comment=` 对 Phrase 也生效 | librime-lua types.cc |
 | `speller/auto_select` 管不了自动上屏 → 必须 `speller/max_code_length: 0` | `speller.cc:134` |
 | `db_class: tabledb` **可写**（只读的是 `stabledb`）→ 自学习/调频/造词实测都生效；本项目三个 user_dict 全用 `tabledb`，落点 `<用户目录>/<name>.user.dict.txt` | 实测（2026-10，见 dict-reference.md §7） |
+| translator **不写 `user_dict`** → 按 `dictionary` 名派生 `<dictionary>.userdb`，且 `enable_user_dict` 默认 true → **加载方案时就把目录建出来**（与 tag 无关） | `user_dictionary.cc:588-612` |
 | `rime_deployer` 会把用户目录**根下**它不认识的 `.bin` 移进 `trash/` → 运行时表放 `dicts/` | 实测 |
 | 缺 `default.yaml`/`symbols.yaml` → schema config 构建失败 → **LM 静默失效** | `PROGRESS §4.7` |
 | 二进制读端极易 off-by-one：**必须配契约测试**（TSV 参考实现逐项比对） | §4.34 / §4.42 |

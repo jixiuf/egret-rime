@@ -1136,6 +1136,20 @@ userdb 写入 egret_wubi_py_script.user.dict.userdb（新 .ldb）
 `Makefile clean-test`；文档更正见 dict-reference.md §3/§6/§7、deployment-debugging.md #4/#5、
 HANDOFF.md §4 表、librime-source-map.md、schema-config-reference.md。
 
+**追加修复（同日，用户反馈“`egret_wubi_py.userdb` / `egret_wubi.userdb` 还是会产生”）**：
+根因在**两个多读法路由块**——`wubi_route` / `py_route` 没写 `user_dict`，
+`UserDictionaryComponent::Create(ticket)` 会按 `dictionary` 名派生
+（`Language::get_language_component` → `egret_wubi` / `egret_wubi_py`），而
+`enable_user_dict` **默认 true**，且**建组件（即加载方案）时就把 LevelDB 目录建出来**
+（与是否触发 tag 无关，所以每次启动都会重建）。
+处置（用户选“复用主词典”）：两块补 `db_class: tabledb` + 复用主翻译器的 user_dict
+（`egret_wubi.user.dict` / `egret_wubi_py_script.user.dict`）——同名 → db_pool 共享，
+学习互通、零新增文件（语义也一致：py_route 与 translator 同为 script_translator + 同 prism；
+wubi_route 与 egret_wubi 同为 table_translator + 同 dictionary）。
+实测：连跑两轮不再产生 `*.userdb` ✓；黄金 **33/33** ✓；三条学习链路
+（自学习/调频/造词）仍全部生效 ✓。曾试过的另一种做法是两块 `enable_user_dict: false`
+（也 33/33、也不建目录），但那样路由不参与学习；二选一已问过用户，选了复用。
+
 ### 4.40 ⭐⭐ 交付路线其实通的！§4.15 的"新增候选会被中途提交"是误判
 
 **重新验证**（这是本轮最重要的发现）：
@@ -1396,6 +1410,55 @@ return translation;                                      // 不过滤！
 **处置**：删掉 `egret_wubi_py.schema.yaml` 里的 `charset_filter`（并在原位留注释说明原因）。
 实测：日志 **7 → 0**、黄金 33/33、各用例不变。
 
+### 4.49 ⭐⭐ H1（搜索器 beam 改用 `M.score`）**证否** —— 而且暴露出「搜索器根本不在决策路径上」
+
+**背景**：§4.43/§4.45 提出「把搜索器 `py_composer` 的打分从『词一元 + 上下文增益』换成
+句级 `lm_rerank.score`」（待办 H1），理由是句级打分能判对「画上小天使们 > 花上小天师门」。
+改动很小（`docs/experiments/h1-mscore-in-beam.patch` 存档），实测结果：
+
+| 配置 | 黄金 20 | 160 句全拼 | 首候选 None（120s 超时） | 整轮耗时 |
+|---|---|---|---|---|
+| 基线（HEAD 打分） | 20/20 | **65/160 (41%)** | 3 | ~15 min |
+| **H1（`M.score` 进 beam）** | 20/20 | **52/160 (32%)** | **50** | ~34 min |
+
+逐句比对：**变好 0 句，变差 13 句，且 13 句全部是 `None`（超时）**。
+
+**① 关键事实（读代码 + 开关确认）：生产配置里 `py_composer.compose` 只有一个消费者**
+
+| 调用点 | 开关 | 现值 |
+|---|---|---|
+| `compose_filter.lua`（注入/共识重排候选） | `dynamic_translator/lm_compose` | **false** |
+| `dynamic_translator.lua`（翻译器侧置顶） | `dynamic_translator/lm_compose_translator` | **false** |
+| **`mix_segmentor.lua`（给整段补 `wubi`/`py` tag）** | `mix_segmentor/enabled` | **true** |
+
+⇒ 搜索器的唯一产出是**一个 tag**，它的 beam 打分只影响「整串算五笔还是拼音」，**不进候选排名**。
+
+**② 量化这条链路的贡献（关掉 `mix_segmentor`，其余不变）**：160 句 **64/160** vs 开启 **65/160**
+—— 即整条「码表搜索器 + LM 打分 + tag 路由」对**全拼长句**评测的贡献 ≈ **1 句**（黄金都是 20/20）。
+
+**②' 但它不是废件（差点误判）**：同样关掉 `mix_segmentor` 跑**黄金 33** →
+`qktqn`（五笔短码序列→我吃饭）**直接 120s 超时爆炸**（保到第 20 条就断）。
+⇒ 这条链路的价值在**混流短码序列**（§4.41 的 tag 机制），全拼长句评测测不到它；
+「全拼评测≈0 贡献」**不支持**“删掉它”这个结论。
+（另：首次跑出现 `wan` 超时，是陷阱 #2/#9 部署竞态，预热后重跑正常。）
+
+**③ 单例验证（决定性）**：取 5 句在 H1 下「失败」的输入（如 `duzhemenyijing...lexingqu`、
+`bujinkexuemiaoshu...`），**H1 与基线的 tag 判定完全相同（都是「整串 py，补 py tag」）、
+首候选也完全相同且正确**。差别只在耗时：
+
+| 每键（compose 一次） | 基线 | H1 |
+|---|---|---|
+| 均值 | 1091 ms | 3214 ms |
+| 末键（52 字母） | 2.3 s | 9.0 s |
+
+**结论**：
+1. **H1 是纯延迟回归、零质量收益** —— 它连「变好一句」都没有；评测掉 13 句是**超时假失败**
+   （判 failure 前必须区分 `None`=超时 与 真错，这是评测口径的坑）。
+2. **H1 的前提不成立**：搜索器不在最终决策路径上，所以「给它换个更好的打分」不可能修长句错误。
+   长句的最终裁决在 `py_route`(script_translator) 的整句候选 + 万象 grammar 那一侧。
+3. 顺带记两个数字：`M.score` 在 beam 里是 O(位置×候选词×串长) 次全文 n-gram 扫描，
+   成本随输入长度迅速爆炸；而基线搜索器本身也不便宜（长输入 1~2 s/键）。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
@@ -1412,7 +1475,10 @@ return translation;                                      // 不过滤！
 ### ⏭ 下一步（按价值；本轮已把"最值钱"的做完，剩下这些）
 | # | 任务 | 说明 |
 |---|---|---|
-| **H1** | **搜索器 beam 打分改用 `M.score`** | 现场验证：句级打分把「画上小天使们」判得比「花上小天师门」高 **5102 分** ✓，而搜索器现在的「词一元 + 上下文增益」混合会被词一元压过 ✗。这是修**近音错字**（长句残余错误主类）最直接的一步 |
+| ~~H1~~ | ~~搜索器 beam 打分改用 `M.score`~~ | **❌ 已证否（§4.49）**：搜索器不在决策路径上（只由 `mix_segmentor` 用来判 tag），实测变好 0 句、变差 13 句全是超时假失败、每键耗时 ×3。改动存档 `docs/experiments/h1-mscore-in-beam.patch` |
+| **H6** | **长句准确率的真正着力点** | 决策路径在 `py_route`(script_translator) 的整句候选 + grammar 侧；改动/评测都应打在这里（§4.49 的教训） |
+| **H7** | `mix_segmentor` + `py_composer` 的**提速**（不是删除） | 全拼评测贡献 ≈ 0，但混流短码序列必需（关掉 → `qktqn` 超时爆炸，§4.49②'）。可把 tag 分类的「整串读法」判定换成**确定性解析**，省掉 LM beam 的 1~2 s/键 |
+| **H8** | 评测口径：区分「超时」与「真错」 | `eval_gram` 的 `None` 目前计入错误；长输入本来就慢 → 会把延迟记成品错误（§4.49 踩过） |
 | H2 | 400MB gram 的**部署校验** | 目前不随包分发（用户自行下载）；应在部署/自检里加存在性检查 + 提示（缺它 = 无 LM） |
 | H3 | **dist/bundle 重打** + 目标机复验 | 现有 `dist/*.tar.gz` 不含本轮修复；host-linux / host-mac 都需重新部署跑自检 |
 | H4 | 扩展读法 | 现有 `wubi`/`py` 两个 tag；可再加「混合读法」等，见 `docs/schema-components.md §6` |
@@ -1433,7 +1499,7 @@ D1（字符 gram）✅ ｜ G5（候选显示五笔码，§4.20）✅ ｜ G8（�
 G9（𨸐 未丢弃的原因，§4.22）✅ ｜ G12（拼音侧自学习，§4.39）✅ ｜
 G13（`max_code_length` 自动上屏，§4.32）✅ ｜ G14（LM 表/码表二进制化 + 契约测试，§4.34/§4.42）✅ ｜
 G15（混流多读法，§4.41）✅ ｜ G16（万象词级 gram 成默认，§4.44）✅ ｜
-G17（`charset_filter` 冗余删除，§4.47）✅
+G17（`charset_filter` 冗余删除，§4.47）✅ ｜ H1（搜索器改 `M.score`）**已证否**，§4.49 ✅
 
 ### 仍有效的老待办
 | # | 任务 |

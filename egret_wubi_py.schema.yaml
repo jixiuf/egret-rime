@@ -243,6 +243,14 @@ mix_segmentor:
 wubi_route:                 # 绑定 tag=wubi 的内建 table_translator（内建组件认 tag，lua 的不认）
   tag: wubi
   dictionary: egret_wubi
+  # 用户词典必须显式写：不写 user_dict 时 librime 按 dictionary 名派生
+  # egret_wubi.userdb（Language::get_language_component），而 enable_user_dict
+  # 默认 true → 加载方案（建组件）时就把 LevelDB 目录建出来（曾多出一对无用的
+  # egret_wubi.userdb / egret_wubi_py.userdb）。
+  # 这里复用主翻译器(first_translator)的 tabledb 用户词典：同名 → db_pool 共享同一
+  # 实例，学习互通、零新增文件（tag=wubi 的整串五笔读法也能用上学习条目）。
+  db_class: tabledb
+  user_dict: egret_wubi.user.dict
   enable_sentence: true
   enable_completion: true
   initial_quality: 1000     # 关键：高于混合库(1) → 五笔读法在整句里胜出
@@ -253,6 +261,11 @@ py_route:                   # 绑定 tag=py 的 script_translator（混流库作
   tag: py
   dictionary: egret_wubi_py
   prism: egret_wubi_py
+  # 同上：不写 user_dict 时会派生 egret_wubi_py.userdb（LevelDB）。
+  # 复用 script 翻译器(translator)的 tabledb 用户词典（同为 script_translator +
+  # 同 prism egret_wubi_py，语义一致；同名共享 → 学习互通）。
+  db_class: tabledb
+  user_dict: egret_wubi_py_script.user.dict
   enable_sentence: true
   enable_completion: false
   max_sentences: 100
