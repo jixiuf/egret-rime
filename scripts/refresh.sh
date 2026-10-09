@@ -190,7 +190,8 @@ for i in "${!STAGES[@]}"; do
       # 混流与黄金零回归；多读音展开反而更差，故 max-readings 保持默认 1。
       "$PY" "$ROOT/scripts/gen_pinyin_words.py" \
         --src "$ROOT/dicts/egret_wubi_words_wangxiang_full.dict.yaml" \
-        --min-weight 300 --out-name egret_py_words_longtail >>"$RUNLOG" 2>&1 \
+        --min-weight 300 --exclude "$ROOT/dicts/egret_py_words_base.dict.yaml" \
+        --out-name egret_py_words_longtail >>"$RUNLOG" 2>&1 \
         && ok "长尾拼音词已生成（约 18 万条，可复现）" || warn "长尾拼音词生成失败"
       # 注意：gen_wubi_py_unified_dicts.py 依赖 dicts/wangxiang_cn_dicts/base.small
       # 等**本仓库没有的外部源数据**（来自原仓库），跑不通 → 默认跳过。

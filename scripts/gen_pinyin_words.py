@@ -117,6 +117,10 @@ def main():
                          "给 full 档五笔词补主读音拼音码，见 PROGRESS §4.55")
     ap.add_argument("--min-weight", type=int, default=0,
                     help="配合 --out-name：词源侧的权重下限（实测 300 最优）")
+    ap.add_argument("--exclude", action="append", default=[],
+                    help="配合 --out-name：排除这些 dict.yaml 里**已有的词**。"
+                         "长尾补注必须用它排除 base 档已有的词，否则同一词会进两张表 "
+                         "→ 候选列表出现重复（曾出过：输入 nihao 三个「你好」）")
     args = ap.parse_args()
 
     if not os.path.exists(args.src):
@@ -130,7 +134,13 @@ def main():
 
     if args.out_name:
         # 长尾模式：单独产一张表（不动各档），权重下限在**词源侧**生效
-        keep = [(w, wt) for w, wt in all_rows if wt >= args.min_weight]
+        excl = set()
+        for x in args.exclude:
+            for w, _wt in rows(x):
+                excl.add(w)
+        keep = [(w, wt) for w, wt in all_rows if wt >= args.min_weight and w not in excl]
+        if excl:
+            print(f"  排除已有词 {len(excl):,} 条（{', '.join(os.path.basename(x) for x in args.exclude)}）")
         tmp = os.path.join(OUT, args.out_name + ".dict.yaml.tmp")
         n = 0
         with open(tmp, "w", encoding="utf-8") as f:

@@ -102,10 +102,10 @@ engine:
     # 既不生效、还每次按键打一条 ERROR。字表分层（§4.23）后扩展区字已不在默认 prism 里，
     # 这个 filter 冗余，故移除。
     - simplifier@traditionalize                     # 简繁切换
-    - uniquifier                # 去重，比如多个繁体字对应一个简体字，此时可能需要去重
     # 放在最后：前面的 long_word_filter 会重排候选，若放在它前面，改写会被覆盖
     - lua_filter@*dump_cands_filter    # 调试：打印整份候选表（默认关）
     - lua_filter@*compose_filter
+    - uniquifier                # 去重（移到最末：实测放中间去不掉重复，见 §4.58）
 
 # ---- 顶层调度：first=传统五笔库，先于混合库，保证简码/全码首候选确定 ----
 dynamic_translator:
