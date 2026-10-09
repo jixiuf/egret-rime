@@ -14,6 +14,10 @@ egret_py_words_src）归一为分档文件，之后切档只改后缀。
 用法:
   python3 scripts/set_tier.py base        # 切到默认档
   python3 scripts/set_tier.py full --dry-run
+
+注意：**拼音侧的 base/full 内容相同**（拼音源 `egret_py_words_src` 只有 6.3 万词，
+已全部 >= base 阈值 451）⇒ 切档对纯拼音路径无影响；真正分档的是五笔词表
+（wangxiang 63k → full 780k）。拼音长尾需要先生成，见 PROGRESS §4.53。
 """
 
 import argparse
@@ -34,11 +38,15 @@ LEGACY = {
     r"dicts/egret_py_words_src\b":
         "dicts/egret_py_words_{tier}",
 }
-# 已分档的三种词表：把 (_core|_base|_full) 换成目标档
+# 已分档的词表：把 (_core|_base|_full) 换成目标档。
+# ⚠ 模式必须能匹配**实际文件名**（踩过：原来写的是 `_wb86_wx` 与裸 `egret_wubi_words`，
+# 两个都匹配不到 `egret_wubi_words_wangxiang_base` / `egret_wubi_words_wb86_base`
+# ——因为 `(_core|_base|_full)?` 后面要求 `\b`，而下一字符是 `_`；
+# 结果五笔侧词库永远停在 base 档，`make tier full` 实际上是个空操作。）
 TIERED = [
-    r"dicts/egret_wubi_words_wb86_wx",   # 万象逗号码（混流库用）—— 必须排在 86 那份之前
-    r"dicts/egret_wubi_words",      # 86 造词码（传统库用）
-    r"dicts/egret_py_words",        # 拼音
+    r"dicts/egret_wubi_words_wangxiang",   # 万象逗号码（混流库用）
+    r"dicts/egret_wubi_words_wb86",        # 86 造词码（传统库用）
+    r"dicts/egret_py_words",               # 拼音
 ]
 
 
