@@ -68,13 +68,27 @@ def rows(path):
 
 
 def readings(word, py, max_readings):
-    """词的读音组合：主读音在前，其余组合去重，最多 max_readings 个。"""
-    per = []
-    for ch in word:
-        r = py(ch, heteronym=True)
-        opts = r[0] if r else [""]
-        per.append(opts[:3])                      # 每个字最多取 3 个读音
+    """词的读音组合：主读音在前，其余组合去重，最多 max_readings 个。
+
+    主读音必须用**词组感知**的 `pinyin(word)`，不能逐字取首读音 ——
+    逐字会把多音字读错：`银行`→yin **xing**（应为 hang）、`腌臜`→**yan** za（应为 a za）、
+    `拜佛`→bai **fu**（应为 fo）。错读音意味着用户按正确读音**打不出这个词**；
+    而评测输入本来就是词组感知生成的（`lazy_pinyin`），两边口径也因此不一致。
+    （§4.56 实测修正：仅此一处改动就让 160 句 +2、200 句 +3）
+    """
+    from pypinyin import pinyin as _pinyin, Style as _Style
+    main = [x[0] for x in _pinyin(word, style=_Style.NORMAL, heteronym=False)]
     combos, seen = [], set()
+    if len(main) == len(word) and all(main):
+        combos.append(" ".join(main))
+        seen.add(combos[0])
+    # 备选读音：逐字多音字的其余读音（与主读音相同的略过）
+    per = []
+    for i, ch in enumerate(word):
+        r = py(ch, heteronym=True)
+        opts = [o for o in (r[0] if r else [""])
+                if o and o != (main[i] if i < len(main) else None)]
+        per.append(opts[:3])
     for combo in itertools.islice(itertools.product(*per), 0, 64):
         if any(not s for s in combo):
             continue
@@ -85,7 +99,7 @@ def readings(word, py, max_readings):
         combos.append(code)
         if len(combos) >= max_readings:
             break
-    return combos
+    return combos[:max_readings] if max_readings > 0 else []
 
 
 def main():
