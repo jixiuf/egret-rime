@@ -1787,6 +1787,34 @@ singlestep ← luaC_fullgc ← lua_gc ← ~LuaTranslation(_M_dispose)
 会被切分器判成“整串五笔”从而走五笔路径（`baifo → 陈赫`）——
 属 §4.41 的判读歧义，与注音无关，留给后续。
 
+### 4.57 H3：目标机复验（macOS ✓；host-linux 离线待验）+ 两个自检脚本 bug
+
+**bundle**：`bash scripts/deploy_bundle.sh` → `dist/egret-rime-runtime-20261009.tar.gz`（29M，
+61 个运行时文件，清单由 `deploy_bundle.sh --list` 单一来源提供，**长尾拼音词表自动入包**）。
+H2 也一并落地：包内 `install.sh` 安装后自检——必需运行时文件 + **引擎 LM 的 400MB gram
+存在性**（缺时打印后果与下载命令）。
+
+**macOS（host-mac，Squirrel）复验** ✅
+```
+更新 61 个文件（含长尾词表）；error 行数 0；备份 $HOME/rime-backup-20261009-155246.tar.gz（可回滚）
+词库指纹 ✓（我q/冷uwyc/署lftj）
+自检 9/9 ✓：tffu→等 khlg→中国 qktnqnr→我吃饭 qchifanle→我吃饭了 uwycuklf→冷部署
+            trwuktnqnr→我们吃饭 + 三条拼音长句
+```
+
+**第一次复验时自检全 ✗（e→额、tffu→他仿佛、khlg→客户两个）**，而拼音长句全 ✓。
+逐层排除：词表 md5 与本地**逐字节一致**；把长尾那行去掉后**同样复现** ⇒ 与本次词库改动无关。
+最后定位到**自检脚本自身的两处 bug**：
+
+| # | bug | 后果 |
+|---|---|---|
+| 1 | `sed 's/^previously_selected_schema: .*/…/'` —— 该行在 user.yaml 里**缩进两格**，`^` 匹配不到 | 替换从未生效 ⇒ console 一直跑上一个方案（`egret_py` 纯拼音）⇒ 五笔用例必然全错而拼音用例正常 |
+| 2 | scratch 目录（`shared_data_dir="."`）缺 `default.yaml/symbols.yaml/essay.txt`（`[ -e ] \|\|` 守卫没生效） | `import_preset: default:key_binder` 取不到 ⇒ `error building config: egret_wubi_py.schema` ⇒ 引擎降级 |
+
+⇐ 现象与"方案选错 + schema 构建失败"完全吻合，**部署本身一直是好的**。
+两处已修（`d60b472`）；host-linux 脚本有同源风险（自检不固定方案、只测拼音长句），
+也一并补上（`3f1032b`，离线**未验证**）。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。
@@ -1810,8 +1838,8 @@ singlestep ← luaC_fullgc ← lua_gc ← ~LuaTranslation(_M_dispose)
 | ~~H7~~ | ~~`mix_segmentor` + `py_composer` 提速~~ | **✅ 已落地（§4.50）**：beam 状态按输入前缀**增量缓存** + LM 增益记忆化 → 判定逐字节不变，单例 32 字 14.3s→5.5s、52 字 60s→11.9s；黄金 33/33。更强的「精确码二分」枚举已试→会触发 librime-lua 关闭期 GC 死循环，已回退 |
 | **H8** | ~~评测口径：区分「超时」与「真错」~~ | **✅ 已落地（§4.52）**：`ok/hang/slow/empty` 四态分类 + 杀进程组；修复后 160 句两次跑**逐句完全一致**（66/160、异常 0）。`regression_test.py` 遇超时不再崩 |
 | **H9** | ~~拆掉 librime-lua 关闭期 GC 活锁~~ | **✅ 根因已定位 + 上游 PR #435**（§4.51）。剩下：等合并后 bump pin（或 setup 加本地 patch），再把前缀桶记忆化落地（已验证 52 字母 11.9→7.8s） |
-| H2 | 400MB gram 的**部署校验** | 目前不随包分发（用户自行下载）；应在部署/自检里加存在性检查 + 提示（缺它 = 无 LM） |
-| H3 | **dist/bundle 重打** + 目标机复验 | 现有 `dist/*.tar.gz` 不含本轮修复；host-linux / host-mac 都需重新部署跑自检 |
+| ~~H2~~ | ~~400MB gram 的部署校验~~ | **✅ 已做（§4.57）**：`install.sh` 自检必需运行时文件 + gram 存在性 + 下载命令 |
+| ~~H3~~ | ~~dist/bundle 重打 + 目标机复验~~ | **✅ macOS 已验（§4.57）**：bundle 20261009 + 自检 9/9；**host-linux 离线待验**（脚本已同步修） |
 | H4 | 扩展读法 | 现有 `wubi`/`py` 两个 tag；可再加「混合读法」等，见 `docs/schema-components.md §6` |
 | H5 | 按键延迟预算 | 搜索器每键都要跑（实测约 3.6ms/键，含一次性码表加载）；多读法前先建预算 |
 
