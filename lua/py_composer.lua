@@ -7,6 +7,8 @@
 --   librime-lua 只能按单音节查词典（多音节 code 查不到），所以在 Lua 里自建：
 --     1) 词表（word → 音节串 → 语料 log 词频权重）
 --     2) 在输入串上做 beam search，打分 = 词权重 + LM（同尺度，直接相加）
+--   性能（§4.50）：切分器对**每个前缀**都调一次 compose，故 beam 状态按输入前缀**增量缓存**
+--   （位置 p 的状态只由前 p 个字符决定），每键从 O(位置数) 降到 O(1 个位置)。
 --
 -- 与 librime 搜索的关键区别：
 --   - 词表只用**拼音**（不含五笔码）→ 不会被 "wan→人世(wwan)" 这类跨路串扰
@@ -46,6 +48,36 @@ local function byte_lt(a, b)
 end
 
 local pack            -- { data=, count=, index_base= }
+
+-- 增量缓存（§4.50）：切分器对**每个前缀**都调一次 `compose`（52 字母输入 = 52 次），
+-- 而 beam 在位置 p 的状态只由输入的前 p 个字符决定、**不随后续输入改变**
+-- → 输入只增长时只需补算新增位置。判定结果与逐次重算**逐字节相同**，
+-- 但每键成本从 O(位置数) 降到 O(1 个位置)。
+local MAX_CODE_LEN = 16     -- 码表最长码长（实测 15: jiangshangzhang）；契约测试兜住
+local cache = { beam = nil, input = "", best = nil }
+
+-- LM 增益（score_segment）记忆化。
+-- 为何有效：增量缓存每键要回扫 MAX_CODE_LEN 个位置，而相邻两次回扫的 (上下文,词)
+-- 组合高度重复；score_segment 是纯查表，重复算就是白烧（它是整个搜索器 ~80% 的开销）。
+-- 容量保护：超过 20 万条就直接清空（条目与词表同量级，不会无限涨）。
+local gain_cache, gain_n = {}, 0
+
+local function gain_of(lm, ctx, text)
+    if not lm then return 0 end
+    local key = ctx .. "\1" .. text
+    local v = gain_cache[key]
+    if v ~= nil then return v end
+    v = lm.score_segment(ctx, text) or 0
+    if gain_n > 200000 then gain_cache, gain_n = {}, 0 end
+    gain_cache[key] = v
+    gain_n = gain_n + 1
+    return v
+end
+
+function M.reset_cache()
+    cache.beam, cache.input, cache.best = nil, "", nil
+    gain_cache, gain_n = {}, 0        -- LM 表可能被重新载入，增益记忆化一并失效
+end
 
 local function u32(o)
     local b1, b2, b3, b4 = pack.data:byte(o, o + 3)
@@ -113,6 +145,7 @@ function M.load(dir)
     local okp, infop = load_pack(dir .. "/compose_table.bin")
     local okp2, infop2 = load_pack(dir .. "/dicts/compose_table.bin")
     if okp2 then okp, infop = okp2, infop2 end
+    M.reset_cache()
     if okp then return true, infop end
 
     local f2 = io.open(dir .. "/compose_table.tsv", "rb")
@@ -152,47 +185,70 @@ function M.compose(input, lm, beam, want)
     local n = #input
     if n == 0 or n > 64 then return {} end
 
-    local best = { [0] = { { score = 0, text = "", ctx = "" } } }
-    for pos = 0, n - 1 do
+    -- 复用上一次的 beam 状态（仅当 beam 宽度相同、且新输入以上次输入为前缀）
+    -- 为何不能简单地从上次长度接着算：候选是按当前位置的 1~2 字前缀查的
+    -- （k2 = input[pos+1..pos+2]），而旧输入末尾处的 k2 是**截断**的（少查一个桶），
+    -- 那些「跨到新字符才成立」的候选当时被 rest 长度过滤掉了。
+    -- 所以：老位置里只有 [base+1-MAX_CODE_LEN, base-1] 这一段会向**新位置**产出候选
+    -- → 回扫这段窗口，只补 epos > base 的候选（老位置的格子不动、不重算）。
+    local base, best
+    if cache.best and cache.beam == beam and #cache.input <= n
+       and input:sub(1, #cache.input) == cache.input then
+        base, best = #cache.input, cache.best
+        for i = base + 1, n do best[i] = nil end   -- 上一轮多算的（输入变短不可能到这么）
+    else
+        base, best = 0, { [0] = { { score = 0, text = "", ctx = "" } } }
+    end
+    local from = 0
+    if base > 0 then
+        from = base + 1 - MAX_CODE_LEN
+        if from < 0 then from = 0 end
+    end
+    -- 把「候选 → 新路径」的构造抽成闭包：避免在下面的双层循环里重复这段（含 UTF-8 截断）
+    local function push(path, w, pos, epos)
+        if epos <= base then return end          -- 老位置上一轮已经填好（不重算、不改动）
+        local lms = gain_of(lm, path.ctx, w.text)
+        -- 词的一元语言模型：log P(w) = log f(w) - log N
+        local sc = path.score + (w.weight - LOG_N) + lms
+        local nb = best[epos]
+        if not nb then nb = {}; best[epos] = nb end
+        -- 上下文按**字符**保留（按字节切会截断 UTF-8）
+        local ctx = path.ctx .. w.text
+        local nctx = utf8.len(ctx)
+        if nctx and nctx > 6 then
+            local chars = {}
+            for _, cp in utf8.codes(ctx) do
+                chars[#chars + 1] = utf8.char(cp)
+            end
+            ctx = table.concat(chars, "", #chars - 5, #chars)
+        end
+        nb[#nb + 1] = { score = sc,
+                        text = path.text .. w.text,
+                        piece = { prev = path.piece, s = pos, e = epos,
+                                  kind = w.kind, code = w.code },
+                        ctx = ctx }
+    end
+    for pos = from, n - 1 do
         local cur = best[pos]
         if cur then
+            -- 候选枚举保持原样（by_key 前缀桶 + 前缀匹配）；改造只在「不重算已定型的位置」
             local k1 = input:sub(pos + 1, pos + 1)
             local k2 = input:sub(pos + 1, pos + 2)
+            local rest = input:sub(pos + 1)
             for _, path in ipairs(cur) do
                 for _, key in ipairs(k1 == k2 and { k1 } or { k2, k1 }) do
-                    local list = by_key[key]
-                    if list then
-                        local rest = input:sub(pos + 1)
-                        for _, w in ipairs(list) do
+                    local blist = by_key[key]
+                    if blist then
+                        for _, w in ipairs(blist) do
                             if rest:sub(1, #w.code) == w.code then
-                                local epos = pos + #w.code
-                                local lms = lm and lm.score_segment(path.ctx, w.text) or 0
-                                -- 词的一元语言模型：log P(w) = log f(w) - log N
-                                local sc = path.score + (w.weight - LOG_N) + lms
-                                local nb = best[epos]
-                                if not nb then nb = {}; best[epos] = nb end
-                                -- 上下文按**字符**保留（按字节切会截断 UTF-8）
-                                local ctx = path.ctx .. w.text
-                                local nctx = utf8.len(ctx)
-                                if nctx and nctx > 6 then
-                                    local chars = {}
-                                    for _, cp in utf8.codes(ctx) do
-                                        chars[#chars + 1] = utf8.char(cp)
-                                    end
-                                    ctx = table.concat(chars, "", #chars - 5, #chars)
-                                end
-                                nb[#nb + 1] = { score = sc,
-                                                text = path.text .. w.text,
-                                                piece = { prev = path.piece, s = pos, e = epos,
-                                                          kind = w.kind, code = w.code },
-                                                ctx = ctx }
+                                push(path, w, pos, pos + #w.code)
                             end
                         end
                     end
                 end
             end
         end
-        if best[pos + 1] and #best[pos + 1] > beam then
+        if pos + 1 > base and best[pos + 1] and #best[pos + 1] > beam then
             local nb = best[pos + 1]
             table.sort(nb, function(a, b) return a.score > b.score end)
             local seen, out = {}, {}
@@ -209,6 +265,7 @@ function M.compose(input, lm, beam, want)
 
     local fin = best[n]
     if not fin then return {} end
+    cache.beam, cache.input, cache.best = beam, input, best
     table.sort(fin, function(a, b) return a.score > b.score end)
     local out = {}
     for i = 1, math.min(want, #fin) do

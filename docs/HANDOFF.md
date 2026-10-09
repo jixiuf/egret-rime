@@ -34,10 +34,14 @@ engine.segmentors
       mix_segmentor：用统一码表搜索器判"整串是哪种读法"，给**整段补 tag**（不切段！）
 ```
 
+- ⚠ **搜索器只影响 tag、不进候选排名**（`compose_filter`/`dynamic_translator` 两侧都关）：
+  所以「给它换个更好的打分」不可能修长句准确率（§4.49 已证否 H1）。
+
 - **引擎 LM = 万象词级 gram**（`wanxiang-lts-zh-hans.gram`，~400MB，原生 octagram 直接读）
 - **Lua 侧重排已关**（`dynamic_translator/lm_rerank: false`、`lm_compose: false`）；
   Lua 的 `lm_rerank.{bin,meta}` 只剩**搜索器自己打分**用
-- **搜索器** = `lua/py_composer.lua` + `data/gram/compose_table.bin`（27 万条统一码表：五笔+拼音）
+- **搜索器** = `lua/py_composer.lua` + `data/gram/compose_table.bin`（27 万条统一码表：五笔+拼音）；
+  beam 状态**按输入前缀增量缓存**（§4.50）：每键 O(1 个位置)，判定不变（52 字母单例 60s→11.9s）
 - 命名规则：内容同时含五笔与拼音 → `egret_wubi_py_*`；只五笔 → `egret_wubi_*`；只拼音 → `egret_py_*`
 - 三个库：`egret_wubi_py`（混流主方案）/ `egret_py`（纯全拼，F4 可切）/ `egret_wubi`（内部辅助 schema）
 
@@ -95,9 +99,8 @@ engine.segmentors
 
 ## 6. 待办（按价值排序）
 
-1. **搜索器 beam 打分改用 `M.score`**：现场验证过 —— 句级打分把 `画上小天使们`(-30646) 判得比
-   `花上小天师门`(-35748) 高 5102 分 ✓，而搜索器现在的"词一元 + 上下文增益"混合会被词一元压过 ✗。
-   这是修**近音错字**（长句残余错误的主类）最直接的一步。
+1. ~~搜索器 beam 打分改用 `M.score`~~ — **❌ 已证否（§4.49）**：搜索器不在决策路径上，改打分＝0 收益＋每键 ×3。
+   同类工作已改为「不改判定、只降成本」：**增量缓存已落地（§4.50）**。
 2. **词级 LM 之外的残余近音错误**：模型能力边界（`梅西方` vs `美西方` 之类）。
 3. **400MB gram 的交付**：目前不随包分发（用户自行下载）；应在部署/自检里加**存在性校验 + 提示**。
 4. **dist/bundle 重打**：现有 `dist/*.tar.gz` 不含本轮全部修复。

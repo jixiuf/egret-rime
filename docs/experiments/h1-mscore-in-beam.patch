@@ -1,0 +1,29 @@
+diff --git a/lua/py_composer.lua b/lua/py_composer.lua
+index 3fb10f5..fbab285 100644
+--- a/lua/py_composer.lua
++++ b/lua/py_composer.lua
+@@ -15,6 +15,7 @@
+ local M = {}
+ 
+ local by_key = {}       -- 码前缀 -> 候选条目
++local WORD_ALPHA = 0.0      -- 词一元的小权重（0 = 纯句级 LM；可试 0.05~0.3）
+ local LOG_N = 20200        -- log(语料总词数)*1000，由 py_meta.txt 覆盖
+ 
+ -- 载入归一化常数
+@@ -166,9 +167,13 @@ function M.compose(input, lm, beam, want)
+                         for _, w in ipairs(list) do
+                             if rest:sub(1, #w.code) == w.code then
+                                 local epos = pos + #w.code
+-                                local lms = lm and lm.score_segment(path.ctx, w.text) or 0
+-                                -- 词的一元语言模型：log P(w) = log f(w) - log N
+-                                local sc = path.score + (w.weight - LOG_N) + lms
++                                -- 打分：主项用**句级** LM 分（M.score，评测验证过的那个；见 §4.43/§4.45：
++                                -- 「画上小天使们」比「花上小天师门」高 5102 分），词的一元作为可调的小权重修正。
++                                -- 为什么不全用词一元：它会把正确信号压过去（近音错字的主因）。
++                                local cand_text = path.text .. w.text
++                                local sfull = (lm and lm.score) and lm.score(cand_text) or nil
++                                local wterm = (w.weight - LOG_N) * WORD_ALPHA
++                                local sc = (sfull and (sfull + wterm)) or (path.score + (w.weight - LOG_N))
+                                 local nb = best[epos]
+                                 if not nb then nb = {}; best[epos] = nb end
+                                 -- 上下文按**字符**保留（按字节切会截断 UTF-8）

@@ -28,6 +28,21 @@ if not ok then print("  ✗ 码表加载失败: " .. tostring(info)); os.exit(1)
 assert(info:find("码表包"), "  读端没有用上 .bin（当前: " .. tostring(info) .. "）")
 
 local bad_key, bad_entry, checked, keys = 0, 0, 0, 0
+-- 契约：`py_composer` 的 MAX_CODE_LEN（增量缓存的回扫窗口宽）必须 ≥ 码表最长码长，
+-- 否则「跨到新字符才成立」的长码会被漏掉（这类隐式上界错过一次就极难定位）。
+local MAX_CODE_LEN_OK = 16
+local max_code_len = 0
+for key, list in pairs(ref) do
+    for _, e in ipairs(list) do
+        if #e.code > max_code_len then max_code_len = #e.code end
+    end
+end
+if max_code_len > MAX_CODE_LEN_OK then
+    print(string.format("  ✗ 码表最长码 %d > py_composer 的 MAX_CODE_LEN(%d)：请同步上调",
+                        max_code_len, MAX_CODE_LEN_OK))
+    os.exit(1)
+end
+print(string.format("  ✓ 码表最长码 %d ≤ MAX_CODE_LEN(%d)", max_code_len, MAX_CODE_LEN_OK))
 for key, list in pairs(ref) do
     keys = keys + 1
     local got = cp.lookup(key)

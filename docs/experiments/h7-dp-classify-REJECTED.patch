@@ -1,0 +1,171 @@
+diff --git a/lua/mix_segmentor.lua b/lua/mix_segmentor.lua
+index 1f8b50a..d887b64 100644
+--- a/lua/mix_segmentor.lua
++++ b/lua/mix_segmentor.lua
+@@ -11,6 +11,10 @@
+ --   · add_segment 的段必须与"当前 start"对齐；下一段前先 forward()
+ --   · 段对象用 Segment(s, e) 构造，tags 必须 **set 形式**（{[tag]=true}，数组会报错）
+ --   · 出错会中断方案（一个候选都没有），所以全程 pcall 兜底；正常返回 true
++--
++-- 读法判定（§4.49）：用 `py_composer.classify`（确定性纯权重 DP，精确码二分 + 增量缓存），
++-- **不再跑 LM beam** —— 旧实现为了判一个 tag 要对每个前缀跑一次 beam，而 beam 每位置都要
++-- 全量扫 by_key[2字前缀]（平均 406 条、最多 4766 条），52 字母输入光搜索器就 52 s。
+ local M = {}
+ 
+ -- 读 py_meta.txt 里的 total_tokens（搜索器的一元归一化常数）。
+@@ -36,11 +40,9 @@ function M.init(env)
+     M.debug = cfg:get_bool("mix_segmentor/debug")
+     M.min_len = cfg:get_int("mix_segmentor/min_len") or 4
+     if not M.enabled then return end
+-    local ok1, lm = pcall(require, "lm_rerank")
+-    local ok2, cp = pcall(require, "py_composer")
+-    if ok1 and ok2 then
+-        M.lm, M.composer = lm, cp
+-        lm.load("lm_rerank.tsv")     -- 搜索器自己的字级表（引擎已改用万象 grammar，见 §4.44）
++    local ok1, cp = pcall(require, "py_composer")
++    if ok1 then
++        M.composer = cp
+         local dir = rime_api.get_user_data_dir()
+         local okload, info = cp.load(dir)
+         if M.debug then log.error("[MIXSEG] 码表: " .. tostring(info)) end
+@@ -50,7 +52,7 @@ function M.init(env)
+ end
+ 
+ function M.func(seg, env)
+-    if not M.enabled or not M.composer or not M.lm then return true end
++    if not M.enabled or not M.composer then return true end
+     local ok = pcall(function()
+         local inp = seg.input
+         local s = seg:get_current_start_position()
+@@ -59,25 +61,18 @@ function M.func(seg, env)
+             log.error(string.format("[MIXSEG] enter inp=%s s=%s e=%s", tostring(inp), tostring(s), tostring(e)))
+         end
+         if not inp or e - s < M.min_len or not inp:match("^[a-z]+$") then return end
+-        local res = M.composer.compose(inp, M.lm, 8, 1)
+-        local best = res and res[1]
+-        if not best or not best.pieces or #best.pieces == 0 then return end
++        -- 读法判定：确定性纯权重 DP（py_composer.classify：无 LM、增量缓存，见 §4.49）
++        local tag = M.composer.classify(inp)
++        if not tag then return end
++        if M.debug then
++            log.error(string.format("[MIXSEG] %s | 整串 %s，补 %s tag", inp, tag, tag))
++        end
+         -- 结论（实测）：rime 里**段就是组字/上屏的单位**，段与段是顺序确认的，
+         -- 不会合并成一句话 —— 所以"把输入切成多段"会直接碎掉（nihaoma -> 吗）。
+         -- 正确用法：**不切段**，只在"整串被判为五笔读法"时，用等长 add_segment
+         -- 给整段**补一个 wubi tag**（与 abc 段取并集）→ 绑 wubi 的 translator
+         -- 就能在同一候选表里加入五笔读法的候选（其 initial_quality 高，会置顶）。
+         -- 判断整串的读法：全五笔 -> 补 wubi；全拼音 -> 补 py（对称）
+-        local all_wubi, all_py = true, true
+-        for _, p in ipairs(best.pieces) do
+-            if p.kind ~= "wubi" then all_wubi = false end
+-            if p.kind ~= "pinyin" then all_py = false end
+-        end
+-        local tag = all_wubi and "wubi" or (all_py and "py") or nil
+-        if not tag or #best.pieces < 2 then return end
+-        if M.debug then
+-            log.error(string.format("[MIXSEG] %s -> %s | 整串 %s，补 %s tag", inp, best.text, tag, tag))
+-        end
+         local ns = Segment(s, e)
+         ns.tags = { [tag] = true }
+         seg:add_segment(ns)          -- 等长 → tags 并集 {abc, wubi}
+diff --git a/lua/py_composer.lua b/lua/py_composer.lua
+index 3fb10f5..5c5473a 100644
+--- a/lua/py_composer.lua
++++ b/lua/py_composer.lua
+@@ -90,6 +90,27 @@ local function pack_prefix(key)
+     return #out > 0 and out or nil
+ end
+ 
++-- 精确码查找（二分）：DP 判定读法用。
++-- 为什么不用 by_key 前缀桶：2 字前缀平均返回 **406 条**、最多 4766 条（"ji"），
++-- 搜索器在每个位置 × 每条路径都全量扫一遍 —— 这才是长输入 1~2 s/键的真正来源。
++local function pack_exact(code)
++    if not pack then return nil end
++    local lo, hi = 0, pack.count - 1
++    while lo <= hi do
++        local mid = math.floor((lo + hi) / 2)
++        if byte_lt(rec_at(mid), code) then lo = mid + 1 else hi = mid - 1 end
++    end
++    local out
++    for i = lo, pack.count - 1 do
++        local c, kind, w = rec_at(i)
++        if c ~= code then break end
++        out = out or {}
++        out[#out + 1] = { kind = (kind == 0) and "wubi" or (kind == 1) and "pinyin" or nil,
++                          weight = w }
++    end
++    return out
++end
++
+ local function load_pack(path)
+     local f = io.open(path, "rb")
+     if not f then return false, "compose_table.bin 缺失" end
+@@ -140,6 +161,67 @@ function M.load(dir)
+     return true, string.format("码表 %d 条", n)
+ end
+ 
++-- ----------------------------------------------------------------
++-- 读法判定（mix_segmentor 用）：确定性纯权重 DP，**不跑 LM**，且**增量**。
++--
++-- 为什么换掉 beam：旧路径为了判「整串算五笔还是拼音」，对**每个前缀**都跑一次
++-- beam search，而 beam 在每个位置都要把 by_key[2字前缀]（平均 406 条、最多 4766 条）
++-- 全量扫一遍 → 52 字母输入光搜索器就 52 s（每键约 1 s）。
++-- 判定其实只需要「最优覆盖路径的段读法」，是个标准最短路：
++--   w(段) = 词权重 - LOG_N（与旧打分项一致），dp[j] = max(dp[i-1] + w)
++-- 用**精确码二分**取候选（每位置最多 MAXL 次查找），并把 dp 前向数组按输入前缀缓存，
++-- 于是每键只需补算新增的那一个位置。
++local MAX_CODE_LEN = 15      -- 与 compose_table 的最大码长一致（jiangshangzhang）
++local cls = { input = "", score = { [0] = 0 }, from = {} }
++
++local function cls_reset()
++    cls.input = ""
++    cls.score = { [0] = 0 }
++    cls.from = {}
++end
++
++--- 判整串读法：全五笔 -> "wubi"，全拼音 -> "py"，混合/单段/不可覆盖 -> nil。
++-- 语义与原先「取最优路径的段读法 + 至少 2 段」完全一致，只是换成精确最优解。
++function M.classify(input)
++    if not pack or not input or #input < 2 then return nil end
++    if cls.input == "" or input:sub(1, #cls.input) ~= cls.input then cls_reset() end
++    for j = #cls.input + 1, #input do
++        local best, bf
++        for L = 1, math.min(MAX_CODE_LEN, j) do
++            local i = j - L + 1
++            local s = cls.score[i - 1]
++            if s then
++                local ents = pack_exact(input:sub(i, j))
++                if ents then
++                    for _, e in ipairs(ents) do
++                        local v = s + (e.weight - LOG_N)
++                        if not best or v > best then
++                            best, bf = v, { prev = i - 1, kind = e.kind }
++                        end
++                    end
++                end
++            end
++        end
++        cls.score[j] = best
++        cls.from[j] = bf
++    end
++    cls.input = input
++    if not cls.score[#input] then return nil end
++    local all_wubi, all_py, npieces, j = true, true, 0, #input
++    while j and j > 0 do
++        local f = cls.from[j]
++        if not f then return nil end
++        npieces = npieces + 1
++        if f.kind ~= "wubi" then all_wubi = false end
++        if f.kind ~= "pinyin" then all_py = false end
++        j = f.prev
++    end
++    if npieces < 2 then return nil end
++    if all_wubi then return "wubi" end
++    if all_py then return "py" end
++    return nil
++end
++
+ --- 候选整句搜索。
+ -- @param input 纯小写字母串
+ -- @param lm    lm_rerank 模块（提供 score_segment(context, text)）
