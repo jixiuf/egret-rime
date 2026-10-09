@@ -281,13 +281,31 @@ sudo emerge -1 '=app-i18n/librime-1.17.0'     # 同时重建 lua / octagram 插�
    可能留下与 1.16 不兼容的产物。用 scratch 目录 + 软链用户文件（build 用 scratch 自己的）。
 5. 首次在全新 scratch 目录里 deploy 可能报 `[deploy] failure`，再跑一次（或显式
    `rime_deployer --build`）即可；`build` 目录保留着就是热重建，别每次 `rm -rf`。
-6. **认证：`ssh-add -l` 成功 ≠ 能签名**。之前 find_agent 只看 `ssh-add -l`，会选中
-   转发进来的 gpg-agent socket（socket 属主是 sshd，处于 restricted 模式 / 需远端
-   pinentry 确认）→ 握手时 `signing failed: agent refused operation`，scp 直接失败。
-   修法：用**一次真实握手**（`ssh ... true`）挑认证方式，顺序 agent socket → 本地
-   私钥（`EGRET_SSH_KEY` → `~/.ssh/id_rsa` → `/export/vmacs/dots/ssh/id_rsa`）→
-   自起 ssh-agent。本机可用私钥是 vmacs dotfiles 里的那个（与转发 agent 里的同一把，
-   `3072 SHA256:S/+8/2y04…`）；`ssh -i` 直连 `localhost:8092` 通，不需要 agent。
+6. **认证：`ssh-add -l` 成功 ≠ 能签名**，而且**本机根本没有能签 host-mac 的 agent**
+   （2026-10-09 查清并改为**纯 agent**，下列结论都是实测）：
+   - 8092 那条隧道会话（本机 sshd 子进程 `sshd: admin`，无 tty）**没带 `-A`**：本机
+     没有 `/tmp/ssh-*/agent.<该 sshd pid>`。同一机器上 `-A` 本身是通的（本机 sshd
+     `AllowAgentForwarding yes`；现存 `/tmp/ssh-arbsXpy5A2/agent.3279782` 就是一次带
+     `-A` 的转发，只是那次的 agent 没装钥匙：“The agent has no identities.”）。
+   - `/run/user/1000/gnupg/S.gpg-agent.ssh`（gpgconf 认定的标准路径）**是失效端点**：
+     socket 文件在，`ssh-add -l` 报 `Connection refused`。
+   - 本机那个活着的 gpg-agent（`--homedir /export/ebook/tools/gnupg`）**homedir 已被删**
+     → 退到 `d.<hash>/S.gpg-agent*`，报 `agent refused operation` / `invalid format`，是空壳；
+     而 Mac 侧 authorized_keys 认的是 **openpgp 钥匙**（`3072 SHA256:S/+8/2y04…`），
+     只有 gpg-agent 能签 —— 它在 Mac 上，从没被转发进来。
+   - `~/.ssh/config` 里 `Host host-mac` 那两条 `RemoteForward` **方向恰好反了**：
+     `RemoteForward <远端 socket> <本地 socket>`，写的是「远端=/Users/...（Mac）,
+     本地=/run/user/1000/...（本机）」= 把本机 agent 推给 Mac；我们要的是反向。
+   - 脚本现在**纯 agent**：候选 = `$SSH_AUTH_SOCK` → `gpgconf --list-dir agent-ssh-socket`
+     → `/run/user/<uid>/gnupg/S.gpg-agent.ssh` → 各 `/tmp/ssh-*/agent.*`（去重、标来源），
+     每个都用**真实握手**（`ssh ... true`）判定；全失败则打印诊断 + Mac 侧修法后 exit 1。
+     **不再读任何私钥文件**（用户要求：不碰 `/export/vmacs/dots/ssh/`），也不再自起 ssh-agent
+     （旧版本 `eval $(ssh-agent -s)` 会泄漏常驻进程——2026-10-09 清掉 6 个）。
+   - 要让它能跑，须在 Mac 上重连隧道时带上 agent：
+     `export SSH_AUTH_SOCK=$(gpgconf --list-dir agent-ssh-socket)` 后
+     `ssh -N -A -R 8092:localhost:22 admin@<本机>`；或反向转发 socket：
+     `ssh -N -R 8092:localhost:22 -R /run/user/1000/gnupg/S.gpg-agent.ssh:<Mac 的 gpg-agent.ssh> admin@<本机>`
+     （本机 sshd 已 `StreamLocalBindUnlink yes`，会顶掉失效 socket）。
 7. **“自检全 ✗、候选为空”大多不是词库问题**，两个已踩过的原因：
    a. 部署清单漏了 lua 组件：schema 引用了 `lua_filter@*compose_filter`、
       `dynamic_translator` 又 `require("py_composer")`，而清单只同步了

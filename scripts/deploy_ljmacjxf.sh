@@ -7,6 +7,8 @@
 #   * 目标机 host-mac（Darwin arm64），ssh 走本机 agent 转发：jixiuf@localhost:8092
 #   * Rime 用户目录：~/Library/Rime（Squirrel）
 #   * 共享数据：/Library/Input Methods/Squirrel.app/Contents/SharedSupport
+#   * 认证：**纯 agent**（不读私钥文件）——需要 Mac 侧把 agent 转发进本机，
+#     见脚本中段注释；失败的诊断信息会打印具体修法
 #   * 重新部署：Squirrel 自带 rime_deployer --build（**默认不重启 Squirrel**，
 #     文件到位即可；Squirrel 菜单“重新部署”或下次登录即生效；需要立即重启加 --restart）
 #   * 自检：~/repos/librime/build/bin/rime_api_console（1.17）
@@ -53,63 +55,75 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# --- 选认证方式：能签名的 agent socket，或本地私钥 ---------------------------
-# 注意：`ssh-add -l` 成功 ≠ 能签名。远端转发进来的 gpg-agent（socket 属主是
-# sshd）通常处于 restricted 模式，或签名时要在远端 pinentry 上确认 → 握手时报
+# --- 认证：**纯 agent**，不读任何私钥文件 ------------------------------------
+# 硬约束（用户要求）：本脚本不碰 /export/vmacs/dots/ssh/ 等目录里的私钥文件，
+# 只用 agent socket 签名。因此依赖「Mac 侧把 agent 转发进本机」：
+#   A) Mac: export SSH_AUTH_SOCK=$(gpgconf --list-dir agent-ssh-socket)
+#           ssh -N -A -R 8092:localhost:22 admin@<本机>
+#   B) Mac: ssh -N -R 8092:localhost:22 \
+#             -R /run/user/1000/gnupg/S.gpg-agent.ssh:$HOME/.gnupg/S.gpg-agent.ssh admin@<本机>
+# 本机 sshd 已允许（AllowAgentForwarding yes / StreamLocalBindUnlink yes）。
+#
+# 注意：`ssh-add -l` 成功 ≠ 能签名。转发进来的 gpg-agent（socket 属主是 sshd）
+# 可能处于 restricted 模式，或签名时要在 Mac 上 pinentry 确认 → 握手报
 # "sign_and_send_pubkey: signing failed: agent refused operation"。
-# 所以这里用一次**真实握手**（ssh ... true）来挑认证方式，顺序：
-#   1) 真能签名的 agent socket（本机开着带 agent 转发的 ssh 会话时）
-#   2) 本地落地私钥（EGRET_SSH_KEY → ~/.ssh/id_rsa → vmacs dots/ssh/id_rsa）
-#   3) 都没有时自起一个 ssh-agent 并加载候选私钥
+# 所以每个候选都用一次**真实握手**（ssh ... true）来判定，而不是看 ssh-add -l。
 PORT_OPTS=(-p "$PORT" -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10)
-KEY_CANDIDATES=(
-  "${EGRET_SSH_KEY:-}"
-  "$HOME/.ssh/id_rsa"
-  "/export/vmacs/dots/ssh/id_rsa"
-)
-SSH_ID_ARGS=()
-AUTH_DESC=""
 
-for s in /tmp/ssh-*/agent.* /run/user/"$(id -u)"/gnupg/S.gpg-agent.ssh; do
+declare -A _seen=()
+AGENT_CANDIDATES=()
+add_agent() {  # add_agent <socket 路径> <来源说明>
+  [ -n "$1" ] || return 0
+  [ -n "${_seen[$1]:-}" ] && return 0
+  _seen[$1]=1
+  AGENT_CANDIDATES+=("$1|$2")
+}
+add_agent "${SSH_AUTH_SOCK:-}"                                        "SSH_AUTH_SOCK 环境变量"
+add_agent "$(gpgconf --list-dir agent-ssh-socket 2>/dev/null)"         "gpgconf agent-ssh-socket"
+add_agent "/run/user/$(id -u)/gnupg/S.gpg-agent.ssh"                  "gpg-agent 标准路径"
+for s in /tmp/ssh-*/agent.*; do
+  [ -S "$s" ] && add_agent "$s" "sshd 转发（会话 pid ${s##*.}）"
+done
+
+AUTH_DESC=""
+for e in "${AGENT_CANDIDATES[@]}"; do
+  s="${e%%|*}"
   [ -S "$s" ] || continue
   SSH_AUTH_SOCK="$s" timeout 5 ssh-add -l >/dev/null 2>&1 || continue
   if SSH_AUTH_SOCK="$s" timeout 20 ssh "${PORT_OPTS[@]}" "$HOST" true >/dev/null 2>&1; then
     export SSH_AUTH_SOCK="$s"
-    AUTH_DESC="agent socket $s"
+    AUTH_DESC="$s（${e##*|}）"
     break
   fi
 done
 
 if [ -z "$AUTH_DESC" ]; then
-  for k in "${KEY_CANDIDATES[@]}"; do
-    [ -f "$k" ] || continue
-    if timeout 20 ssh "${PORT_OPTS[@]}" -o IdentitiesOnly=yes -i "$k" "$HOST" true >/dev/null 2>&1; then
-      SSH_ID_ARGS=(-i "$k" -o IdentitiesOnly=yes)
-      AUTH_DESC="本地私钥 $k"
-      break
-    fi
-  done
+  { echo "找不到可用 agent（纯 agent 模式：不读私钥文件）"
+    echo
+    echo "候选 agent socket 现状："
+    for e in "${AGENT_CANDIDATES[@]}"; do
+      s="${e%%|*}"; src="${e##*|}"
+      if [ -S "$s" ]; then
+        ids="$(SSH_AUTH_SOCK="$s" timeout 5 ssh-add -l 2>&1 | tr '\n' ' ')"
+        printf '  %-45s [%s]  →  %s\n' "$s" "$src" "${ids:-（握手/连接失败）}"
+      else
+        printf '  %-45s [%s]  →  不存在\n' "$s" "$src"
+      fi
+    done
+    echo
+    echo "  修法：在 Mac 上重连隧道时把 agent 带进来（本机 sshd 已允许转发）："
+    echo "        （注意 ~/.ssh/config 里 Host host-mac 那两条 RemoteForward 方向是\"把本机 agent 推给 Mac\"，恰好反了）"
+    echo "    A) export SSH_AUTH_SOCK=\$(gpgconf --list-dir agent-ssh-socket)"
+    echo "       ssh -N -A -R 8092:localhost:22 admin@$(hostname -I 2>/dev/null | awk '{print $1}')"
+    echo "    B) ssh -N -R 8092:localhost:22 \\"
+    echo "         -R /run/user/$(id -u)/gnupg/S.gpg-agent.ssh:$HOME/.gnupg/S.gpg-agent.ssh admin@$(hostname -I 2>/dev/null | awk '{print $1}')"
+  } >&2
+  exit 1
 fi
+echo "==> 认证: agent socket $AUTH_DESC（已用真实握手验证；纯 agent，未读任何私钥文件）"
 
-if [ -z "$AUTH_DESC" ]; then
-  echo "==> 没有可用 agent/私钥，自起 ssh-agent 并加载候选私钥"
-  eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
-  for k in "${KEY_CANDIDATES[@]}"; do
-    [ -f "$k" ] || continue
-    ssh-add "$k" >/dev/null 2>&1 || continue
-    if timeout 20 ssh "${PORT_OPTS[@]}" "$HOST" true >/dev/null 2>&1; then
-      AUTH_DESC="新起的 ssh-agent + $k"
-      break
-    fi
-  done
-fi
-
-[ -n "$AUTH_DESC" ] || {
-  echo "找不到可用认证方式（agent 转发/本地私钥握手都失败）：ssh $HOST"; exit 1; }
-echo "==> 认证: $AUTH_DESC（已用真实握手验证）"
-
-SSH="ssh ${PORT_OPTS[*]}${SSH_ID_ARGS[*]+ ${SSH_ID_ARGS[*]}}"
-SCP="scp -P $PORT -o BatchMode=yes -o StrictHostKeyChecking=accept-new${SSH_ID_ARGS[*]+ ${SSH_ID_ARGS[*]}}"
+SSH="ssh ${PORT_OPTS[*]}"
+SCP="scp -P $PORT -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
 
 # --- 远端只读探测 -----------------------------------------------------------
 probe() {
@@ -132,7 +146,7 @@ echo "  输入法进程: $(pgrep -x Squirrel >/dev/null && echo "Squirrel pid $(
 for d in "$HOME/vmacs/rime" "$HOME/repos/egret-rime"; do
   [ -d "$d/.git" ] && echo "  $d: $(git -C "$d" rev-parse --short HEAD 2>/dev/null) ($(git -C "$d" status --short 2>/dev/null | wc -l | tr -d ' ') 个改动)"
 done
-echo "  词库现状: $(ls "$R/dicts/egret_wubi_py"/ 2>/dev/null | wc -l | tr -d ' ') 个文件; lm_rerank.tsv $([ -e "$R/lm_rerank.tsv" ] && echo 有 || echo 无)"
+echo "  词库现状: $(ls "$R"/dicts/egret_wubi_py_*.dict.yaml 2>/dev/null | wc -l | tr -d ' ') 个 egret_wubi_py 词库; lm_rerank.bin $([ -e "$R/dicts/lm_rerank.bin" ] && echo 有 || echo 缺)"
 PROBE
 }
 
@@ -243,7 +257,7 @@ while IFS= read -r f; do
   cp -f "/tmp/egret/$f" "$R/$f"
   CNT=$((CNT+1))
 done < <(cd /tmp/egret && find . -type f)
-echo "        更新 $CNT 个文件；lm_rerank.tsv: $([ -e "$R/lm_rerank.tsv" ] && echo 有 || echo 缺)"
+echo "        更新 $CNT 个文件；lm_rerank.bin/meta: $([ -e "$R/dicts/lm_rerank.bin" ] && [ -e "$R/dicts/lm_rerank.meta" ] && echo 有 || echo 缺)"
 echo "        剩余指向 vmacs 的软链: $(ls "$R" | while read -r x; do [ -L "$R/$x" ] && readlink "$R/$x" | grep -q vmacs && echo "$x"; done | tr '\n' ' ')(预期只剩 *.gram)"
 
 echo "  [4/5] 重建（Squirrel 自带 rime_deployer；不动 Squirrel 进程）"
@@ -334,7 +348,7 @@ for c in "e=有" "q=我" "yi=就" "tffu=等" "khlg=中国" \
          "qktnqnr=我吃饭" "qchifanle=我吃饭了" "uwycuklf=冷部署" "trwuktnqnr=我们吃饭"; do
   code="${c%%=*}"; want="${c##*=}"
   got="$(printf '%s\n\n' "$code" | "$BIN/rime_api_console" 2>/dev/null \
-         | grep -m1 -E '^1\. \[' | sed 's/^1\. \[//;s/\]$//')"
+         | grep -m1 -E '^1\. \[' | sed 's/^1\. \[//; s/\]\( .*\)\{0,1\}$//')"
   if [ "$got" = "$want" ]; then mark="✓"; else mark="✗"; fi
   printf '%-28s 期望 %-14s 实际 %-14s %s\n' "$code" "$want" "${got:-?}" "$mark"
   # console 运行会改写 previously_selected_schema，每条用例后重置
