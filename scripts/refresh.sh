@@ -183,6 +183,10 @@ for i in "${!STAGES[@]}"; do
       fi
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
+      # 五笔长尾（§4.60）：86 造词码家族没有长尾（base==full==6.3万词），
+      # 把万象长尾的二字词按自举的字码表转成 86 词组码，让五笔能打出罕见词。
+      "$PY" "$ROOT/scripts/gen_wubi_86_longtail.py" >>"$RUNLOG" 2>&1 \
+        && ok "五笔 86 长尾词已生成（约 8.3 万条，可复现）" || warn "五笔长尾生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "已切到 $TIER 档" || warn "切档失败"
       # 长尾拼音词（§4.55）：base 档只收权重 >=451 的词，451 以下的长尾在纯拼音路径上
