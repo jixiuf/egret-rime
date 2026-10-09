@@ -319,11 +319,11 @@ else
     # → 候选为空（自检全 ✗ 的常见假故障）
     BIN="$HOME/repos/librime/build/bin"
     for f in default.yaml symbols.yaml essay.txt; do
-      [ -e "$CHK/$f" ] || ln -sfn "$BIN/$f" "$CHK/$f"
+      ln -sfn "$BIN/$f" "$CHK/$f"      # 无条件覆盖：shared_data_dir="." 时缺它 schema 构建会中止
     done
     reset_schema() {
       [ -f "$R/user.yaml" ] || return 0
-      sed -i '' -e 's/^previously_selected_schema: .*/previously_selected_schema: egret_wubi_py/' \
+      sed -i '' -e 's/^[[:space:]]*previously_selected_schema: .*/  previously_selected_schema: egret_wubi_py/' \
           "$R/user.yaml" 2>/dev/null
     }
     # console 会改写 previously_selected_schema，测前先固定
@@ -352,7 +352,7 @@ for c in "e=有" "q=我" "yi=就" "tffu=等" "khlg=中国" \
   if [ "$got" = "$want" ]; then mark="✓"; else mark="✗"; fi
   printf '%-28s 期望 %-14s 实际 %-14s %s\n' "$code" "$want" "${got:-?}" "$mark"
   # console 运行会改写 previously_selected_schema，每条用例后重置
-  sed -i '' -e 's/^previously_selected_schema: .*/previously_selected_schema: egret_wubi_py/' \
+  sed -i '' -e 's/^[[:space:]]*previously_selected_schema: .*/  previously_selected_schema: egret_wubi_py/' \
       "$R/user.yaml" 2>/dev/null
 done
 echo "EGRET-CHECK-DONE"
