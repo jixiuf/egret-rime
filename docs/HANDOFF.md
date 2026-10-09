@@ -105,10 +105,12 @@ engine.segmentors
 3. **400MB gram 的交付**：目前不随包分发（用户自行下载）；应在部署/自检里加**存在性校验 + 提示**。
 4. **dist/bundle 重打**：现有 `dist/*.tar.gz` 不含本轮全部修复。
 5. **目标机复验**：host-linux（Gentoo+fcitx5）/ host-mac（macOS+Squirrel）——本轮改动多，需重新部署并跑自检。
-6. **拆掉 librime-lua 关闭期 GC 活锁**（§4.50）：`RimeFinalize → Lua::~Lua → luaC_fullgc → singlestep`
-   概率性活锁，是搜索器所有更快变体的共同阻塞点（已验证：前缀桶记忆化 52 字母 11.9s→7.7s，
-   但 32 字母用例 3/3 挂死；变体存档 `docs/experiments/h7-bucket-memo-REJECTED.patch`）。
-7. **评测集分层/扩样**；评测口径先把「超时」与「真错」分开（长输入 120s 超时会把延迟记成品错误）。
+6. **拆掉 librime-lua 关闭期 GC 活锁**（§4.51）：**已定位根因 + 提上游 PR #435**
+   （`lua_gears.cc` 每 256 次析构做一次全量 GC，在 `lua_close` 期间重入 → 活锁）。
+   本地已打补丁并重建（32 字母用例 挂死→3.35s）。剩下：合并后 bump pin（或 setup 加本地 patch），
+   再把前缀桶记忆化落地（已验证 52 字母 11.9→7.8s，存档 `docs/experiments/h7-bucket-memo-pending-pin-bump.patch`）。
+7. **评测集分层/扩样**；评测口径先把「超时」与「真错」分开（长输入 120s 超时会把延迟记成品错误；
+   也存在 **exit 挂死被记成 None** 的情况——同上 PR 修后可消）。
 
 ## 7. 环境地图
 

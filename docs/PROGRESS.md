@@ -1516,10 +1516,62 @@ gdb bt: main → RimeFinalize → Registry::Clear → ~LuaComponent<LuaTranslato
 
 ⇒ **下一个 1.5~3× 全部卡在同一个 librime-lua 关闭期 GC 死锁上**（上面的 gdb 栈）；
 它还是**概率性**的（加 GC step 后同输入 1/2 成功），说明是 GC 状态相关的活锁，不是确定性死循环。
-变体已归档 `docs/experiments/h7-bucket-memo-REJECTED.patch`。
+变体已归档 `docs/experiments/h7-bucket-memo-pending-pin-bump.patch`。
 **这是目前性价比最高的后续项**：拆掉它就能把搜索器再降一档（估计总共 10~20×）。
 
 （另：`lua_segmentor` 没有 `fini` 钩子（`lua_segmentor.cc` 无 fini），所以"关闭前清缓存"这条捷径走不通。）
+
+### 4.51 ⭐⭐⭐ H9 破案：关闭期 GC 活锁的根因是 `lua_gears.cc` 里「每 256 次析构做一次全量 GC」
+
+§4.50 里所有更快变体都被同一个现象挡住：console 打印完候选后**不退出**（一个核 100%、RSS 恒定、
+`timeout` 的 SIGTERM 也杀不掉）。本轮用 gdb 拓到根因，并修到了**上游**。
+
+**根因（`librime-lua`，上下游 master 仍在）**：
+```cpp
+// src/lua_gears.cc
+LuaTranslation::~LuaTranslation() {
+  static std::atomic<unsigned int> counter {0};
+  int c = counter.fetch_add(1, std::memory_order_relaxed);
+  if (c % 256 == 0) lua_->gc();          // ← 全量 GC
+  else               lua_->gc_step(32);
+}
+```
+若这次析构发生在 **Lua 状态关闭过程中**（`Lua::~Lua` → `lua_close` → `luaC_freeallobjects` → 终结器），
+GC 本已正在跑 ⇒ `lua_gc(LUA_GCCOLLECT)` 是对它的**重入**调用 ⇒ Lua 5.3 的 GC 状态机活锁。
+计数器是**进程级全局**的 ⇒ 是否命中取决于「本次会话一共销毁了多少个 LuaTranslation」
+—— 这就是它看起来"随机"、且**改代码快慢就会碰到/碰不到**的原因（也是为什么 §4.50 里
+同一种改动有时好有时挂）。
+
+gdb 栈与之一一对应：
+```
+singlestep ← luaC_fullgc ← lua_gc ← ~LuaTranslation(_M_dispose)
+  ← LuaType<shared_ptr<Translation>>::gc ← GCTM ← luaC_freeallobjects ← close_state
+  ← Lua::~Lua ← ~LuaComponent<LuaTranslator> ← Registry::Clear ← RimeFinalize ← main
+```
+
+**修法（12 行，无行为改变）**：`Lua` 加 `closing_` 标志（`Lua::~Lua()` 在 `lua_close` 前置位），
+`LuaTranslation` 析构在 closing 时跳过 GC（关闭期统计 GC 本来就无意义）。
+
+**实测**（librime 1.17.0 + 本地重建插件；`rime_api_console` 喂整句拼音后退出）：
+
+| 用例 | 修复前 | 修复后 |
+|---|---|---|
+| 32 字母 `yiwangdeshi...` | **3/3 挂死**（>60s 被杀） | **3/3 正常，3.35 s** |
+| 52 字母 `duzhe...` | 11.9 s（且偶发挂死） | 7.8 s |
+| 黄金 33 | — | **33/33 ✓** |
+
+**已提交上游**：`hchunhui/librime-lua` → **PR #435**（基于上游 `6f30968`，`+12/-0`，3 文件）。
+本地 vendored 插件保持 **pin(`ad1e4a6`) + 该补丁（未提交）**，与已构建的 `librime.so` 一致。
+
+**后续（已解锁）**：§4.50 那两个更快变体现在能用了 —— 其中**前缀桶记忆化**已在本地验证通过
+（同表：32 字母 挂死→**3.35 s**、52 字母 11.9→**7.8 s**、黄金 33/33 ✓），
+但**未随包交付**：`make setup` 克隆的是 pin 的 `ad1e4a6`（不含修复），
+若把记忆化写进代码而新人重建环境就会回到活锁。选择：等 #435 合并后 bump pin，
+或在 `setup_env.sh` 里像 librime 那样加一条本地 patch 步骤。
+补丁存档：`docs/experiments/h7-bucket-memo-pending-pin-bump.patch`。
+
+> 另：这个活锁也会**污染评测** —— exit 挂死会被 `subprocess.run(timeout=...)` 记成 `None`，
+> 而它打的候选其实是对的（stdout 里已经有 `1. [...]`）。H8 的「超时 vs 真错」应一并把这条分开。
 
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
@@ -1540,7 +1592,7 @@ gdb bt: main → RimeFinalize → Registry::Clear → ~LuaComponent<LuaTranslato
 | **H6** | **长句准确率的真正着力点** | 决策路径在 `py_route`(script_translator) 的整句候选 + grammar 侧；改动/评测都应打在这里（§4.49 的教训） |
 | ~~H7~~ | ~~`mix_segmentor` + `py_composer` 提速~~ | **✅ 已落地（§4.50）**：beam 状态按输入前缀**增量缓存** + LM 增益记忆化 → 判定逐字节不变，单例 32 字 14.3s→5.5s、52 字 60s→11.9s；黄金 33/33。更强的「精确码二分」枚举已试→会触发 librime-lua 关闭期 GC 死循环，已回退 |
 | **H8** | 评测口径：区分「超时」与「真错」 | `eval_gram` 的 `None` 目前计入错误；长输入本来就慢 → 会把延迟记成品错误（§4.49 踩过）。另：`timeout` 发的 **SIGTERM 杀不掉卡住的 console**（实测残留进程 100% CPU 跑十分钟，直接污染后续评测，§4.50 踩过） |
-| **H9** | **拆掉 librime-lua 关闭期 GC 活锁**（性价比最高的下一步） | 它是 §4.50 里所有更快变体的共同阻塞点（`RimeFinalize → Lua::~Lua → luaC_fullgc → singlestep`，概率性、RSS 恒定）。拆掉后搜索器还能再降 1.5~20× |
+| **H9** | ~~拆掉 librime-lua 关闭期 GC 活锁~~ | **✅ 根因已定位 + 上游 PR #435**（§4.51）。剩下：等合并后 bump pin（或 setup 加本地 patch），再把前缀桶记忆化落地（已验证 52 字母 11.9→7.8s） |
 | H2 | 400MB gram 的**部署校验** | 目前不随包分发（用户自行下载）；应在部署/自检里加存在性检查 + 提示（缺它 = 无 LM） |
 | H3 | **dist/bundle 重打** + 目标机复验 | 现有 `dist/*.tar.gz` 不含本轮修复；host-linux / host-mac 都需重新部署跑自检 |
 | H4 | 扩展读法 | 现有 `wubi`/`py` 两个 tag；可再加「混合读法」等，见 `docs/schema-components.md §6` |
