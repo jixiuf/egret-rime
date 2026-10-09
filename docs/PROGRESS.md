@@ -1505,6 +1505,22 @@ gdb bt: main → RimeFinalize → Registry::Clear → ~LuaComponent<LuaTranslato
 **顺带踩到的坑**：`timeout` 发的 **SIGTERM 杀不掉卡住的 console**（实测残留进程 100% CPU 跑十几分钟），
 直接污染后续评测 —— 评测前先 `pkill -9 -f '[r]ime_api_console'`（用 `[r]` 避免 pkill 杀掉自己，见 §7）。
 
+**还能再快多少？（本轮试过、都被同一个 bug 卡住）**
+
+| 变体 | 52 字母单例 | 32 字母单例 | 结果 |
+|---|---|---|---|
+| 已落地（缓存 + LM 记忆化） | 11.9 s | 5.5 s | ✅ 稳定 |
+| + **前缀桶记忆化**（`by_key` 不再每次重建 406 条） | **7.7 s** | **挂死**（3/3） | ❌ |
+| + 精确码二分枚举 | （未测全） | **挂死**（3/3） | ❌ |
+| 上面 + 每键 `collectgarbage("step")` | 7.9 s | 3.3 s **但 2 次里挂 1 次** | ❌ 不可靠 |
+
+⇒ **下一个 1.5~3× 全部卡在同一个 librime-lua 关闭期 GC 死锁上**（上面的 gdb 栈）；
+它还是**概率性**的（加 GC step 后同输入 1/2 成功），说明是 GC 状态相关的活锁，不是确定性死循环。
+变体已归档 `docs/experiments/h7-bucket-memo-REJECTED.patch`。
+**这是目前性价比最高的后续项**：拆掉它就能把搜索器再降一档（估计总共 10~20×）。
+
+（另：`lua_segmentor` 没有 `fini` 钩子（`lua_segmentor.cc` 无 fini），所以"关闭前清缓存"这条捷径走不通。）
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。
@@ -1524,6 +1540,7 @@ gdb bt: main → RimeFinalize → Registry::Clear → ~LuaComponent<LuaTranslato
 | **H6** | **长句准确率的真正着力点** | 决策路径在 `py_route`(script_translator) 的整句候选 + grammar 侧；改动/评测都应打在这里（§4.49 的教训） |
 | ~~H7~~ | ~~`mix_segmentor` + `py_composer` 提速~~ | **✅ 已落地（§4.50）**：beam 状态按输入前缀**增量缓存** + LM 增益记忆化 → 判定逐字节不变，单例 32 字 14.3s→5.5s、52 字 60s→11.9s；黄金 33/33。更强的「精确码二分」枚举已试→会触发 librime-lua 关闭期 GC 死循环，已回退 |
 | **H8** | 评测口径：区分「超时」与「真错」 | `eval_gram` 的 `None` 目前计入错误；长输入本来就慢 → 会把延迟记成品错误（§4.49 踩过）。另：`timeout` 发的 **SIGTERM 杀不掉卡住的 console**（实测残留进程 100% CPU 跑十分钟，直接污染后续评测，§4.50 踩过） |
+| **H9** | **拆掉 librime-lua 关闭期 GC 活锁**（性价比最高的下一步） | 它是 §4.50 里所有更快变体的共同阻塞点（`RimeFinalize → Lua::~Lua → luaC_fullgc → singlestep`，概率性、RSS 恒定）。拆掉后搜索器还能再降 1.5~20× |
 | H2 | 400MB gram 的**部署校验** | 目前不随包分发（用户自行下载）；应在部署/自检里加存在性检查 + 提示（缺它 = 无 LM） |
 | H3 | **dist/bundle 重打** + 目标机复验 | 现有 `dist/*.tar.gz` 不含本轮修复；host-linux / host-mac 都需重新部署跑自检 |
 | H4 | 扩展读法 | 现有 `wubi`/`py` 两个 tag；可再加「混合读法」等，见 `docs/schema-components.md §6` |

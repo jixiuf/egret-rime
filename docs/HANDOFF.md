@@ -105,7 +105,10 @@ engine.segmentors
 3. **400MB gram 的交付**：目前不随包分发（用户自行下载）；应在部署/自检里加**存在性校验 + 提示**。
 4. **dist/bundle 重打**：现有 `dist/*.tar.gz` 不含本轮全部修复。
 5. **目标机复验**：host-linux（Gentoo+fcitx5）/ host-mac（macOS+Squirrel）——本轮改动多，需重新部署并跑自检。
-6. **评测集分层/扩样**；按键延迟预算（多读法/搜索器每键都要跑）。
+6. **拆掉 librime-lua 关闭期 GC 活锁**（§4.50）：`RimeFinalize → Lua::~Lua → luaC_fullgc → singlestep`
+   概率性活锁，是搜索器所有更快变体的共同阻塞点（已验证：前缀桶记忆化 52 字母 11.9s→7.7s，
+   但 32 字母用例 3/3 挂死；变体存档 `docs/experiments/h7-bucket-memo-REJECTED.patch`）。
+7. **评测集分层/扩样**；评测口径先把「超时」与「真错」分开（长输入 120s 超时会把延迟记成品错误）。
 
 ## 7. 环境地图
 
