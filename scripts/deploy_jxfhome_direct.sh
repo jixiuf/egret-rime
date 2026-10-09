@@ -131,15 +131,20 @@ echo "        librime: ${SYS_LIB:-（未找到，用 console 自带）}"
 # 每条输入**单独跑一次 console**（一次喂多行会让后一行的按键落进前一条还没提交的
 # 组字里，输出中途候选 → 假故障）；且跑两轮取第二轮（重建后首跑有冷启动竞态，
 # 见 docs/PROGRESS.md §4.18 测量纪律）。
+# 固定方案：console 按 user.yaml 的 previously_selected_schema 选方案。若不固定，
+# 用户切到 egret_py 时自检会**静默地测纯拼音**（五笔用例全错的假故障，macOS 侧踩过）。
+sed -i 's/^[[:space:]]*previously_selected_schema: .*/  previously_selected_schema: egret_wubi_py/' "$R/user.yaml" 2>/dev/null
 out=""
 for _pass in 1 2; do
   out=""
-  for _code in jintiandetianqizenmeyang wojintianmeiyoukong; do
+  # 加三条五笔/混流用例：只测拼音长句看不出「方案选错/五笔层坏」这类回归
+  for _code in jintiandetianqizenmeyang wojintianmeiyoukong tffu khlg qktnqnr; do
     r=$(LD_PRELOAD="$SYS_LIB" timeout 180 "$C" 2>/dev/null <<< "$_code
 " | grep -m1 -E "^1\. " | sed 's/^1\. \[//;s/\]$//')
     out="$out$r  "
   done
 done
 echo "        结果: $out（第 2 轮）"
+echo "        期望: 今天的天气怎么样 我今天没有空 等 中国 我吃饭"
 for f in /usr/share/rime-data/*; do b=$(basename "$f"); [ -L "$R/$b" ] && [ "$(readlink "$R/$b")" = "$f" ] && rm -f "$R/$b"; done
 REMOTE
