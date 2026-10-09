@@ -61,12 +61,27 @@ def char2codes(pairs):
     return {ch: cnt.most_common(1)[0][0] for ch, cnt in votes.items()}
 
 
-def gen86(word, c2):
-    """86 词组码（只支持 2 字词：本轮验证 100% 一致的那一类）"""
-    if len(word) != 2:
+def gen86(word, c2, rule3="std"):
+    """86 词组码。
+
+    三字词的码式**两种口径**（§4.61）：
+      std  —— 标准五笔：字1首码 + 字2首码 + 字3的两码（如 计算机 y+t+sm）
+      legacy—— 本仓库旧数据用的：字1两码 + 字2首码 + 字3首码
+    """
+    cs = [c2.get(ch) for ch in word]
+    if not cs or any(x is None for x in cs):
         return None
-    a, b = c2.get(word[0]), c2.get(word[1])
-    return a + b if a and b else None
+    n = len(cs)
+    if n == 1:
+        return None
+    if n == 2:
+        return cs[0] + cs[1]
+    if n == 3:
+        return (cs[0][:1] + cs[1][:1] + cs[2]) if rule3 == "std" \
+            else (cs[0] + cs[1][:1] + cs[2][:1])
+    if n == 4:
+        return "".join(c[:1] for c in cs)
+    return cs[0][:1] + cs[1][:1] + cs[2][:1] + cs[-1][:1]
 
 
 def top_candidates(code, cwd, timeout, want):
@@ -105,6 +120,9 @@ def main():
     ap.add_argument("--timeout", type=int, default=60)
     ap.add_argument("--weight-min", type=int, default=0)
     ap.add_argument("--weight-max", type=int, default=10 ** 9)
+    ap.add_argument("--word-len", type=int, default=2, help="采样词长（2 或 3）")
+    ap.add_argument("--rule3", default="std", choices=["std", "legacy"],
+                    help="三字词码式口径（std=标准 1+1+2；legacy=仓库旧数据 2+1+1）")
     ap.add_argument("--exclude-base", action="store_true",
                     help="排除 base 档已有的词（测「长尾缺口」时必须开，否则混入已覆盖的词）")
     args = ap.parse_args()
@@ -113,7 +131,7 @@ def main():
     c2 = char2codes([(w, c) for w, c, _ in ref])
     base_words = {w for w, _c, _wt in ref}
     pool = [(w, wt) for w, c, wt in load(args.src)
-            if args.weight_min <= wt <= args.weight_max and len(w) == 2
+            if args.weight_min <= wt <= args.weight_max and len(w) == args.word_len
             and (not args.exclude_base or w not in base_words)]
     # 按权重降序取前 3 倍，再随机采样（避免只测最高频，也避免全测碎片）
     pool.sort(key=lambda x: -x[1])
@@ -122,7 +140,7 @@ def main():
     rnd.shuffle(pool)
     cases, seen = [], set()
     for w, wt in pool:
-        code = gen86(w, c2)
+        code = gen86(w, c2, args.rule3)
         if code and code not in seen:
             seen.add(code)
             cases.append((code, w, wt))

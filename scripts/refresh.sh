@@ -181,6 +181,10 @@ for i in "${!STAGES[@]}"; do
       else
         ok "跳过整句词库（无 data/corpus，用仓库内已有产物）"
       fi
+      # 五笔三字词码式修正为**标准 1+1+2**（旧数据是 2+1+1，用户按标准打不出来，§4.61）。
+      # 幂等（已是标准码则 0 改动），必须在 gen_dict_tiers 之前跑。
+      "$PY" "$ROOT/scripts/fix_wubi_86_3char_codes.py" >>"$RUNLOG" 2>&1 \
+        && ok "五笔三字词码已核（标准 1+1+2）" || warn "三字词码修正失败"
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       # 五笔长尾（§4.60）：86 造词码家族没有长尾（base==full==6.3万词），

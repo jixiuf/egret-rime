@@ -87,6 +87,47 @@ for _lua in glob.glob("lua/*.lua"):
             continue
         print(f"  ✗ {_lua} 运行时读 {_fn}，但部署清单里没有"); err += 1
 
+# 2.8) 五笔 86 码口径契约（§4.61）：三字词必须是**标准** 1+1+2。
+#      本仓库旧数据用的是 2+1+1（如 爱可视 epsp），实测用户按标准码打三字词
+#      top1 = 0/50、top8 = 2% —— 肌肉记忆直接失效。改回旧口径会让这条又静默退化。
+_src = "dicts/egret_wubi_words_wb86_src.dict.yaml"
+if os.path.exists(_src):
+    import collections as _coll
+    _rows = []
+    _st = False
+    for _ln in open(_src, encoding="utf-8"):
+        if not _st:
+            if _ln.rstrip() == "...":
+                _st = True
+            continue
+        _f = _ln.rstrip("\n").split("\t")
+        if len(_f) >= 3 and _f[2].isdigit():
+            _rows.append((_f[0].strip(), _f[1]))
+    _votes = _coll.defaultdict(_coll.Counter)
+    for _w, _c in _rows:
+        if len(_w) == 2 and len(_c) == 4 and " " not in _c:
+            _votes[_w[0]][_c[:2]] += 1
+            _votes[_w[1]][_c[2:]] += 1
+    _c2 = {ch: v.most_common(1)[0][0] for ch, v in _votes.items()}
+    _ok = _bad = 0
+    for _w, _c in _rows:
+        if len(_w) != 3:
+            continue
+        _cs = [_c2.get(ch) for ch in _w]
+        if any(x is None for x in _cs):
+            continue
+        if _cs[0][:1] + _cs[1][:1] + _cs[2] == _c:
+            _ok += 1
+        else:
+            _bad += 1
+    # 容差只留给"极少数合法例外"（如同码冲突被人工改写）：>7 条即判失败。
+    # （曾把阈值设成 1%，反向测试塞 30 条坏码仍能通过 —— 阈值必须紧到能抓住回归）
+    _tol = max(3, int(0.002 * (_ok + _bad)))
+    if _ok + _bad and _bad > _tol:
+        print(f"  ✗ 三字词码式不是标准 1+1+2：{_bad}/{_ok + _bad} 条不符"
+              f"（修法: python3 scripts/fix_wubi_86_3char_codes.py）")
+        err += 1
+
 # 3) 语法
 for p in glob.glob("scripts/*.py") + glob.glob("scripts/**/*.py", recursive=True):
     r = subprocess.run([sys.executable, "-c", f"import ast;ast.parse(open({p!r},encoding='utf-8').read())"],
