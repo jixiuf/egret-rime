@@ -16,5 +16,6 @@ use_preset_vocabulary: false
 import_tables:
   - dicts/egret_py_chars        # 字表：8105 常用字，无调音节
   - dicts/egret_py_words_base  # 词表：按档位（core/base/full）切换
+  - dicts/egret_py_words_longtail # 长尾拼音词（≥300 权重，17.8 万条，§4.55）
   - dicts/egret_wubi_py_user_phrases       # 手工维护的短语
 ...

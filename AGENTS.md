@@ -21,6 +21,7 @@ bash scripts/refresh.sh --loop 30   # 常驻：每 30 分钟增量刷新（语�
 | 产物 | 位置 | 说明 |
 |---|---|---|
 | 词库（三档） | `dicts/*_words_{core,base,full}.dict.yaml` | 每档**同时含五笔码与拼音码**；权重按语料词频回归到 0-1000 |
+| 长尾拼音词 | `dicts/egret_py_words_longtail.dict.yaml` | base 档的 451 阈值切掉的 451 以下长尾词，补上拼音码（17.8 万条）；两套独立句子集各 +8/+9 句（§4.55）|
 | 86 造词码词库 | `dicts/egret_wubi_words_wb86_*.dict.yaml` | 传统库（形码确定性层） |
 | **语言模型（必需）** | `data/gram/wanxiang-lts-zh-hans.gram` | **词级** gram（万象 LMDG，约 400MB）——引擎原生 octagram 直接用它；**不随仓库分发，需自行下载**（见 README）|
 | 搜索器码表 | `data/gram/compose_table.{tsv,bin}` | 统一码表（五笔+拼音 27 万条）；`.bin` 是运行时读的（契约测试 `scripts/check_compose_table.lua`）|

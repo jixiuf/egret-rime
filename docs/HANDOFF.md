@@ -13,7 +13,7 @@ cd /export/ebook/egret-rime
 make test                                  # 黄金 33 条 + 契约测试（必须全过）
 make lint                                  # 命名/路径/契约/运行时文件一致性
 bash scripts/probe.sh qktnqnr gdrnthtcsu ronghe   # 混流短码 / 整串五笔 / 自动上屏
-make eval                                  # 160 句整句评测（并行 6，当前 66/160 = 41%）
+make eval                                  # 160 句整句评测（并行 6，当前 72/160 = 45%）
 bash scripts/refresh.sh --only dict        # 重建词库产物（可复现，秒级）
 bash scripts/refresh.sh --loop 30          # 常驻增量刷新（语料在持续增长）
 ```
@@ -50,10 +50,13 @@ engine.segmentors
 | 指标 | 值 |
 |---|---|
 | 黄金用例 | **33/33**（`make test`） |
-| 整句(全拼) 160 句 | **66/160 (41%)** ← 万象词级 gram；旧 Lua 字级重排只有 43/160 (27%) |
+| 整句(全拼) 160 句 | **72/160 (45%)** ← 万象词级 gram + 长尾拼音词（§4.55）|
+| 整句(全拼) 200 句（另一套，留出集） | **75/200 (38%)**（未接长尾时 69/200）|
+| 长尾拼音词接入前 | 66/160 (41%)；旧 Lua 字级重排只有 43/160 (27%)|
 | 长句三态（8 句，最难的 epub 子集） | 纯拼音 0/8、纯五笔 2/8、混打 0/8（切分器 ON/OFF 对照过） |
 | 混流短码 | `qktnqnr→我吃饭`、`qchifanle→我吃饭了`、`uwycuklf→冷部署`、`gdrnthtcsu→天气怎么样` |
 | 峰值 RSS | 万象 gram 128MB ／ Lua 字级表 141MB |
+| 评测可复现性 | §4.52 后**逐句 160/160 一致**（此前 ±2 句波动全来自 GC 活锁超时假失败）|
 | 评测提速 | `eval_gram.py --jobs 6`（每例仍独立 console 进程） |
 
 ## 3. ⚠️ 被本会话推翻的旧结论（不要再看旧的）

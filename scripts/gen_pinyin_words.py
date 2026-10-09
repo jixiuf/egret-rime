@@ -98,6 +98,11 @@ def main():
     ap.add_argument("--alt-discount", type=float, default=0.8,
                     help="非主读音的权重折扣")
     ap.add_argument("--src", default=SRC)
+    ap.add_argument("--out-name", default=None,
+                    help="只产出这一张表（不落各档）：用于「长尾补注」——"
+                         "给 full 档五笔词补主读音拼音码，见 PROGRESS §4.55")
+    ap.add_argument("--min-weight", type=int, default=0,
+                    help="配合 --out-name：词源侧的权重下限（实测 300 最优）")
     args = ap.parse_args()
 
     if not os.path.exists(args.src):
@@ -108,6 +113,27 @@ def main():
 
     all_rows = list(rows(args.src))
     print(f"词源 {os.path.basename(args.src)}: {len(all_rows):,} 条")
+
+    if args.out_name:
+        # 长尾模式：单独产一张表（不动各档），权重下限在**词源侧**生效
+        keep = [(w, wt) for w, wt in all_rows if wt >= args.min_weight]
+        tmp = os.path.join(OUT, args.out_name + ".dict.yaml.tmp")
+        n = 0
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write(header(args.out_name, [
+                f"长尾拼音词表（无调音节，主读音）｜词源权重 >= {args.min_weight}",
+                f"词源: {os.path.basename(args.src)}",
+                "用途：base 档只收 >=451 的词，长尾（451 以下）在纯拼音路径上",
+                "「只能单字硬组」——本表给它补上拼音码。实测 160/200 两套",
+                "独立句子集各 +8/+9 句，且混流与黄金零回归（PROGRESS §4.55）",
+            ]))
+            for word, weight in keep:
+                for code in readings(word, py, args.max_readings):
+                    f.write(f"{word}\t{code}\t{weight}\n")
+                    n += 1
+        os.replace(tmp, os.path.join(OUT, args.out_name + ".dict.yaml"))
+        print(f"  长尾表 {args.out_name}: 词源 >= {args.min_weight} 共 {n:,} 条")
+        return
 
     # 只产出规范名的 base 表；各档由 gen_dict_tiers.py 从它派生
     tiers = list(TIERS) if args.tier == "all" else [args.tier]

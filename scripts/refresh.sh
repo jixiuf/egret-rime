@@ -185,6 +185,13 @@ for i in "${!STAGES[@]}"; do
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       "$PY" "$ROOT/scripts/set_tier.py" "$TIER" >>"$RUNLOG" 2>&1 \
         && ok "已切到 $TIER 档" || warn "切档失败"
+      # 长尾拼音词（§4.55）：base 档只收权重 >=451 的词，451 以下的长尾在纯拼音路径上
+      # 「只能单字硬组」——本步给它们补拼音码。实测两套独立句子集各 +6 句，
+      # 混流与黄金零回归；多读音展开反而更差，故 max-readings 保持默认 1。
+      "$PY" "$ROOT/scripts/gen_pinyin_words.py" \
+        --src "$ROOT/dicts/egret_wubi_words_wangxiang_full.dict.yaml" \
+        --min-weight 300 --out-name egret_py_words_longtail >>"$RUNLOG" 2>&1 \
+        && ok "长尾拼音词已生成（约 18 万条，可复现）" || warn "长尾拼音词生成失败"
       # 注意：gen_wubi_py_unified_dicts.py 依赖 dicts/wangxiang_cn_dicts/base.small
       # 等**本仓库没有的外部源数据**（来自原仓库），跑不通 → 默认跳过。
       # 即：字符表层的**主体**（字/拼音码/五笔全码）按"入库源数据"处理；
