@@ -15,8 +15,10 @@
   · 二字词码 = 两字两码相接（与 wb86 表语义完全一致）；
   · 权重沿用万象权重（同一尺度：如 你好=749），只取 base 档没有的词（避免重复候选，§4.58）。
 
-只做**二字词**：三字词的码式在本仓库 wb86 数据里是 2+1+1（非标准五笔的 1+1+2，见 §4.60），
-长尾里 61 万条三字词多为碎片，先不引入。
+词长：**二字词 + 三字词**（三字词用标准 1+1+2，§4.62 已把生成逻辑改对）。
+三字词的缺失很可见：`计算机/大学生/图书馆/办公室/互联网/中国人/研究生/火车站`…
+这些日常词本仓库全都没有（万象权重 350~443，正落在 300~450 这个桶里）。
+权重 <300 的 58 万条三字词多为碎片，**不引入**（可用 --weight-min 自行调）。
 
 用法:
   python3 scripts/gen_wubi_86_longtail.py                      # 默认权重 300~450，二字词
@@ -53,6 +55,7 @@ def load(path):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--lens", default="2,3", help="处理哪些词长，逗号分隔（默认 2,3）")
     ap.add_argument("--weight-min", type=int, default=300)
     ap.add_argument("--weight-max", type=int, default=450)
     ap.add_argument("--out", default=OUT_NAME)
@@ -70,16 +73,24 @@ def main():
     base_words = {w for w, _c, _wt in wb}
 
     rows, skipped = [], 0
+    lens = {int(x) for x in args.lens.split(",") if x.strip()}
     for w, c, wt in load(SRC_WX):
-        if len(w) != 2 or not (args.weight_min <= wt <= args.weight_max):
+        if len(w) not in lens or not (args.weight_min <= wt <= args.weight_max):
             continue
         if w in base_words:
             continue
-        a, b = c2.get(w[0]), c2.get(w[1])
-        if not a or not b:
+        # 字的两码：优先自举表；缺则退回该词万象码的「每字第一组」（同为 2 字母，尺度一致）
+        per = [g.split(",")[0] for g in c.split()]
+        if len(per) != len(w) or any(len(p) < 2 for p in per):
             skipped += 1
             continue
-        rows.append((w, a + b, max(1, int(wt * args.weight_scale))))
+        cs = [c2.get(ch) or per[i] for i, ch in enumerate(w)]
+        if any(len(x) < 2 for x in cs):
+            skipped += 1
+            continue
+        # 标准五笔词组码（§4.61/§4.62）：2 字=2+2；3 字=1+1+2
+        code = cs[0] + cs[1] if len(w) == 2 else cs[0][:1] + cs[1][:1] + cs[2]
+        rows.append((w, code, max(1, int(wt * args.weight_scale))))
 
     rows.sort(key=lambda r: -r[2])
     path = os.path.join(DICTS, args.out + ".dict.yaml")
