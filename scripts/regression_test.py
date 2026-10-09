@@ -131,11 +131,17 @@ def first_candidate(code, cwd):
 
     连跑两次取第二次：冷部署后首跑的分段与热机不同（prism 非确定性，
     见 docs/PROGRESS.md §4.18 测量纪律），单跑结论不可信。
+
+    超时（搜索爆炸 / librime-lua 关闭期 GC 活锁，见 §4.51）不再抛异常中断整轮，
+    而是返回一个显眼的标记，让回归报告直接暴露它。
     """
     result = None
     for _ in range(2):
-        p = subprocess.run([LIBRIME_CONSOLE], input=code + "\n\n",
-                           capture_output=True, text=True, cwd=cwd, timeout=120)
+        try:
+            p = subprocess.run([LIBRIME_CONSOLE], input=code + "\n\n",
+                               capture_output=True, text=True, cwd=cwd, timeout=120)
+        except subprocess.TimeoutExpired:
+            return "(超时/挂死)"
         result = None
         for line in p.stdout.splitlines():
             m = re.match(r"1\. \[([^\]]*)\]", line.strip())

@@ -23,7 +23,9 @@ import glob
 import os
 import re
 import shutil
+import signal
 import subprocess
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 import sys
 
@@ -169,21 +171,45 @@ def reset_schema(user_dir):
             open(path, "w", encoding="utf-8").write(s2)
 
 
-def first_candidate(code, cwd, timeout=25):
-    """跑一次 console 取首候选。超时/异常返回 None（计为失败，不中断评测）。
+def run_console(code, cwd, timeout):
+    """跑一次 console，返回 (stdout, status)。
 
-    注：gram 过大时个别长句会搜索爆炸（曾见 180s+），故需短超时容错。
+    为什么不能用 subprocess.run(timeout=...)：超时时它把已产生的 stdout 一起丢掉，
+    于是「候选已经打出来了、只是进程不退」（librime-lua 关闭期 GC 活锁，见 PROGRESS §4.51）
+    与「搜索爆炸、根本没算出候选」被混成同一个 None（H8）。
+
+    超时时 kill 后**把已产生的输出读回来**，据此分类：
+      ok    — 正常退出
+      hang  — 超时被 kill，但**已经打出候选**（答案是对的，进程不退）
+      slow  — 超时被 kill，且没打出候选（真慢/搜索爆炸）
     """
+    # start_new_session：超时时杀**整个进程组**。只 p.kill() 直接子进程的话，
+    # 孙进程还持有 stdout 管道 → 下面那次 communicate() 会一直阻塞（自测踩到过）。
+    p = subprocess.Popen([CONSOLE], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         stderr=subprocess.DEVNULL, text=True, cwd=cwd,
+                         start_new_session=True)
     try:
-        p = subprocess.run([CONSOLE], input=code + "\n\n", capture_output=True,
-                           text=True, cwd=cwd, timeout=timeout)
+        out, _ = p.communicate(code + "\n\n", timeout=timeout)
+        return out or "", "ok"
     except subprocess.TimeoutExpired:
-        return None
-    for line in p.stdout.splitlines():
+        try:
+            os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            p.kill()
+        out, _ = p.communicate()
+        out = out or ""
+        produced = any(re.match(r"1\. \[([^\]]*)\]", l.strip()) for l in out.splitlines())
+        return out, ("hang" if produced else "slow")
+
+
+def first_candidate(code, cwd, timeout=25):
+    """跑一次 console 取首候选，返回 (首候选 或 None, status)。状态见 run_console。"""
+    out, status = run_console(code, cwd, timeout)
+    for line in out.splitlines():
         m = re.match(r"1\. \[([^\]]*)\]", line.strip())
         if m:
-            return m.group(1)
-    return None
+            return m.group(1), status
+    return None, ("empty" if status == "ok" else "slow")
 
 
 def switch_gram(user_dir, gram_path, language):
@@ -216,12 +242,14 @@ def run_suite(user_dir, cases, label):
             outs = list(ex.map(lambda code: first_candidate(code, user_dir, timeout=120), codes))
     else:
         outs = [first_candidate(code, user_dir) for code in codes]
-    for c, code, got in zip(cases, codes, outs):
+    for c, code, (got, status) in zip(cases, codes, outs):
         expect = c[1]
         reset_schema(user_dir)
-        hits.append((code, expect, got, got == expect))
+        hits.append((code, expect, got, got == expect, status))
     ok = sum(1 for h in hits if h[3])
-    print(f"  {label:<28} {ok}/{len(cases)}  ({ok/len(cases)*100:.0f}%)")
+    st = Counter(h[4] for h in hits)
+    extra = "  ".join(f"{k}={st[k]}" for k in ("hang", "slow", "empty") if st.get(k))
+    print(f"  {label:<28} {ok}/{len(cases)}  ({ok/len(cases)*100:.0f}%)" + (f"   [{extra}]" if extra else ""))
     return hits
 
 
@@ -325,11 +353,17 @@ def main():
         if sentences:
             s = sum(1 for h in results[label]["sent"] if h[3])
             line += f"  句子 {s}/{len(sentences)} ({s/len(sentences)*100:.0f}%)"
+            st = Counter(h[4] for h in results[label]["sent"])
+            bad = [f"{k}={st[k]}" for k in ("hang", "slow", "empty") if st.get(k)]
+            if bad:
+                line += "  [异常: " + " ".join(bad) + "]"
         print(line)
         if sentences:
             for h in results[label]["sent"]:
                 if not h[3]:
-                    print(f"    ✗ {h[0][:36]:<36} 期望 {h[1]} 得到 {h[2]}")
+                    # status 非 ok 时标出来：hang=答案其实对但进程不退；slow=没算出候选
+                    tag = "" if h[4] == "ok" else f"  <{h[4]}>"
+                    print(f"    ✗ {h[0][:36]:<36} 期望 {h[1]} 得到 {h[2]}{tag}")
 
 
 if __name__ == "__main__":
