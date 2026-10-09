@@ -181,10 +181,6 @@ for i in "${!STAGES[@]}"; do
       else
         ok "跳过整句词库（无 data/corpus，用仓库内已有产物）"
       fi
-      # 五笔三字词码式修正为**标准 1+1+2**（旧数据是 2+1+1，用户按标准打不出来，§4.61）。
-      # 幂等（已是标准码则 0 改动），必须在 gen_dict_tiers 之前跑。
-      "$PY" "$ROOT/scripts/fix_wubi_86_3char_codes.py" >>"$RUNLOG" 2>&1 \
-        && ok "五笔三字词码已核（标准 1+1+2）" || warn "三字词码修正失败"
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
       # 五笔长尾（§4.60）：86 造词码家族没有长尾（base==full==6.3万词），
@@ -201,8 +197,13 @@ for i in "${!STAGES[@]}"; do
         --min-weight 300 --exclude "$ROOT/dicts/egret_py_words_base.dict.yaml" \
         --out-name egret_py_words_longtail >>"$RUNLOG" 2>&1 \
         && ok "长尾拼音词已生成（约 18 万条，可复现）" || warn "长尾拼音词生成失败"
-      # 注意：gen_wubi_py_unified_dicts.py 依赖 dicts/wangxiang_cn_dicts/base.small
-      # 等**本仓库没有的外部源数据**（来自原仓库），跑不通 → 默认跳过。
+      # 注意：gen_wubi_py_unified_dicts.py **不能在这里自动跑**，两个原因：
+      #   ① 它需要 dicts/wangxiang_cn_dicts/base.small.dict.yaml（**拼音侧**源，本仓库没有）
+      #      —— 五笔侧（本次关心的部分）其实能算，但整脚本会因此中断；
+      #   ② 它会覆盖根 wrapper egret_wubi.dict.yaml，而那里现在是分档 + 五笔长尾的接线。
+      # 所以它的产物按"入库源数据"处理（与下面 gen_wubi_py_unified_dicts 段落一致）；
+      # 但它的**词组码式规则已修正为标准五笔**（§4.62：三字词 1+1+2、五字以上 前3首码+末首码），
+      # 且契约检查（check_consistency 2.8）守着——不再需要"生成后再修"。
       # 即：字符表层的**主体**（字/拼音码/五笔全码）按"入库源数据"处理；
       # 但**简码拼写**已由 gen_jianma_spellings.py 从仓库内派生（上面那步），
       # 分档词表层由 gen_dict_tiers.py 从仓库内数据派生 —— 组句所需的部分均可复现。

@@ -432,11 +432,11 @@ def gen_wubi_traditional():
     - length_equal: 2
       formula: "AaAbBaBb"
     - length_equal: 3
-      formula: "AaAbBaCa"
+      formula: "AaBaCaCb"      # 标准三字词：字1首码+字2首码+字3前2码（§4.62）
     - length_equal: 4
       formula: "AaBaCaDa"
     - length_in_range: [5, 10]
-      formula: "AaAbYaZa"
+      formula: "AaBaCaZa"      # 标准五字以上：前3字首码+末字首码（§4.62）
 """
     out = header("wubi_py_wubi", [
         "传统结构五笔词库（供 table_translator@wubi）：",
@@ -477,14 +477,20 @@ def gen_wubi_traditional():
         if any(f is None for f in fs):
             continue
         L = len(word)
+        # 词组码一律用**标准五笔**规则（§4.62 修正；旧版三字词/五字以上用的是非标准式，
+        # 实测用户按标准码打三字词 top1 = 0/50、top8 = 2% —— 肌肉记忆直接失效）：
+        #   2 字  = 字1前2码 + 字2前2码
+        #   3 字  = 字1首码 + 字2首码 + 字3前2码        （旧版误用 字1前2码+字2首码+字3首码）
+        #   4 字  = 每字首码
+        #   >=5 字 = 前3字首码 + 末字首码               （旧版误用 字1前2码+末2字首码）
         if L == 2:
             code = fs[0][:2] + fs[1][:2]
         elif L == 3:
-            code = fs[0][:2] + fs[1][:1] + fs[2][:1]
+            code = fs[0][:1] + fs[1][:1] + fs[2][:2]
         elif L == 4:
             code = "".join(f[:1] for f in fs)
         else:
-            code = fs[0][:2] + fs[-2][:1] + fs[-1][:1]
+            code = fs[0][:1] + fs[1][:1] + fs[2][:1] + fs[-1][:1]
         out += f"{word}\t{code}\t{w}\n"
         nw += 1
     n += nw
@@ -501,11 +507,11 @@ def gen_wubi_traditional():
     - length_equal: 2
       formula: "AaAbBaBb"
     - length_equal: 3
-      formula: "AaAbBaCa"
+      formula: "AaBaCaCb"      # 标准三字词：字1首码+字2首码+字3前2码（§4.62）
     - length_equal: 4
       formula: "AaBaCaDa"
     - length_in_range: [5, 10]
-      formula: "AaAbYaZa"
+      formula: "AaBaCaZa"      # 标准五字以上：前3字首码+末字首码（§4.62）
 import_tables:
   - dicts/egret_wubi_chars
   - dicts/egret_wubi_words
