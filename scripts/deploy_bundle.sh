@@ -127,6 +127,27 @@ for f in "$SRC"/*; do
 done
 
 echo
+# ---- 自检（H2）：必需运行时文件 + 引擎 LM ----
+# 400MB 的词级 gram **不随包分发**（见上方注释）；缺它 = grammar 加载失败 = 没有语言模型。
+echo
+miss=0
+for f in egret_wubi_py.schema.yaml egret_wubi_py.dict.yaml lua/py_composer.lua \
+         dicts/compose_table.bin dicts/lm_rerank.bin dicts/lm_rerank.meta dicts/py_meta.txt; do
+  if [ ! -e "$TARGET/$f" ]; then echo "  x 缺必需文件: $f"; miss=1; fi
+done
+[ "$miss" = 0 ] && echo "  ok 必需运行时文件齐全"
+GRAM="wanxiang-lts-zh-hans.gram"
+if [ -e "$TARGET/$GRAM" ] || [ -L "$TARGET/$GRAM" ]; then
+  echo "  ok 语言模型 $GRAM 已在目标目录"
+else
+  echo "  !  缺少引擎语言模型（约 400MB，本包不分发）: $TARGET/$GRAM"
+  echo "     不装它的后果：grammar 加载失败 -> 没有语言模型，整句准确率明显下降"
+  echo "     （实测：万象词级 gram 41~46% vs 无 LM / 字级重排 27%）"
+  echo "     获取： wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/$GRAM"
+  echo "           mv $GRAM <Rime 用户目录>/"
+fi
+echo
+
 echo "安装完成。接下来："
 case "$(uname -s)" in
   Darwin) echo "  1) 点菜单栏 Squirrel 图标 → 重新部署（或 \"/Library/Input Methods/Squirrel.app/Contents/MacOS/rime_deployer\" --build \"$TARGET\"）"
