@@ -69,6 +69,7 @@ import_tables:
   # - dicts/wangxiang_cn_dicts/8105        # 旧带调字表(派生无调拼写会跨音节竞争,弃用)
   - dicts/egret_py_words_base # 拼音基础词库(无调化副本)
   - dicts/egret_py_words_longtail # 长尾拼音词（≥300 权重，17.8 万条，§4.55）
+  - dicts/egret_py_words_mined4   # 四字词拼音码（语料挖掘，§4.69）
   # - dicts/wangxiang_cn_dicts/base.small   # 旧带调词库(弃用)
   # - dicts/wangxiang_cn_dicts/correlation.small
   # - dicts/wangxiang_cn_dicts/chars            #字表，包含了所有带拼音的汉字

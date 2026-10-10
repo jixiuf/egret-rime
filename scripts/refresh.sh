@@ -191,6 +191,13 @@ for i in "${!STAGES[@]}"; do
       else
         ok "跳过四字词挖掘（无 data/corpus，用仓库内已有产物）"
       fi
+      # 四字词的**拼音码**（同上来源；只用主读音，§4.56 的词组感知注音）
+      if [ -f "$ROOT/dicts/egret_wubi_words_wb86_mined4.dict.yaml" ]; then
+        "$PY" "$ROOT/scripts/gen_pinyin_words.py" \
+          --src "$ROOT/dicts/egret_wubi_words_wb86_mined4.dict.yaml" \
+          --out-name egret_py_words_mined4 >>"$RUNLOG" 2>&1 \
+          && ok "四字词拼音码已生成" || warn "四字词拼音码生成失败"
+      fi
       # 五笔长尾（§4.60）：86 造词码家族没有长尾（base==full==6.3万词），
       # 把万象长尾的二字词按自举的字码表转成 86 词组码，让五笔能打出罕见词。
       "$PY" "$ROOT/scripts/gen_wubi_86_longtail.py" >>"$RUNLOG" 2>&1 \
