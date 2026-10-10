@@ -15,7 +15,12 @@ schema:
     Egret 白鹭全拼 —— 用本仓库生成的拼音字/词表（语料词频回归权重）。
     既可单独当全拼输入法，也是五笔方案反查用的词典。
   dependencies:
-    - stroke # builtin: hspnz(一丨丿丶乙)
+    # 笔画反查（`+笔画）需要 rime-data 的 stroke.dict.yaml —— 本仓库不带该词典
+    # （我们的构建数据目录只有 essay/symbols/luna_pinyin/cangjie5）。
+    # 声明依赖会在缺词典时刷日志（“Error loading table for dictionary 'stroke'”），
+    # 故默认**不声明**：想启用笔画反查，把 stroke.dict.yaml 放到用户目录根，
+    # 再把下面两行取消注释（并打开文末的 reverse_lookup 块）。
+    # - stroke # builtin: hspnz(一丨丿丶乙)
 __include: egret.common.yaml:editor
 __include: egret.common.yaml:switches
 __include: egret.common.yaml:opencc
@@ -55,18 +60,19 @@ grammar:
   __patch:
     - egret.common.yaml:grammar
 
-# 反查笔画（与上游一致）。dictionary: stroke 指 rime 数据包（rime-data/brise）里的
-# 内置 stroke 词典——它既不在 librime 引擎里（我们的构建数据目录只有
-# essay/symbols/luna_pinyin/cangjie5），也不在参考仓库 ~/vmacs/rime 里，
-# 所以当前这条是惰性的。要启用：把 rime-data 的 stroke.dict.yaml 放到用户目录根，
-# 或改指别的词典。
-reverse_lookup:
-  __patch:
-    - egret.common.yaml:reverse_lookup_stroke
+# 反查笔画（可选，默认关）。dictionary: stroke 指 rime 数据包（rime-data/brise）里的
+# 内置 stroke 词典——它既不在 librime 引擎里，也不在本仓库里，所以**默认不引用**
+# （引用它会在新版 librime 上刷 “Error loading table for dictionary 'stroke'” 与
+#  schema 校验告警）。启用方法：把 rime-data 的 stroke.dict.yaml 放到用户目录根，
+# 然后取消下面注释，并在 schema/dependencies 里加回 `- stroke`。
+# reverse_lookup:
+#   __patch:
+#     - egret.common.yaml:reverse_lookup_stroke
 
 engine:
   processors:
     - lua_processor@*select_character
+    - ascii_composer                     # 中西文切换；缺它则英文态/中英混输不可用
     - recognizer
     - key_binder
     - speller
@@ -83,7 +89,7 @@ engine:
   translators:
     - punct_translator
     - script_translator
-    - reverse_lookup_translator@reverse_lookup
+    # reverse_lookup_translator@reverse_lookup   # 笔画反查（默认关，见文头说明）
     - lua_translator@*date_translator
     - lua_translator@*lunar
     - lua_translator@*number_translator

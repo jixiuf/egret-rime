@@ -2256,6 +2256,37 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 明确不做**——它是纯粹的"加词"，直接推高每键耗时（且 §4.53 已实测排序代价）；
 拼音侧调参也已证进入低敏感区间（§4.68）。
 
+### 4.71 把 `egret_py` / `egret_wubi` 补成**可独立选用的一等方案**
+
+**现状（动手前实测）**：
+- `egret_wubi.schema.yaml` 只有 **24 行**，是个占位（"internal helper schema, do not select"）：
+  只写了 translator，**没有 engine/开关/反查/注释**；能打字只是因为 librime 会**继承
+  `default.yaml` 的引擎**（含 script_translator）——能用但属"意外"，且名字/描述都在劝退。
+- `egret_py.schema.yaml` 结构较全（110 行），但缺 `ascii_composer`（**英文态/中英切换不可用**），
+  且引用了一个**仓库里根本没有的** `stroke` 词典（在较新 librime 上刷
+  `Error loading table for dictionary 'stroke'` + schema 校验告警）。
+
+**改动**：
+1. **`egret_wubi` 重写为完整方案**：`speller`（五笔字母表 + `max_code_length: 0` + 无需 algebra）
+   → `table_translator`（`egret_wubi` 库：字表简码/全码 + 二字/三字词 + 五笔长尾 11.5 万 +
+   四字词 + 整句词库；用户词典 tabledb 自学习；completion + sentence）
+   → `grammar`（万象词级 LM）→ `` `+拼音 `` 反查 → engine 全套 processors/segmentors/translators/filters
+   → **候选注释显示拼音**（`reverse_lookup_filter@pinyin_comment`，认生僻字用）。
+2. **`egret_py` 补齐**：加 `ascii_composer`；把惰性的笔画反查改成**注释 + 启用说明**
+   （不再声明 `stroke` 依赖 ⇒ 新版 librime 不再刷那两条错误）。
+3. `default.custom.yaml` 的 `schema_list` 加 `egret_wubi` ⇒ 三个方案可选（F4 切换）。
+
+**验证**（探针会**回显实际加载的 schema**）：
+| 方案 | 结果 |
+|---|---|
+| `egret_wubi`（白鹭五笔） | **6/6**：`khlg→中国`、`tffu→等`、`qktqn→我吃饭`、`mffp→周勃`、`ytsm→计算机`、`pwyy→社会主义` |
+| `egret_py`（白鹭全拼） | **4/4**：`nihao→你好`、长句 ✓、`shehuizhuyi→社会主义`；且纯拼音行为正确（`khlg→客户两个`**不是**中国 ✓）|
+| `egret_wubi_py`（主方案） | 不变 ✓ |
+| 全链 | `make lint` ✓ / 黄金 **33/33** ✓ / `make verify-wubi` 全过 ✓；部署器错误 **0** |
+
+> 踩坑：探针里 `previously_selected_schema` 必须写在 **`var:` 下**——我第一轮写成顶层，
+> 被忽略后 console 一直在跑主方案，于是"验证"了三个方案其实都是同一个 ✗（已改为回显实际方案）。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。

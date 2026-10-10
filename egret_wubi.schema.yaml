@@ -1,24 +1,101 @@
 #   -*- coding: utf-8 -*-
-# 内部辅助 schema：仅为让部署器编译 egret_wubi 词库
-# （egret_wubi_py 的 dependencies 引用依赖时需要依赖方有 schema 文件）。
-# 不要加入 default.custom.yaml 的 schema_list，也不要直接选用。
-# 用户可选的三个方案见 default.custom.yaml：egret_wubi_py（混流）、egret_py（全拼）。
+# 白鹭五笔（egret_wubi）—— 纯五笔方案，可独立选用。
+#
+# 词库 = 本仓库生成的 86 造词码传统库（`dicts/egret_wubi_words_wb86_*.dict.yaml`）：
+#   · 字表：显式一/二/三级简码 + 全码（无派生短码 → 每码唯一条目，首候选确定）
+#   · 词组：二字词 base + 三字词 + **五笔长尾 11.5 万** + **四字词 8.7 千（语料挖掘）**
+#   · 另有「整句词库」（高频整句 → 五笔短码序列，见 gen_sentence_dict.py）
+# 反查：`+拼音（词典 egret_py）；候选注释里显示**拼音**（认生僻字用）
+#
+# 与主方案的关系：`egret_wubi_py`（混流）把它当 first_translator 用；
+# 本方案是它的"纯五笔"独立形态，配置保持同源（egret.common.yaml 共享块）。
 schema:
   schema_id: egret_wubi
-  name: "wubi py wubi (internal)"
-  version: "1"
+  name: "白鹭五笔"
+  version: "1.0"
   author:
     - jixiuf
   description: |
-    internal helper schema, do not select.
-    传统结构五笔词库（显式简码/全码/词组码），供
-    table_translator@egret_wubi 精确查询，见 egret_wubi_py.schema.yaml
-  dependencies:
-    - stroke
+    白鹭五笔：86 造词码五笔（简码/全码/词组码 + 长尾 + 四字词），带万象词级语言模型。
+    `+拼音 反查；候选注释显示拼音。
+__include: egret.common.yaml:editor
+__include: egret.common.yaml:switches
+__include: egret.common.yaml:opencc
+__include: egret.common.yaml:guide
+__include: egret.common.yaml:lua_config
+
+speller:
+  # 五笔只用字母；词组码连续输入，不需要 ' 分隔符
+  alphabet: "zyxwvutsrqponmlkjihgfedcba"
+  # 必须设 0：speller.cc:134 的 AutoSelectAtMaxCodeLength 只检查 max_code_length、
+  # **不看 auto_select**，码长一到就上屏（设 4 会在第 4 码自动上屏，无法继续选词/组句）。
+  # 想恢复"四码上屏"的老五笔手感，可在用户目录 patch：
+  #   speller/auto_select_pattern: ^[a-df-zA-DF-Z]\w{3}
+  max_code_length: 0
+  auto_select: false
+  # 简码/全码/词组码都在词表里显式给出 → 不需要 algebra 派生
 
 translator:
-  dictionary: egret_wubi
-  enable_user_dict: false
-  enable_completion: false
-  enable_sentence: false
-  initial_quality: 1000
+  dictionary: egret_wubi        # 表里就是五笔码，交给 table_translator 精确查
+  enable_user_dict: true
+  db_class: tabledb             # tabledb 才能自学习调频（见 docs/dict-reference.md §3）
+  user_dict: egret_wubi.user.dict
+  enable_completion: true       # 前缀补全：打一半也能看到候选
+  enable_sentence: true         # 组句：长词/短码序列/整句（配合下面的 grammar）
+  initial_quality: 1
+
+# 词级语言模型（万象 LMDG）：作用于组句，同主方案，见 PROGRESS §4.44/§4.68
+grammar:
+  __patch:
+    - egret.common.yaml:grammar
+
+# `+拼音 反查（词典 egret_py）
+reverse_lookup:
+  __patch:
+    - egret.common.yaml:reverse_lookup_pinyin
+
+engine:
+  processors:
+    - lua_processor@*select_character   # C-h / C-l 以词定字
+    - ascii_composer                    # 中西文切换（无它则英文态不可用）
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - lua_translator@*date_translator
+    - lua_translator@*lunar
+    - lua_translator@*number_translator
+    - lua_translator@*unicode
+    - reverse_lookup_translator@reverse_lookup
+    - table_translator                  # 取上面 translator: 块（dictionary: egret_wubi）
+  filters:
+    - simplifier@emoji
+    # 候选注释显示**拼音**：把候选文本拿去反查 egret_py，命中的读音写进注释
+    - reverse_lookup_filter@pinyin_comment
+    - lua_filter@*long_word_filter
+    - lua_filter@*reduce_emoji_filter
+    - simplifier@traditionalize
+    - uniquifier                        # 放最后：实测放中间去不掉重复（§4.58）
+
+abc_segmentor:
+  extra_tags:
+    - reverse_lookup
+
+# 候选注释 = 该词的拼音（配 reverse_lookup_filter@pinyin_comment）
+pinyin_comment:
+  tags: [ abc ]
+  dictionary: egret_py
+  overwrite_comment: true
+  comment_format:
+    - "xform/[ ].*$//"
+    - "xform/^/ /"

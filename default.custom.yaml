@@ -1,6 +1,7 @@
 patch:
   schema_list:
-    - schema: egret_wubi_py
+    - schema: egret_wubi_py   # 混流（五笔+拼音，主方案）
+    - schema: egret_wubi      # 纯五笔（86 造词码 + 长尾 + 四字词）
     - schema: egret_py        # 纯全拼（也是 `+拼音 反查的词典来源）
 
   menu/page_size: 6
