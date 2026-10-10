@@ -1568,7 +1568,12 @@ singlestep ← luaC_fullgc ← lua_gc ← ~LuaTranslation(_M_dispose)
 ```
 
 **修法（12 行，无行为改变）**：`Lua` 加 `closing_` 标志（`Lua::~Lua()` 在 `lua_close` 前置位），
-`LuaTranslation` 析构在 closing 时跳过 GC（关闭期统计 GC 本来就无意义）。
+并让 **`Lua::gc()` / `Lua::gc_step()` 在 closing 时直接返回**。
+> 初版是把守卫放在 `LuaTranslation::~LuaTranslation()`（只挡已知那一个调用点）；
+> **上游作者 review 时建议把守卫下沉到 `Lua::gc/gc_step`** —— 采纳：这两个函数是插件里**唯一**
+> 驱动 `lua_gc()` 的地方，按咽喉点守卫天然覆盖全部调用方，且 `lua_gears.cc` 无需改动
+> （补丁从 3 文件缩到 **2 文件 +12 行**）。改完用同一组用例复验：32 字母 3/3 正常退出（3.9s）、
+> 52 字母 3/3（8.9s），黄金 33/33 不变。
 
 **实测**（librime 1.17.0 + 本地重建插件；`rime_api_console` 喂整句拼音后退出）：
 
@@ -1578,7 +1583,8 @@ singlestep ← luaC_fullgc ← lua_gc ← ~LuaTranslation(_M_dispose)
 | 52 字母 `duzhe...` | 11.9 s（且偶发挂死） | 7.8 s |
 | 黄金 33 | — | **33/33 ✓** |
 
-**已提交上游**：`hchunhui/librime-lua` → **PR #435**（基于上游 `6f30968`，`+12/-0`，3 文件）。
+**已提交上游**：`hchunhui/librime-lua` → **PR #435**（基于上游 `6f30968`，`+12/-0`，**2 文件**；
+按作者 review 建议改为在 `Lua::gc/gc_step` 处守卫，提交 `3d54eac`）。
 本地 vendored 插件保持 **pin(`ad1e4a6`) + 该补丁（未提交）**，与已构建的 `librime.so` 一致。
 
 **后续（已解锁）**：§4.50 那两个更快变体现在能用了 —— 其中**前缀桶记忆化**已在本地验证通过
