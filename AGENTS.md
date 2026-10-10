@@ -83,6 +83,12 @@ RIME_SHARED_DIR / RIME_FROST_DIR / RIME_WANXIANG_DIR / EGRET_GRAM_DIR。
 
 ## 验证基线
 
+**全链验收一条命令**：`make verify`（= 契约 + 黄金 33 + **五笔能力 5 组** + **输入延迟门**）。
+后两者是 2026-10 新增的护栏，用来防"加词导致能力/延迟退化"（见 docs/PROGRESS.md §4.40）：
+- `make verify-wubi`：五笔打词（二字/三字/四字 × base/长尾）固定采样 + 阈值；
+- `make bench`：三串固定拼音的整串重放耗时，超基线 1.5× 失败（基线在脚本里）；
+- `make verify-bundle`：**交付包验收**（解包→装到空目录→部署→8 条探针；模拟目标机）。
+
 **黄金用例 33 条全过**（`make test`，含契约测试）；整句(全拼)多来源评测 **160 句**：
 **66/160 (41%)**（用万象词级 gram；旧的 Lua 字级重排只有 27%——见 `docs/PROGRESS.md` §4.44）。
 

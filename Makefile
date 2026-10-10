@@ -38,7 +38,7 @@ PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
 
 GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram
 
-.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench
+.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -104,6 +104,11 @@ env-test:
 	@echo "共享数据目录: $(SHARED_DIR)"
 
 # --- 回归测试 ---------------------------------------------------------------
+verify: test verify-wubi bench  ## 全链验收：契约 + 黄金 33 + 五笔能力 + 延迟门
+
+verify-bundle:             ## 交付包验收（解包→装到空目录→部署→探针；目标机模拟）
+	@$(PYTHON) scripts/verify_bundle.py
+
 verify-wubi: env-test      ## 五笔能力验收（H11 五组 + 阈值，约 1 分钟；超阈 exit 1）
 	@$(PYTHON) scripts/verify_wubi.py
 

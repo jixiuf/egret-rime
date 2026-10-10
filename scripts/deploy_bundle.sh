@@ -99,6 +99,11 @@ fi
 
 echo "源:   $SRC"
 echo "目标: $TARGET  (模式: $MODE)"
+# 防呆：目标就是包目录本身 → 下面的 rm -rf 会把源删掉，再 cp 就没了（踩过：包会自毁）
+if [ "$(cd "$TARGET" 2>/dev/null && pwd)" = "$SRC" ]; then
+  echo "✗ 目标目录与包目录相同（$SRC）：会先删后拷把自己清空。请换个目标目录。"
+  exit 1
+fi
 mkdir -p "$TARGET"
 BAK="$TARGET/.egret-backup-$(date +%Y%m%d-%H%M%S)"
 NEED_BAK=0
