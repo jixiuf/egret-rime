@@ -102,6 +102,8 @@ engine.segmentors
 | `scripts/probe_long_sentences.py [N] [标签]` | 长句三态（纯拼音/纯五笔/混打），支持 A/B |
 | `make check` | 重建 dict 阶段 → 黄金 → 混流探针 → 160 句评测（一条命令验全链） |
 | `make eval` | 160 句整句评测（等价 `eval_gram.py --sentences 160 --jobs 6`） |
+| `make verify-wubi` | **五笔能力验收**（H11 五组 + 阈值，~1 分钟；改词库后必跑） |
+| `make bench` | **输入延迟门**（三串固定输入；超基线 1.5× 失败）|
 
 ## 6. 待办（按价值排序）
 
