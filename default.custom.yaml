@@ -1,3 +1,13 @@
+#   -*- coding: utf-8 -*-
+# 全局配置补丁（所有方案共用）。
+#
+# 2026-10 从 ~/vmacs/rime/default.custom.yaml 移植了一批**可用性绑定**（§4.72）：
+#   · key_binder/select_first_character|last_character —— 我们的 lua/select_character.lua
+#     一直在读这两个键，但此前**从未定义** ⇒ 以词定字（C-h/C-l）是惰性的；
+#   · key_binder/bindings —— 翻页（C-,/C-.）、光标（C-p/n/b/f）、编辑（C-d/C-k）、
+#     中英切换（C-S-2）、取消（C-g/F17）；
+#   · ascii_composer/switch_key —— 五笔用户的常见偏好：Shift 不做中英切换（避免打码时误切），
+#     Caps Lock 直接上屏原始码。**不习惯就删掉这一段**（回到 Shift 切换中英）。
 patch:
   schema_list:
     - schema: egret_wubi_py   # 混流（五笔+拼音，主方案）
@@ -21,3 +31,33 @@ patch:
       - ascii_punct
       - traditionalization
       - emoji
+
+  ascii_composer:
+    good_old_caps_lock: true
+    switch_key:
+      Caps_Lock: commit_code    # Caps Lock：把当前码原样上屏（不切中英）
+      Shift_L: noop             # Shift 不切中英（五笔打码时不希望误切换）
+      Shift_R: noop
+
+  key_binder:
+    # 以词定字：lua/select_character.lua 读这两个键（此前未定义 ⇒ 功能惰性）
+    select_first_character: "Control+h"
+    select_last_character: "Control+l"
+    bindings:
+      - { when: always, accept: Control+Shift+2, toggle: ascii_mode }
+      - { when: always, accept: Control+g, send: Escape }
+      - { when: always, accept: F17, send: Escape }
+      - { when: composing, accept: F19, send: Escape }
+      # 翻页
+      - { when: paging, accept: Control+comma, send: Page_Up }
+      - { when: has_menu, accept: Control+period, send: Page_Down }
+      # 组字中的光标/编辑（emacs 习惯）
+      - { when: composing, accept: Control+p, send: Up }
+      - { when: composing, accept: Control+n, send: Down }
+      - { when: composing, accept: Control+b, send: Left }
+      - { when: composing, accept: Control+f, send: Right }
+      - { when: composing, accept: Control+d, send: Delete }
+      - { when: composing, accept: Control+k, send: Shift+Delete }
+      - { when: composing, accept: Control+r, send: Up }
+      - { when: composing, accept: Control+s, send: Down }
+      - { when: composing, accept: Control+m, send: Return }

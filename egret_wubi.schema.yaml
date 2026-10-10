@@ -80,8 +80,9 @@ engine:
     - table_translator                  # 取上面 translator: 块（dictionary: egret_wubi）
   filters:
     - simplifier@emoji
-    # 候选注释显示**拼音**：把候选文本拿去反查 egret_py，命中的读音写进注释
-    - reverse_lookup_filter@pinyin_comment
+    # 候选注释显示**五笔编码**（原生组件）：把候选文本拿去反查传统五笔库，
+    # 命中的码写进注释 —— 五笔方案里这是最有用的一条提示（认码/纠错）
+    - reverse_lookup_filter@wubi_comment
     - lua_filter@*long_word_filter
     - lua_filter@*reduce_emoji_filter
     - simplifier@traditionalize
@@ -91,10 +92,11 @@ abc_segmentor:
   extra_tags:
     - reverse_lookup
 
-# 候选注释 = 该词的拼音（配 reverse_lookup_filter@pinyin_comment）
-pinyin_comment:
+# 候选注释 = 该词的**五笔编码**（配 reverse_lookup_filter@wubi_comment）
+# 与主方案同款配置：一个字有多个码时只显示第一个（xform 去掉其余）
+wubi_comment:
   tags: [ abc ]
-  dictionary: egret_py
+  dictionary: egret_wubi
   overwrite_comment: true
   comment_format:
     - "xform/[ ].*$//"

@@ -119,8 +119,8 @@ jintiandetianqizenmeyang→今天的天气怎么样
   `IsGoogleLoggingInitialized`）、boost 1.66 < 要求 1.74、gcc 8 缺
   `std::filesystem`。解：自建 glog 0.6.0 到 `third-party/prefix` +
   boost1.78（EPEL）+ gcc-toolset-12（见 scripts/setup_env.sh）。
-- librime 实验补丁 translator/always_make_sentences 已在本仓库
-  librime 工作区（默认关，config 门控）。
+- ⚠ 更正（2026-10）：`always_make_sentences` 补丁**不在**本仓库的 librime 里
+  （`third-party/librime` 是纯净 1.17.0）；要用得自己打补丁，见 PROGRESS §4.72。
 
 ## 已知陷阱（完整清单见 docs/deployment-debugging.md，知识库索引见 docs/README.md）
 

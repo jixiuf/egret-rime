@@ -2287,6 +2287,36 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 > 踩坑：探针里 `previously_selected_schema` 必须写在 **`var:` 下**——我第一轮写成顶层，
 > 被忽略后 console 一直在跑主方案，于是"验证"了三个方案其实都是同一个 ✗（已改为回显实际方案）。
 
+### 4.72 五笔方案显示编码 + 参考 ~/vmacs/rime 的改良（采纳 3 项 / 否掉 3 项）
+
+**① 五笔方案候选注释改为显示「五笔编码」**（用户要求）：`egret_wubi` 的注释从拼音换成
+`reverse_lookup_filter@wubi_comment`（与主方案同款配置）⇒ `khlg→[中国] khlg`、`ytsm→[计算机] ytsm` ✓
+
+**② 移植自 `~/vmacs/rime`（拆分前的老仓库）**——**采纳**：
+
+| 项 | 价值 |
+|---|---|
+| `key_binder/select_first_character\|last_character` | **真缺口**：我们的 `lua/select_character.lua` 一直在读这两个键，但 `default.custom.yaml` **从未定义** ⇒ 以词定字（C-h/C-l）一直是**惰性**的 ✓ 现已生效 |
+| `key_binder/bindings` | 翻页（C-,/C-.）、光标（C-p/n/b/f）、编辑（C-d/C-k）、中英切换（C-S-2）、取消（C-g/F17）——日常手感 |
+| `ascii_composer`（`good_old_caps_lock` + `switch_key`）| 五笔常见偏好：Shift 不切中英（打码时避免误切）、CapsLock 原样上屏（不喜欢可删这一段）|
+
+**③ 我们已更优（无需移植）**：`collocation_min_length` 3（他们 2）、`collocation_penalty` -12（他们 -10）、
+万象词级 LM（他们 essay 字级）、lua 目录（`compose_filter`/`mix_segmentor`/`py_composer`/`lm_rerank`
+都是本轮新增，他们那边没有）、以及 §4.71 刚补全的两个方案本身。
+
+**④ 评估后不采纳**：
+- **`always_make_sentences`**（他们的方案里开着）：需要给 librime **打补丁 + 加重排 lua**，
+  且文档已定性——"Sentence 的 log 值与 phrase 的 exp 值不可比，属产品级决策"（
+  `docs/design-weights-jianma-grammar.md` §135/§149）。记入待办，等有评测口径再说。
+  ⚠ 顺带更正：`AGENTS.md` 里"该补丁已在本仓库 librime 工作区"是**迁移前的旧话**——
+  当前 `third-party/librime` 是纯净 1.17.0，**没有**该补丁。
+- 他们的 `wubi_sentence_speller`（四码上屏）：我们用显式码 + 保守关闭 `auto_select`；
+  `egret_wubi.schema.yaml` 里已写明如何按需开启。
+- 平台配置（`fcitx5.custom.yaml`/`ibus_rime.custom.yaml` 的样式/app_options）：属个人偏好，
+  不宜随包覆盖用户文件（且他们那两份内容是 macOS Squirrel 的，命名与内容对不上）。
+
+**验证**：`make lint` ✓、黄金 **33/33** ✓、三方案探针全部通过（含回显实际加载的 schema）✓
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。
