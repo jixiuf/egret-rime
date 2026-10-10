@@ -183,6 +183,14 @@ for i in "${!STAGES[@]}"; do
       fi
       "$PY" "$ROOT/scripts/gen_dict_tiers.py" >>"$RUNLOG" 2>&1 \
         && ok "三档词表已生成（五笔码 + 拼音码）" || warn "分档生成失败"
+      # 四字词（§4.67）：词库/仓库都没有四字词源，用**自有语料 jieba 挖掘**
+      # （`社会主义/人工智能/也就是说`…）；五笔码=每字首码，权重按 log 词频映射到 300~700。
+      if [ -d "$ROOT/data/corpus/clean/para" ]; then
+        "$PY" "$ROOT/scripts/gen_wubi_86_mined_4char.py" --mine-mb 800 >>"$RUNLOG" 2>&1 \
+          && ok "四字词（语料挖掘）已生成" || warn "四字词挖掘失败"
+      else
+        ok "跳过四字词挖掘（无 data/corpus，用仓库内已有产物）"
+      fi
       # 五笔长尾（§4.60）：86 造词码家族没有长尾（base==full==6.3万词），
       # 把万象长尾的二字词按自举的字码表转成 86 词组码，让五笔能打出罕见词。
       "$PY" "$ROOT/scripts/gen_wubi_86_longtail.py" >>"$RUNLOG" 2>&1 \
