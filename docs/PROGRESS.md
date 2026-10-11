@@ -2399,6 +2399,38 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 `dicts/{py_meta.txt,lm_rerank.bin,lm_rerank.meta,compose_table.bin}` ✓；`make verify`（契约+黄金+五笔能力+延迟门）
 与 `make verify-bundle`（8/8）全过 ✓
 
+### 4.75 `make deploy` 在 host-linux 跑通：实体目录自动备份 + **父目录软链导致断链**的根因
+
+**背景**：host-linux（Gentoo，注意 `HOME=$HOME` —— 看着像 macOS，实际是 Linux）
+跑 `make deploy` 直接失败：`dicts/lua/opencc 是目录，拒绝覆盖`（该目录此前被
+`deploy_host-linux_direct.sh` 做成「自包含」，三个子目录都是实体）。
+
+**第二批坑（修完①才暴露，更隐蔽）**：`make deploy` 报成功、`ls -la` 也看得见链，
+但链其实是**断的**（指向不存在的 `~/vmacs/repos/egret-rime/...`）⇒ `rime_deployer --build`
+把断链当垃圾清掉 ⇒ 用户目录只剩 `build/` + 用户词典，**方案直接消失**。
+
+**三处修复**（`scripts/rel_symlink.py` + `Makefile`）：
+
+| # | 问题 | 修复 |
+|---|---|---|
+| ① | 目标是实体目录 ⇒ 直接拒绝，`make deploy` 用不了 | 新增 `--backup-existing`：改名 `<link>.bak-<时间戳>` 再建链（**默认仍拒绝**，只是错误信息给出选项）；deploy 对 dicts/lua/opencc 启用 |
+| ② | **父目录是软链**时用未解析路径算相对深度 ⇒ 链少一层 ⇒ 断链 | `link_dir = os.path.realpath(dirname(link))`（内核解析相对链的基准是**物理目录**）。普通路径下 realpath==abspath，行为不变 |
+| ③ | `*.yaml` 里 `user.yaml`/`default.custom.yaml`（Rime 会回写）被软链 ⇒ 写脏仓库、丢目标机原配置；`installation.yaml`（机器态）被软链成开发机那份 ⇒ 两机 sync 同一 `installation_id` | 前两者**缺失时才复制**，`installation.yaml` **完全不碰**（与 `make env-test`/`deploy_bundle.sh` 同口径） |
+
+**验证（真实目标机 host-linux）**：
+- 备份：`~/rime-backup-20261011-162544.tar.gz`（46M，排除 *.gram）+ 目标目录内
+  `dicts.bak-*/lua.bak-*/opencc.bak-*`（71M/140K/276K，可 `mv` 回滚）；
+- 软链 16 条**均可解析**；`rime_deployer --build` 后**不再被清**；fcitx5 重启（pid 85319）；
+- scratch 自检 `~/.egret-check`：`jintiandetianqizenmeyang→今天的天气怎么样`、`tffu→等`、
+  `khlg→中国`、`qktnqnr→我吃饭`，**跑两轮 4/4 一致**（含需要词级 gram 的整句）；
+- 400MB gram **不重新下载**：目标机现有 419MB 文件 `ln` 硬链进 `data/gram/`（同文件系统，零拷贝）；
+- host-linux 仓库 `git status` 干净 —— 用户态文件不再被软链污染（修复③的直接效果）。
+
+**新增陷阱**（已同步 AGENTS.md）：
+1. **父目录含软链时，相对软链的基准必须用 `realpath`**，否则链静默失效；`rime_deployer` 会把断链
+   当垃圾清掉 ⇒ 症状是「部署成功但方案不见了」。诊断：`readlink -f <link>` 能解析到真实路径即 OK。
+2. 目标机 `HOME` 未必在常规位置（host-linux 是 Gentoo 却 `HOME=$HOME`）：排查路径问题先 `readlink -f`。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。
@@ -2425,7 +2457,7 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 | **H8** | ~~评测口径：区分「超时」与「真错」~~ | **✅ 已落地（§4.52）**：`ok/hang/slow/empty` 四态分类 + 杀进程组；修复后 160 句两次跑**逐句完全一致**（66/160、异常 0）。`regression_test.py` 遇超时不再崩 |
 | ~~H9~~ | ~~拆掉 librime-lua 关闭期 GC 活锁~~ | **✅ 全部完成（§4.51 → §4.73）**：根因定位 → 上游 PR #435 **已合并** → pin bump 到 `6da5d6c` → 桶记忆化落地 ⇒ **键盘延迟 -35%**（52 字母 12.9→9.0s）|
 | ~~H2~~ | ~~400MB gram 的部署校验~~ | **✅ 已做（§4.57）**：`install.sh` 自检必需运行时文件 + gram 存在性 + 下载命令 |
-| ~~H3~~ | ~~dist/bundle 重打 + 目标机复验~~ | **✅ macOS 已验（§4.57）**：bundle 20261009 + 自检 9/9；**host-linux 离线待验**（脚本已同步修） |
+| ~~H3~~ | ~~dist/bundle 重打 + 目标机复验~~ | **✅ macOS 已验（§4.57）**：bundle 20261009 + 自检 9/9；**host-linux 已在线**（§4.75：`make deploy` 路径 4/4 探针通过，链路可见性已修）——`dist/bundle` 流程在 host-linux 上仍待验（脚本已同步修） |
 | H4 | 扩展读法 | 现有 `wubi`/`py` 两个 tag；可再加「混合读法」等，见 `docs/schema-components.md §6` |
 | H5 | 按键延迟预算 | 搜索器每键都要跑（实测约 3.6ms/键，含一次性码表加载）；多读法前先建预算 |
 

@@ -128,6 +128,10 @@ jintiandetianqizenmeyang→今天的天气怎么样
   测前重置（regression_test.py 已自动处理）。
 - rm -rf build 后首次 console 有维护竞态，跑两次再采信。
 - 软链目录内 ln -sf 会自引用覆盖源文件。
+- **相对软链的基准目录必须用 `realpath`**（父目录本身是软链时，用未解析路径算
+  少一层 ⇒ 链是断的；`rime_deployer` 会把断链清掉 ⇒ 「部署成功但方案不见了」，
+  `make deploy` 已修，见 §4.75）。目标机 `HOME` 也未必在常规位置（host-linux 是
+  Gentoo 却 `HOME=$HOME`）——排查路径先 `readlink -f`。
 - translator 配置块键必须与 @name_space 完全一致，dictionary 不支持
   子目录路径（import_tables 支持）。
 - 传统库与混合库对"字全码 vs 2+2 词码冲突"的处理语义相反
