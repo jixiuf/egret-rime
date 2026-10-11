@@ -38,7 +38,12 @@ def main():
     target_abs = os.path.abspath(args.target)
     if not args.allow_missing and not os.path.exists(target_abs):
         sys.exit(f"目标不存在：{target_abs}")
-    rel = os.path.relpath(target_abs, os.path.dirname(link))
+    # 相对路径必须从**物理目录**算：link 所在目录里若有软链（如
+    # ~/.local/share/fcitx5 -> ~/vmacs/linux/local/share:fcitx5），内核解析相对链时
+    # 是相对物理目录的 ⇒ 用未解析的路径算会少算层级，链一建就是断链
+    # （host-linux 实测：链指向 ~/vmacs/repos/...，rime_deployer 随后把断链清掉）。
+    link_dir = os.path.realpath(os.path.dirname(link))
+    rel = os.path.relpath(target_abs, link_dir)
     # 已存在（含指向别处的软链、坏链）先删
     if os.path.lexists(link):
         if os.path.islink(link) or os.path.isfile(link):
