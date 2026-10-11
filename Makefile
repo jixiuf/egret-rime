@@ -184,10 +184,21 @@ gram-lm:           ## 下载万象词级语言模型（~400MB；断点续传，�
 	  echo "已下载 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)）"; \
 	fi
 
-deploy:            ## 软链到输入法用户目录（TARGET=...；仓库内一律相对软链；缺 LM 自动下载）
+deploy:            ## 软链到输入法用户目录（TARGET=...；目标已有实体目录 dicts/lua/opencc 会先改名备份为 *.bak-<时间戳>）
 	@mkdir -p $(TARGET_DIR)
-	@for d in dicts lua opencc; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$d" "$(REPO)/$$d" --quiet; done
-	@for f in $(REPO)/*.yaml; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$(basename $$f)" "$$f" --quiet; done
+	@for d in dicts lua opencc; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$d" "$(REPO)/$$d" --quiet --backup-existing; done
+	@# user.yaml / default.custom.yaml 是**用户态**（Rime 会回写）：软链会把改动写回仓库、
+	@# 并丢掉目标机原有配置（同 env-test 的口径）⇒ 只在缺失时复制一份，不建链
+	@# installation.yaml 同理是**机器态**（install_time/installation_id，已 gitignore）：
+	@# 绝不能把它软链/拷成开发机那份，否则两台机器 sync 到同一个 id 会互相覆盖
+	@for f in $(REPO)/*.yaml; do \
+	  case "$$(basename $$f)" in \
+	    installation.yaml) ;; \
+	    user.yaml|default.custom.yaml) \
+	      [ -e "$(TARGET_DIR)/$$(basename $$f)" ] || cp -f "$$f" "$(TARGET_DIR)/";; \
+	    *) $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$(basename $$f)" "$$f" --quiet;; \
+	  esac; \
+	done
 	@# 运行时二进制/元数据：优先 git 跟踪的 dicts/，再回退 data/gram/
 	@for f in lm_rerank.tsv py_words.tsv py_syllables.txt lm_rerank.bin lm_rerank.meta compose_table.bin py_meta.txt; do \
 		if [ -f "$(DICTS)/$$f" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$f" "$(DICTS)/$$f" --quiet; \

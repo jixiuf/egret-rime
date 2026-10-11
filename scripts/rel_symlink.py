@@ -12,11 +12,15 @@
   #     → data/rime-test/dicts -> ../../dicts
 
 行为：已存在（含坏链）则先删再建；目标不存在则报错退出（除非 --allow-missing）。
+
+目标已是**实体目录**时默认拒绝（防误删用户数据）；加 `--backup-existing` 会把该目录
+改名为 `<link>.bak-<时间戳>` 再建链（可回滚）。
 """
 
 import argparse
 import os
 import sys
+import time
 
 
 def main():
@@ -25,6 +29,8 @@ def main():
     ap.add_argument("target", help="指向的目标（可绝对、可相对当前目录）")
     ap.add_argument("--allow-missing", action="store_true",
                     help="目标不存在时也建（例如先占位）")
+    ap.add_argument("--backup-existing", action="store_true",
+                    help="目标是实体目录时，改名为 <link>.bak-<时间戳> 再建链（默认拒绝）")
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
 
@@ -37,8 +43,19 @@ def main():
     if os.path.lexists(link):
         if os.path.islink(link) or os.path.isfile(link):
             os.unlink(link)
+        elif args.backup_existing:
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            bak = f"{link}.bak-{stamp}"
+            n = 1
+            while os.path.lexists(bak):
+                bak = f"{link}.bak-{stamp}.{n}"
+                n += 1
+            os.rename(link, bak)
+            print(f"  ⚠ {link} 是实体目录，已备份为 "
+                  f"{os.path.basename(bak)}（要回滚：rm 掉软链后 mv 回来）", file=sys.stderr)
         else:
-            sys.exit(f"{link} 是目录，拒绝覆盖")
+            sys.exit(f"{link} 是目录，拒绝覆盖"
+                     "（确认要替换就加 --backup-existing：自动改名备份后建链）")
     os.makedirs(os.path.dirname(link), exist_ok=True)
     os.symlink(rel, link)
     if not args.quiet:
