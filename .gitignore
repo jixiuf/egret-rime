@@ -16,3 +16,6 @@ dist/
 dicts/egret_wubi_py/egret_wubi_py_pinyin_base_small.dict.yaml
 dicts/egret_wubi_py/egret_wubi_force_end.dict.yaml.tmp
 dicts/egret_wubi_py/egret_wubi_force_end.dict.yaml
+
+# 微信桥收发文件的工作目录（不要入库）
+.pi-wechat-files/
