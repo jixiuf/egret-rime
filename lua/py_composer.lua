@@ -134,7 +134,14 @@ local function load_pack(path)
         local b1, b2, b3, b4 = data:byte(9, 12)
         return b1 + b2 * 256 + b3 * 65536 + b4 * 16777216
     end)()
-    by_key = setmetatable({}, { __index = function(_, key) return pack_prefix(key) end })
+    -- 前缀桶**记忆化**：pack_prefix 每次调用都要做一次二分 + 为桶里每条记录新建
+    -- 一张表 + 切一次码串（平均 406 条），而 compose 里每个位置×每条路径都会取一次；
+    -- 桶内容对固定码表是常量 ⇒ 第一次算完就 rawset 回去。（只读使用，调用方不改它。）
+    by_key = setmetatable({}, { __index = function(t, key)
+        local v = pack_prefix(key)
+        if v then rawset(t, key, v) end
+        return v
+    end })
     return true, string.format("码表包 %d 条", pack.count)
 end
 
@@ -266,6 +273,7 @@ function M.compose(input, lm, beam, want)
     local fin = best[n]
     if not fin then return {} end
     cache.beam, cache.input, cache.best = beam, input, best
+    collectgarbage("step")   -- TEST: 每键推一步 GC
     table.sort(fin, function(a, b) return a.score > b.score end)
     local out = {}
     for i = 1, math.min(want, #fin) do

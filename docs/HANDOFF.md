@@ -117,7 +117,7 @@ engine.segmentors
 4. ~~dist/bundle 重打~~ — **✅ 2026-10-09**：`dist/egret-rime-runtime-20261009.tar.gz`（29M，61 文件）。
 5. **目标机复验**：macOS（host-mac）**✅ 9/9 自检通过**；**host-linux 离线待验**
    （其部署脚本已同步修好"自检不固定方案/只测拼音"的同源风险）。
-6. **拆掉 librime-lua 关闭期 GC 活锁**（§4.51）：**已定位根因 + 提上游 PR #435**
+6. ~~拆掉 librime-lua 关闭期 GC 活锁~~ — **✅ 已合并并落地（§4.73）**：pin→`6da5d6c`，桶记忆化已进 `lua/py_composer.lua`，延迟 -35%。原文：**已定位根因 + 提上游 PR #435**
    （`lua_gears.cc` 每 256 次析构做一次全量 GC，在 `lua_close` 期间重入 → 活锁）。
    本地已打补丁并重建（32 字母用例 挂死→3.35s）。剩下：合并后 bump pin（或 setup 加本地 patch），
    再把前缀桶记忆化落地（已验证 52 字母 11.9→7.8s，存档 `docs/experiments/h7-bucket-memo-pending-pin-bump.patch`）。

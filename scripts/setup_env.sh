@@ -40,7 +40,7 @@ warn() { printf '    \033[33m!\033[0m %s\n' "$*"; }
 REPOS=(
   "librime|https://github.com/rime/librime.git|33e78140250125871856cdc5b42ddc6a5fcd3cd4|tag 1.17.0"
   "librime-octagram|https://github.com/lotem/librime-octagram.git|57d18b9f58e5284bd891d559f6bdd16cf60341e9|octagram 语法/LM 插件"
-  "librime-lua|https://github.com/hchunhui/librime-lua.git|ad1e4a6c98abf634dd34242a747f9b1d5d069fbe|lua 组件（方案核心）"
+  "librime-lua|https://github.com/hchunhui/librime-lua.git|6da5d6cedb853380ed1b5b9b6979cb1a9c028353|lua 组件（方案核心）"
   "glog|https://github.com/google/glog.git|b33e3bad4c46c8a6345525fd822af355e5ef9446|v0.6.0 日志（RHEL8 自带 0.3.5 过旧）"
   "kenlm|https://github.com/kpu/kenlm.git|4cb443e60b7bf2c0ddf3c745378f76cb59e254e5|n-gram 训练"
   "rime-build-grammar|https://github.com/gaboolic/rime-build-grammar.git|fda2036f0ea7579dde63753d16c460657282caad|gram 训练管线脚本"

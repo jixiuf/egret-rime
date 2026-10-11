@@ -42,9 +42,11 @@ CASES = [
     ("duzhemenyijingduiqichehedianyingpinglunshiqulexingqu", 52),      # 长（最坏情况）
 ]
 BASELINE = {
-    "jintiandetianqizenmeyang": 3.52,
-    "yiwangdeshixigongzuoshizuoshenme": 6.19,
-    "duzhemenyijingduiqichehedianyingpinglunshiqulexingqu": 12.92,
+    # 2026-10-11 更新：搜索器"前缀桶记忆化"落地（§4.73，此前被 librime-lua 的
+    # 关闭期 GC 活锁挡住，上游 PR #435 合并后解锁）⇒ 全面快 35%。
+    "jintiandetianqizenmeyang": 2.30,
+    "yiwangdeshixigongzuoshizuoshenme": 4.02,
+    "duzhemenyijingduiqichehedianyingpinglunshiqulexingqu": 9.03,
 }
 
 
