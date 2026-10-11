@@ -2349,6 +2349,56 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 ⇒ 全面 **-35%**；相比本轮优化前的 52 字母 **60 s**，累计 **6.6×**。`scripts/bench_typing.py` 的
 基线已同步更新（§4.70 的性能门继续守着）。
 
+### 4.74 可维护性：仓库内一律**相对软链** + 运行时文件**必须入 git** + LM 自动下载
+
+用户提的两件事（+ 一个答疑），逐条落地并用**新 clone 端到端**验证。
+
+**① 仓库内软链全改相对**（此前 20 个全指向 `/export/ebook/egret-rime/...` ✗
+⇒ 仓库一换目录/换机器，链全断，且 `ls -l` 看不出这层耦合）
+- 新增 `scripts/rel_symlink.py`（算相对路径 + 覆盖已存在链），`make env-test` / `make deploy`
+  的建链全部改用它；`data/input/*`（外部语料源）也一并改相对。
+- 现况：`data/rime-test/dicts -> ../../dicts` ✓、`data/rime-test/default.yaml ->
+  ../../third-party/librime/build/bin/default.yaml` ✓
+
+**② 运行时文件必须入 git**（用户：py_meta.txt 没提交，但打包要用；clone 后所需文件应都在）
+- 审计（清单源文件 × `git ls-files`）：**4 个运行时文件未入 git** ——
+  `data/gram/{lm_rerank.meta,lm_rerank.bin,compose_table.bin,py_meta.txt}`。
+  **根因**：清单从 **gitignore 的 `data/gram/`** 取源，而 `dicts/` 里已有被跟踪的副本却没被用
+  ⇒ 本地一切正常、**新 clone 打出的包会缺这些文件** ✗。
+- 处置：清单**优先取 `dicts/`**（没有再回退 `data/gram/`）；`dicts/py_meta.txt` 入 git
+  （`gen_py_tables.py` 现在**双写** `dicts/` + `data/gram/`，refresh 不会让它过期）；
+  `installation.yaml` **不再打包**（每台机器的 id，librime 自建）；`make env-test` 的拷贝同样优先 `dicts/`。
+- **守卫**：`check_consistency.py` 新增"部署清单的每个源文件必须存在且已入 git"
+  （反向验证：改回 `data/gram/` 取源 → 报 4 处错误 ✓）。
+
+**③ `make deploy` 三处真 bug（在 clone 里测出来的）**
+| bug | 后果 |
+|---|---|
+| 写死 `$(TARGET)dicts`（假定 TARGET 以 `/` 结尾）| 传 `TARGET=/x` → 全部铺到 `/xdicts` ✗，而脚本仍打印"已部署"（误导）|
+| 残留一行 `ln -sf $(GRAM_DIR)/py_meta.txt $(TARGET)` | 与新循环重复、且是绝对链 |
+| 部署的是 **essay gram**（Lua 重排时代的遗留）| 与 `grammar/language: wanxiang-lts-zh-hans` 不符 ⇒ 等于没装 LM |
+
+**④ 语言模型自动下载**（用户：能下载就 curl 下载即可）
+- 新增 `make gram-lm`（`curl -fL --retry 3 -C -` 断点续传；已有则跳过，显示体积）；
+- `make deploy` 发现 LM 缺失**自动调用它**，再软链到目标目录；
+- 部署包 `install.sh` 加**显式** `--download-lm`（默认不联网，只在自检里提示命令）。
+- 验证用小文件冒充 LM 走完整链路：① 缺失→下载 ✓ ② 已有→跳过 ✓ ③ deploy 自动下载并链接 ✓
+
+**⑤ `py_meta.txt` 答疑**（用户问：作用 / 是否必要 / 手工维护词典是否要更新）
+- **作用**：搜索器的**词一元归一化常数** `LOG_N = log(语料总词数)*1000`
+  （`total_tokens=37720811` ⇒ LOG_N≈17 440），用于每条词的惩罚项 `词权重 − LOG_N`。
+- **是否必要**：**非必需**。缺失时回退硬编码 20200 并**只告警不抛错**。实测缺失：黄金 33/33、
+  `verify-wubi` 全过、160 句 **75/160 不变** ⇒ 当前取值与回退值的差异不影响我们的裁决。
+- **手工维护词典要不要手工更新它**：**不需要**。它是**语料统计量**（总词数），与词库增删无关；
+  只有重跑语料/词频管线时由 `scripts/gen_py_tables.py` 重新生成（现在双写两处）。
+- 顺带：读取逻辑从 `mix_segmentor` / `compose_filter` **各一份**收敛为
+  `py_composer.load_meta` **唯一实现**（带缺失告警）。
+
+**新 clone 端到端验证**（`git clone --depth 1 file://$PWD`，181MB）：
+① 清单 63 项源文件**缺 0** ✓ ② `make deploy` 后目标**缺 0** ✓ ③ 包内含
+`dicts/{py_meta.txt,lm_rerank.bin,lm_rerank.meta,compose_table.bin}` ✓；`make verify`（契约+黄金+五笔能力+延迟门）
+与 `make verify-bundle`（8/8）全过 ✓
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。

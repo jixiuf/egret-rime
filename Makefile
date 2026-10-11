@@ -40,10 +40,12 @@ GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/202607
 
 # deploy 用：允许 TARGET 带/不带尾斜杠（此前写死 $(TARGET)dicts，传 /x 会拼成 /xdicts）
 TARGET_DIR := $(patsubst %/,%,$(TARGET))
-# 运行时真正用的语言模型（万象词级）；essay gram 是 Lua 重排时代的遗留，不再部署
+# 运行时真正用的语言模型（万象词级）；essay gram 是 Lua 重排时代的遗留，不再部署。
+# 400MB，**不随仓库/部署包分发** ⇒ `make deploy` 发现缺失会自动下载（可断点续传）。
 GRAM_LM := $(GRAM_DIR)/wanxiang-lts-zh-hans.gram
+GRAM_LM_URL ?= https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/wanxiang-lts-zh-hans.gram
 
-.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle
+.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle gram-lm
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -169,7 +171,19 @@ eval-gram:        ## AB 评测各套 gram（默认比 essay-bgc vs 自训）
 	$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 100
 
 # --- 部署到输入法 -----------------------------------------------------------
-deploy:            ## 软链到输入法用户目录（TARGET=...；仓库内一律相对软链）
+gram-lm:           ## 下载万象词级语言模型（~400MB；断点续传，已有则跳过）
+	@mkdir -p "$(GRAM_DIR)"
+	@if [ -f "$(GRAM_LM)" ]; then \
+	  echo "已存在 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)）"; \
+	else \
+	  echo "下载 $(GRAM_LM_URL)"; \
+	  curl -fL --retry 3 --retry-delay 2 -C - -o "$(GRAM_LM).part" "$(GRAM_LM_URL)" \
+	    && mv -f "$(GRAM_LM).part" "$(GRAM_LM)" \
+	    || { echo "✗ 下载失败：$(GRAM_LM_URL)"; echo "  国内网络可试：proxychains4 make gram-lm"; rm -f "$(GRAM_LM).part"; exit 1; }; \
+	  echo "已下载 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)）"; \
+	fi
+
+deploy:            ## 软链到输入法用户目录（TARGET=...；仓库内一律相对软链；缺 LM 自动下载）
 	@mkdir -p $(TARGET_DIR)
 	@for d in dicts lua opencc; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$d" "$(REPO)/$$d" --quiet; done
 	@for f in $(REPO)/*.yaml; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$(basename $$f)" "$$f" --quiet; done
@@ -178,9 +192,10 @@ deploy:            ## 软链到输入法用户目录（TARGET=...；仓库内一
 		if [ -f "$(DICTS)/$$f" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$f" "$(DICTS)/$$f" --quiet; \
 		elif [ -f "$(GRAM_DIR)/$$f" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$f" "$(GRAM_DIR)/$$f" --quiet; fi; \
 	done
-	@# 语言模型（400MB，不随仓库分发）
+	@# 语言模型（400MB，不随仓库分发）：缺了就**自动下载**（断点续传），再软链过去
+	@if [ ! -f "$(GRAM_LM)" ]; then echo "  语言模型缺失 → 自动下载（~400MB）…"; $(MAKE) -s gram-lm || true; fi
 	@if [ -f "$(GRAM_LM)" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/wanxiang-lts-zh-hans.gram" "$(GRAM_LM)" --quiet; \
-	 else echo "  ! 缺 $(GRAM_LM)（不随仓库分发，请按 README 下载）"; fi
+	 else echo "  ! 仍未取得 $(GRAM_LM)：可手动 curl 到该路径（见 README）"; fi
 	@echo "已部署到 $(TARGET_DIR) (重新部署/重启输入法后生效)"
 
 # --- 语料管线（阶段 A~E）----------------------------------------------------

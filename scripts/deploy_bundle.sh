@@ -95,10 +95,12 @@ set -uo pipefail
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 MODE=copy
+DL_LM=0
 TARGET=""
 for a in "$@"; do
   case "$a" in
     --link) MODE=link ;;
+    --download-lm) DL_LM=1 ;;
     *) TARGET="$a" ;;
   esac
 done
@@ -160,8 +162,16 @@ else
   echo "  !  缺少引擎语言模型（约 400MB，本包不分发）: $TARGET/$GRAM"
   echo "     不装它的后果：grammar 加载失败 -> 没有语言模型，整句准确率明显下降"
   echo "     （实测：万象词级 gram 41~46% vs 无 LM / 字级重排 27%）"
-  echo "     获取： wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/$GRAM"
-  echo "           mv $GRAM <Rime 用户目录>/"
+  echo "     获取： curl -fL -C - -o \"$TARGET/$GRAM\" \\
+           https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/$GRAM"
+  echo "           （或重跑本脚本并加 --download-lm，我来自动下）"
+  if [ "$DL_LM" = 1 ]; then
+    echo "  --> --download-lm：开始下载 $GRAM（~400MB，断点续传）"
+    curl -fL --retry 3 -C - -o "$TARGET/$GRAM.part" \
+      "https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/$GRAM" \
+      && mv -f "$TARGET/$GRAM.part" "$TARGET/$GRAM" && echo "  ok 语言模型已就位" \
+      || { echo "  !  下载失败（网络受限可先在别处下好再拷进来）"; rm -f "$TARGET/$GRAM.part"; }
+  fi
 fi
 echo
 
