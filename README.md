@@ -116,12 +116,16 @@ make deploy TARGET=~/.config/ibus/rime/
 
 **必须**准备词级 gram（引擎 LM，缺它长句会明显变差）：
 
-```
-wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/wanxiang-lts-zh-hans.gram
+```bash
+make gram-lm          # 下载万象词级 LM（~400MB，断点续传；已有则跳过）
+# 或直接 make deploy —— 发现缺失会自动调它下载
 ```
 
-gram 默认存放在 `data/gram/`（`make setup-gram` 下载），部署时软链到
-Rime 用户目录（部署不复制 gram）。
+来源：`https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram`
+（`make setup-gram` 等价于 `make gram-lm`）。gram 存放在 `data/gram/`，部署时软链到 Rime
+用户目录（部署不复制 gram；**不随仓库/部署包分发**）。
+
+> 另有 `make gram-essay`（essay 字级 gram）**仅供评测 A/B**，方案运行时不再使用它。
 
 ## 词库再生成
 

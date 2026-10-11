@@ -43,9 +43,9 @@ TARGET_DIR := $(patsubst %/,%,$(TARGET))
 # 运行时真正用的语言模型（万象词级）；essay gram 是 Lua 重排时代的遗留，不再部署。
 # 400MB，**不随仓库/部署包分发** ⇒ `make deploy` 发现缺失会自动下载（可断点续传）。
 GRAM_LM := $(GRAM_DIR)/wanxiang-lts-zh-hans.gram
-GRAM_LM_URL ?= https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/wanxiang-lts-zh-hans.gram
+GRAM_LM_URL ?= https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram
 
-.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle gram-lm
+.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle gram-lm gram-essay
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -57,7 +57,9 @@ setup-clone:
 setup-build:
 	bash scripts/setup_env.sh build
 
-setup-gram: $(GRAM)
+setup-gram: gram-lm   ## 下载运行时语言模型（= make gram-lm，万象词级）
+
+gram-essay: $(GRAM)   ## 仅评测 A/B 用（essay 字级 gram，方案运行时不用它）
 
 $(GRAM):
 	mkdir -p $(GRAM_DIR)
@@ -97,7 +99,6 @@ env-test:
 	@for f in default.yaml symbols.yaml essay.txt; do \
 		$(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$f $(LIBRIME_BIN)/$$f --quiet; \
 	done
-	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
 	@cp -f $(REPO)/data/gram/wanxiang-lts-zh-hans.gram $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
 	@# 运行时文件优先取 **git 跟踪的 dicts/**（新 clone 也有），没有再回退 data/gram/
