@@ -38,6 +38,11 @@ PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
 
 GRAM_URL := https://github.com/lotem/rime-octagram-data/releases/download/20260712/zh-hans-t-essay-bgc.gram
 
+# deploy 用：允许 TARGET 带/不带尾斜杠（此前写死 $(TARGET)dicts，传 /x 会拼成 /xdicts）
+TARGET_DIR := $(patsubst %/,%,$(TARGET))
+# 运行时真正用的语言模型（万象词级）；essay gram 是 Lua 重排时代的遗留，不再部署
+GRAM_LM := $(GRAM_DIR)/wanxiang-lts-zh-hans.gram
+
 .PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle
 
 # --- 环境搭建 ---------------------------------------------------------------
@@ -164,16 +169,19 @@ eval-gram:        ## AB 评测各套 gram（默认比 essay-bgc vs 自训）
 	$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 100
 
 # --- 部署到输入法 -----------------------------------------------------------
-deploy: $(GRAM)
-	mkdir -p $(TARGET)
-	@for d in dicts lua opencc; do $(PYTHON) scripts/rel_symlink.py "$(TARGET)$$d" "$(REPO)/$$d" --quiet; done
-	@for f in $(REPO)/*.yaml; do $(PYTHON) scripts/rel_symlink.py "$(TARGET)$$(basename $$f)" "$$f" --quiet; done
-	@$(PYTHON) scripts/rel_symlink.py "$(TARGET)$$(basename $(GRAM))" "$(GRAM)" --quiet
+deploy:            ## 软链到输入法用户目录（TARGET=...；仓库内一律相对软链）
+	@mkdir -p $(TARGET_DIR)
+	@for d in dicts lua opencc; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$d" "$(REPO)/$$d" --quiet; done
+	@for f in $(REPO)/*.yaml; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$(basename $$f)" "$$f" --quiet; done
+	@# 运行时二进制/元数据：优先 git 跟踪的 dicts/，再回退 data/gram/
 	@for f in lm_rerank.tsv py_words.tsv py_syllables.txt lm_rerank.bin lm_rerank.meta compose_table.bin py_meta.txt; do \
-		[ -f "$(GRAM_DIR)/$$f" ] && $(PYTHON) scripts/rel_symlink.py "$(TARGET)$$f" "$(GRAM_DIR)/$$f" --quiet || true; \
+		if [ -f "$(DICTS)/$$f" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$f" "$(DICTS)/$$f" --quiet; \
+		elif [ -f "$(GRAM_DIR)/$$f" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$f" "$(GRAM_DIR)/$$f" --quiet; fi; \
 	done
-	ln -sf "$(GRAM_DIR)/py_meta.txt" "$(TARGET)"
-	@echo "已部署到 $(TARGET) (重新部署/重启输入法后生效)"
+	@# 语言模型（400MB，不随仓库分发）
+	@if [ -f "$(GRAM_LM)" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/wanxiang-lts-zh-hans.gram" "$(GRAM_LM)" --quiet; \
+	 else echo "  ! 缺 $(GRAM_LM)（不随仓库分发，请按 README 下载）"; fi
+	@echo "已部署到 $(TARGET_DIR) (重新部署/重启输入法后生效)"
 
 # --- 语料管线（阶段 A~E）----------------------------------------------------
 # 一键刷新：用 data/input 下最新语料增量刷新全部产物（抽取→清洗→词频→词典→gram→验证）
