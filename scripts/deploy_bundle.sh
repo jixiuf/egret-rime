@@ -163,12 +163,12 @@ else
   echo "     不装它的后果：grammar 加载失败 -> 没有语言模型，整句准确率明显下降"
   echo "     （实测：万象词级 gram 41~46% vs 无 LM / 字级重排 27%）"
   echo "     获取： curl -fL -C - -o \"$TARGET/$GRAM\" \\
-           https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/$GRAM"
+           https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/$GRAM"
   echo "           （或重跑本脚本并加 --download-lm，我来自动下）"
   if [ "$DL_LM" = 1 ]; then
     echo "  --> --download-lm：开始下载 $GRAM（~400MB，断点续传）"
     curl -fL --retry 3 -C - -o "$TARGET/$GRAM.part" \
-      "https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/$GRAM" \
+      "https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/$GRAM" \
       && mv -f "$TARGET/$GRAM.part" "$TARGET/$GRAM" && echo "  ok 语言模型已就位" \
       || { echo "  !  下载失败（网络受限可先在别处下好再拷进来）"; rm -f "$TARGET/$GRAM.part"; }
   fi
@@ -218,7 +218,7 @@ egret-rime 运行时部署包
 ----------------
 把 wanxiang-lts-zh-hans.gram 放进 Rime 用户目录（与 *.yaml 同级）。
 缺它 = 没有语言模型（整句准确率大幅下降）。
-下载：wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/v2n3/wanxiang-lts-zh-hans.gram
+下载：wget -c https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram
 EOF
 
 cd "$DIST"
