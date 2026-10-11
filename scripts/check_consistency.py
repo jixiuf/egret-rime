@@ -128,6 +128,29 @@ if os.path.exists(_src):
               f"（修法: python3 scripts/fix_wubi_86_3char_codes.py）")
         err += 1
 
+# 2.9) 部署清单的**源文件必须入 git**（新 clone 后要能打出完整的包）。
+#      踩过：清单只从 data/gram/（gitignore 的目录）取 lm_rerank.bin/compose_table.bin/
+#      py_meta.txt ⇒ 本地有、新 clone 没有 ⇒ 打出的包缺运行时文件。
+try:
+    _mf = subprocess.run(["bash", "scripts/deploy_bundle.sh", "--list"],
+                         capture_output=True, text=True).stdout
+    for _ln in _mf.splitlines():
+        if "|" not in _ln:
+            continue
+        _src = _ln.split("|")[0]
+        if not os.path.exists(_src):
+            print(f"  ✗ 部署清单引用的源文件不存在: {_src}")
+            err += 1
+            continue
+        r = subprocess.run(["git", "ls-files", "--error-unmatch", _src],
+                           capture_output=True)
+        if r.returncode != 0:
+            print(f"  ✗ 部署清单的源文件未入 git（新 clone 会缺）: {_src}")
+            err += 1
+except Exception as _e:
+    print(f"  · 清单/git 检查跳过（{_e}）")
+    warn += 1
+
 # 3) 语法
 for p in glob.glob("scripts/*.py") + glob.glob("scripts/**/*.py", recursive=True):
     r = subprocess.run([sys.executable, "-c", f"import ast;ast.parse(open({p!r},encoding='utf-8').read())"],

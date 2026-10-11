@@ -69,33 +69,37 @@ env-test:
 	  { echo "生成产物缺失，自动跑 scripts/refresh.sh --only dict ..."; \
 	    bash "$(REPO)/scripts/refresh.sh" --only dict >/dev/null 2>&1 || true; }
 	@mkdir -p $(TEST_DIR)/build
+	@# 一律用**相对**软链（scripts/rel_symlink.py）：整棵树可搬迁、链不会断
 	@for f in $(REPO)/*.yaml; do \
 		case "$$(basename $$f)" in \
 			user.yaml|default.custom.yaml) ;; \
-			*) ln -sf "$$f" $(TEST_DIR)/ ;; \
+			*) $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$(basename $$f) "$$f" --quiet ;; \
 		esac \
 	done
 	@# 用户态配置用复制而非软链: console/deployer 会回写这两个文件,
 	@# 软链会把改动写到仓库里(见 AGENTS.md 陷阱 #1)
 	@cp -f $(REPO)/user.yaml $(REPO)/default.custom.yaml $(TEST_DIR)/
-	@for d in dicts lua opencc; do ln -sfn $(REPO)/$$d $(TEST_DIR)/$$d; done
+	@for d in dicts lua opencc; do $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$d $(REPO)/$$d --quiet; done
 	@mkdir -p $(SHARED_DIR)
 	@for f in default.yaml symbols.yaml essay.txt; do \
-		ln -sf $(LIBRIME_BIN)/$$f $(SHARED_DIR)/ 2>/dev/null || true; \
+		$(PYTHON) $(REPO)/scripts/rel_symlink.py $(SHARED_DIR)/$$f $(LIBRIME_BIN)/$$f --quiet; \
 	done
 	@# 关键: console 运行时 user_data_dir 与 shared_data_dir 均为 "."（librime 默认），
 	@# 所以 default.yaml/symbols.yaml 必须同时存在于用户目录，否则
 	@# `default:key_binder` 解析失败 → schema config 构建失败 → **grammar(LM) 静默失效**。
 	@for f in default.yaml symbols.yaml essay.txt; do \
-		ln -sf $(LIBRIME_BIN)/$$f $(TEST_DIR)/ 2>/dev/null || true; \
+		$(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$f $(LIBRIME_BIN)/$$f --quiet; \
 	done
 	@cp -f $(GRAM) $(TEST_DIR)/ 2>/dev/null || true
 	@cp -f $(REPO)/data/gram/wanxiang-lts-zh-hans.gram $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
-	@cp -f $(GRAM_DIR)/lm_rerank.tsv $(GRAM_DIR)/lm_rerank.meta \
-		$(GRAM_DIR)/lm_rerank.bin $(GRAM_DIR)/compose_table.bin \
-		$(GRAM_DIR)/py_words.tsv $(GRAM_DIR)/py_syllables.txt \
-		$(GRAM_DIR)/py_meta.txt $(TEST_DIR)/ 2>/dev/null || true
+	@# 运行时文件优先取 **git 跟踪的 dicts/**（新 clone 也有），没有再回退 data/gram/
+	@for f in lm_rerank.meta lm_rerank.bin compose_table.bin py_meta.txt; do \
+		if [ -f $(DICTS)/$$f ]; then cp -f $(DICTS)/$$f $(TEST_DIR)/; \
+		elif [ -f $(GRAM_DIR)/$$f ]; then cp -f $(GRAM_DIR)/$$f $(TEST_DIR)/; fi; \
+	done
+	@cp -f $(GRAM_DIR)/lm_rerank.tsv $(GRAM_DIR)/py_words.tsv \
+		$(GRAM_DIR)/py_syllables.txt $(TEST_DIR)/ 2>/dev/null || true
 	@# 先部署出 build/ 产物: 空 build/ 下首次 console 会撞维护竞态(陷阱 #2)
 	@$(LIBRIME_BIN)/rime_deployer --build $(TEST_DIR) $(SHARED_DIR) \
 		$(TEST_DIR)/build >/dev/null 2>&1 || true
@@ -162,14 +166,12 @@ eval-gram:        ## AB 评测各套 gram（默认比 essay-bgc vs 自训）
 # --- 部署到输入法 -----------------------------------------------------------
 deploy: $(GRAM)
 	mkdir -p $(TARGET)
-	ln -sfn "$(DICTS)" "$(TARGET)dicts"
-	ln -sfn "$(REPO)/lua" "$(TARGET)lua"
-	ln -sfn "$(REPO)/opencc" "$(TARGET)opencc"
-	ln -sf "$(REPO)/"*.yaml "$(TARGET)"
-	ln -sf "$(GRAM)" "$(TARGET)"
-	ln -sf "$(GRAM_DIR)/lm_rerank.tsv" "$(TARGET)"
-	ln -sf "$(GRAM_DIR)/py_words.tsv" "$(TARGET)"
-	ln -sf "$(GRAM_DIR)/py_syllables.txt" "$(TARGET)"
+	@for d in dicts lua opencc; do $(PYTHON) scripts/rel_symlink.py "$(TARGET)$$d" "$(REPO)/$$d" --quiet; done
+	@for f in $(REPO)/*.yaml; do $(PYTHON) scripts/rel_symlink.py "$(TARGET)$$(basename $$f)" "$$f" --quiet; done
+	@$(PYTHON) scripts/rel_symlink.py "$(TARGET)$$(basename $(GRAM))" "$(GRAM)" --quiet
+	@for f in lm_rerank.tsv py_words.tsv py_syllables.txt lm_rerank.bin lm_rerank.meta compose_table.bin py_meta.txt; do \
+		[ -f "$(GRAM_DIR)/$$f" ] && $(PYTHON) scripts/rel_symlink.py "$(TARGET)$$f" "$(GRAM_DIR)/$$f" --quiet || true; \
+	done
 	ln -sf "$(GRAM_DIR)/py_meta.txt" "$(TARGET)"
 	@echo "已部署到 $(TARGET) (重新部署/重启输入法后生效)"
 

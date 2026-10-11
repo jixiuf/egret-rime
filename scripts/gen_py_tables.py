@@ -74,9 +74,12 @@ def main():
     total_chars=sum(v for k,v in freq.items() if k.startswith("\x01"))
     total_tokens=int(total_chars / 1.5) if total_chars else 1
     mp=os.path.join(rime_paths.GRAM_DIR,"py_meta.txt")
-    with open(mp,"w",encoding="utf-8") as f:
-        f.write(f"total_tokens={total_tokens}\n")
-    print(f"语料总词数 {total_tokens:,} -> {mp}")
+    mp_git=os.path.join(rime_paths.DICTS,"py_meta.txt")
+    # 写两份：dicts/（**入 git 的规范位置**，新 clone 也拿得到）+ data/gram/（本地产物目录）
+    for _p in (mp_git, mp):
+        with open(_p,"w",encoding="utf-8") as f:
+            f.write(f"total_tokens={total_tokens}\n")
+    print(f"语料总词数 {total_tokens:,} -> {mp_git} / {mp}")
     sp=os.path.join(rime_paths.GRAM_DIR,"py_syllables.txt")
     wp=os.path.join(rime_paths.GRAM_DIR,"py_words.tsv")
     with open(sp,"w",encoding="utf-8") as f:

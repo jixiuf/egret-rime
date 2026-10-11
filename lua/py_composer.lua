@@ -74,6 +74,38 @@ local function gain_of(lm, ctx, text)
     return v
 end
 
+--- 读部署目录里的 py_meta.txt（total_tokens -> LOG_N）。
+-- 这是**唯一实现**（此前 mix_segmentor / compose_filter 各抄了一份，容易改漏）。
+-- 先找 dicts/（部署位置）再退回用户目录根；**缺文件不能抛错**——曾因部署漏它
+-- 导致整个 segmentor 初始化失败（fcitx 日志 "bad argument #1 to 'lines'"）。
+-- 缺它不影响可用性（LOG_N 退回默认值），只影响分段偏好，故只告警。
+function M.load_meta(dir)
+    local tried = {}
+    for _, p in ipairs({ dir .. "/dicts/py_meta.txt", dir .. "/py_meta.txt" }) do
+        local f = io.open(p, "r")
+        if f then
+            local v
+            for line in f:lines() do
+                local t = line:match("^total_tokens=(%d+)$")
+                if t then v = tonumber(t) end
+            end
+            f:close()
+            if v then
+                M.set_total_tokens(v)
+                return v
+            end
+            tried[#tried + 1] = p .. "（无 total_tokens 行）"
+        else
+            tried[#tried + 1] = p
+        end
+    end
+    if log and log.warning then
+        log.warning("[py_composer] 未找到 py_meta.txt，LOG_N 用默认值 "
+            .. tostring(M.get_log_n()) .. "；找过: " .. table.concat(tried, ", "))
+    end
+    return nil
+end
+
 function M.reset_cache()
     cache.beam, cache.input, cache.best = nil, "", nil
     gain_cache, gain_n = {}, 0        -- LM 表可能被重新载入，增益记忆化一并失效

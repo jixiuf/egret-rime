@@ -36,7 +36,10 @@ LIST_ONLY=0
 # 输出格式: 仓库内路径|目标相对路径
 manifest() {
   for f in "$ROOT"/*.yaml; do
-    b="$(basename "$f")"; [ "$b" = user.yaml ] && continue   # 用户态，不覆盖
+    b="$(basename "$f")"
+    case "$b" in
+      user.yaml|installation.yaml) continue ;;   # 用户态/机器态，不覆盖
+    esac
     echo "$b|$b"
   done
   for f in "$ROOT"/lua/*.lua; do echo "lua/$(basename "$f")|lua/$(basename "$f")"; done
@@ -47,15 +50,24 @@ manifest() {
     [ -e "$f" ] || continue
     echo "opencc/$(basename "$f")|opencc/$(basename "$f")"
   done
-  # LM 重排的运行时文件：.bin（二分查表用）+ .meta（总字数，backoff 归一化用）。
-  # .tsv 只是同一份数据的可读视图，给人排查用，不部署。
-  [ -f "$ROOT/data/gram/lm_rerank.meta" ] && echo "data/gram/lm_rerank.meta|dicts/lm_rerank.meta"
+  # 运行时二进制/元数据：**优先取 git 跟踪的 dicts/ 副本**（新 clone 也有），
+  # 没有才回退到 data/gram/（本地产物目录，不入 git）。此前只从 data/gram/ 取 ⇒
+  # 新 clone 打出的包**缺这几个文件**（用户 git clone 后 `make deploy` 就不齐）。
+  #   · lm_rerank.meta/.bin：LM 重排表（.tsv 只是给人看的可读视图，不部署）
+  #   · compose_table.bin：统一码表搜索器
+  #   · py_meta.txt：搜索器的一元归一化常数（total_tokens -> LOG_N）
   # 放 dicts/ 而不是用户目录根：fcitx 每次重启都会跑一遍部署，deployer 会把根下
   # 不认识的 .bin 当无主文件移进 trash/（实测每次重启 lm_rerank.bin 都被移走）。
-  [ -f "$ROOT/data/gram/lm_rerank.bin" ]  && echo "data/gram/lm_rerank.bin|dicts/lm_rerank.bin"
-  [ -f "$ROOT/data/gram/compose_table.bin" ] && echo "data/gram/compose_table.bin|dicts/compose_table.bin"
-  # 搜索器要读 py_meta.txt（total_tokens -> LOG_N）；也放 dicts/ 免得被 deployer 清
-  [ -f "$ROOT/data/gram/py_meta.txt" ] && echo "data/gram/py_meta.txt|dicts/py_meta.txt"
+  for f in lm_rerank.meta lm_rerank.bin compose_table.bin py_meta.txt; do
+    if [ -f "$ROOT/dicts/$f" ]; then
+      echo "dicts/$f|dicts/$f"
+    elif [ -f "$ROOT/data/gram/$f" ]; then
+      echo "data/gram/$f|dicts/$f"
+    fi
+  done
+  # installation.yaml **不打**：它是每台机器自己的（install_time/installation_id），
+  # librime 会在需要时自行生成；打出去反而会把各机器的 id 覆盖成同一个。
+  # 用户态配置（user.yaml / *.custom.yaml 里的自定义）同理不覆盖。
   # 词级 gram（wanxiang-lts-zh-hans.gram, ~400MB）不打包：用户自行下载，
   # 放到 <rime用户目录>/ 下即可。缺它 = 没有语言模型。见 README。
   return 0
