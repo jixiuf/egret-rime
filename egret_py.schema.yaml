@@ -101,6 +101,7 @@ engine:
     - lua_filter@*reduce_emoji_filter
     - simplifier@traditionalize
     - uniquifier
+    - lua_filter@*tail_word_filter   # 长句页尾留「字/词」候选（可先字修正）
 
 abc_segmentor:
   extra_tags:

@@ -106,6 +106,7 @@ engine:
     - lua_filter@*dump_cands_filter    # 调试：打印整份候选表（默认关）
     - lua_filter@*compose_filter
     - uniquifier                # 去重（移到最末：实测放中间去不掉重复，见 §4.58）
+    - lua_filter@*tail_word_filter  # 长句页尾留「字/词」候选（可先字修正）——须在 uniquifier 之后（只重排最终表）
 
 # ---- 顶层调度：first=传统五笔库，先于混合库，保证简码/全码首候选确定 ----
 dynamic_translator:

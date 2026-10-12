@@ -164,7 +164,31 @@ for p in glob.glob("scripts/**/*.sh", recursive=True) + glob.glob("scripts/*.sh"
     if subprocess.run(["bash", "-n", p], capture_output=True).returncode:
         print(f"  ✗ bash 语法: {p}"); err += 1
 
-# 4) refresh.sh 里未提到的生成器（提示，不算错）
+# 4) 键名字优先（王码「25 键名字四连击」）：同码词不得压过键名字
+# 用户实测拦住的回归（kkkk 出「串串」而非「口」），见 docs/PROGRESS.md §4.76。
+# 词表是生成产物，任一生成器漏了 keyname_priority 就会在这里报出来。
+try:
+    sys.path.insert(0, os.path.join(ROOT, "scripts"))
+    from keyname_priority import caps as _kn_caps
+    _kcaps = _kn_caps(os.path.join(ROOT, "dicts"))
+    _trad_tables = ["egret_wubi_words_wb86_base", "egret_wubi_words_wb86_longtail",
+                    "egret_wubi_words_wb86_mined4", "egret_wubi_sentence",
+                    "egret_wubi_force_end"]
+    for _t in _trad_tables:
+        _p = os.path.join(ROOT, "dicts", _t + ".dict.yaml")
+        if not os.path.exists(_p):
+            continue
+        for _line in open(_p, encoding="utf-8"):
+            _f = _line.rstrip("\n").split("\t")
+            if len(_f) >= 3 and _f[2].isdigit() and _f[1] in _kcaps \
+                    and int(_f[2]) > _kcaps[_f[1]]:
+                print(f"  ✗ 键名字被压：{_f[0]} {_f[1]} 权重 {_f[2]} > 上限 {_kcaps[_f[1]]}"
+                      f"（{_t}）—— 生成器漏了 keyname_priority")
+                err += 1
+except Exception as _e:
+    print(f"  · 键名字优先检查跳过（{_e}）") ; warn += 1
+
+# 5) refresh.sh 里未提到的生成器（提示，不算错）
 rs = open("scripts/refresh.sh", encoding="utf-8").read()
 missing = [os.path.basename(p) for p in sorted(glob.glob("scripts/gen_*.py"))
            if os.path.basename(p) not in rs]

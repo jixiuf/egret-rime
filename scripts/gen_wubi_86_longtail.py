@@ -33,6 +33,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import rime_paths  # noqa: E402
+from keyname_priority import caps as keyname_caps, cap_weight  # noqa: E402
 
 DICTS = rime_paths.DICTS
 SRC_WX = os.path.join(DICTS, "egret_wubi_words_wangxiang_full.dict.yaml")
@@ -91,6 +92,18 @@ def main():
         # 标准五笔词组码（§4.61/§4.62）：2 字=2+2；3 字=1+1+2
         code = cs[0] + cs[1] if len(w) == 2 else cs[0][:1] + cs[1][:1] + cs[2]
         rows.append((w, code, max(1, int(wt * args.weight_scale))))
+
+    # 键名字优先：同码词压到键名字之下（如 tttt 的 笔笔/竹笙 不能压住 禾，§4.76）
+    kcaps = keyname_caps(DICTS)
+    capped = 0
+    fixed = []
+    for w, c, wt in rows:
+        new_wt, was_capped = cap_weight(c, wt, kcaps)
+        capped += 1 if was_capped else 0
+        fixed.append((w, c, new_wt))
+    rows = fixed
+    if capped:
+        print(f"  键名字优先：压权重 {capped} 条")
 
     rows.sort(key=lambda r: -r[2])
     path = os.path.join(DICTS, args.out + ".dict.yaml")

@@ -57,6 +57,12 @@ TIER_DESC = {
     "full": "≈78 万词，尽量全（长尾交给 gram）",
 }
 
+# --- 键名字优先（王码「25 键名字四连击」规则，见 scripts/keyname_priority.py）---
+# 用户实测：kkkk → 串串(593) 压住 口(544)。规则与实现细节见 §4.76。
+from keyname_priority import KEYNAME_4, caps as keyname_caps, cap_weight  # noqa: E402
+
+CAP_STATS = {}      # code -> [(词, 原权重)]，仅用于打印
+
 
 def header(name, comment_lines):
     out = ["# RIME dictionary", "# 由 scripts/gen_dict_tiers.py 生成，请勿手改",
@@ -82,8 +88,11 @@ def rows(path):
                 yield p[0], p[1], int(p[2])
 
 
-def write_tier(kind, src, tier, minw, note, prefix="egret_wubi_py"):
-    """按权重过滤写出一个档位文件，返回条目数。"""
+def write_tier(kind, src, tier, minw, note, prefix="egret_wubi_py", caps=None):
+    """按权重过滤写出一个档位文件，返回条目数。
+
+    caps: {码: 权重上限}，用于「键名字优先」（见 KEYNAME_4）；传 None 表示不改权重。
+    """
     name = f"{prefix}_{kind}_{tier}"
     out_path = os.path.join(OUT, name + ".dict.yaml")
     n = 0
@@ -91,6 +100,12 @@ def write_tier(kind, src, tier, minw, note, prefix="egret_wubi_py"):
         f.write(header(name, [f"{note}｜档位 {tier}（{TIER_DESC[tier]}）",
                               f"权重 >= {minw}（源: {os.path.relpath(src, REPO)}）"]))
         for w, code, weight in rows(src):
+            if caps:
+                code = code.strip()
+                new_weight, capped = cap_weight(code, weight, caps)
+                if capped:
+                    CAP_STATS.setdefault(code, []).append((w, weight))
+                    weight = new_weight
             if weight >= minw:
                 f.write(f"{w}\t{code}\t{weight}\n")
                 n += 1
@@ -122,10 +137,22 @@ def main():
         if not os.path.exists(src):
             print(f"  ! 跳过 {kind}: 源文件缺失 {src}")
             continue
+        # 键名字优先只对**传统库词**（86 造词码，纯 4 字母）生效；混合库词是逗号
+        # token（如 串串 = "kk,hk kk,hk"），码要运行时由 algebra 派生，此处不匹配。
+        caps = keyname_caps(DICTS) if kind == "words_wb86" else None
         for tier in tiers:
             minw = TIERS[tier]
-            n = write_tier(kind, src, tier, minw, note, prefix)
+            n = write_tier(kind, src, tier, minw, note, prefix, caps)
             print(f"  {kind:<14} {tier:<5} >= {minw:<4} {n:>7} 条")
+
+    if CAP_STATS and args.tier != "stats":
+        tot = sum(len(v) for v in CAP_STATS.values())
+        print(f"\n键名字优先（王码 25 键名字四连击）：压权重 {tot} 条条目 / "
+              f"{len(CAP_STATS)} 个码")
+        for code in sorted(CAP_STATS, key=lambda c: -max(w for _, w in CAP_STATS[c])):
+            items = ", ".join(f"{w}({w0})" for w, w0 in
+                              sorted(CAP_STATS[code], key=lambda x: -x[1])[:3])
+            print(f"  {code} {KEYNAME_4.get(code, '')}: {items}")
 
     if args.tier == "all" or args.stats:
         print("\n档位规模合计（三套码相加）：")

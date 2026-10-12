@@ -43,6 +43,12 @@ engine.segmentors
 - **搜索器** = `lua/py_composer.lua` + `data/gram/compose_table.bin`（27 万条统一码表：五笔+拼音）；
   beam 状态**按输入前缀增量缓存**（§4.50）：每键 O(1 个位置)，判定不变（52 字母单例 60s→11.9s）
 - 命名规则：内容同时含五笔与拼音 → `egret_wubi_py_*`；只五笔 → `egret_wubi_*`；只拼音 → `egret_py_*`
+- **长句页尾留字/词（先字修正）**：`lua/tail_word_filter.lua`（§4.76）——首候选是 ≥4 字整句时，
+  每页最后 2 位放**非整句**候选（字/词/前缀词）。选它只上屏前缀，余下输入继续组句 ⇒
+  长句首字词不合意时先选字修正，不必退格重打。短码/全码/词组路径一行不动。
+- **键名字优先**：`scripts/keyname_priority.py`（§4.76）——25 个键名字四连击码
+  （口 kkkk / 禾 tttt / 大 dddd …）把**同码词压到其下**，保字第 1（口 544 > 串串 543），
+  不改正字表权重；`make lint` 有契约守卫（任一词表漏接生成器即报错）。
 - 三个库/方案（F4 可切，`default.custom.yaml` 的 schema_list 三者都在）：
   `egret_wubi_py`（混流主方案）/ `egret_wubi`（**纯五笔**，86 造词码 + 长尾 + 四字词，§4.71）/
   `egret_py`（**纯全拼**，也是 `+拼音 反查的词典来源）

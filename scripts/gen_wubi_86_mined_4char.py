@@ -37,6 +37,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import rime_paths  # noqa: E402
+from keyname_priority import caps as keyname_caps, cap_weight  # noqa: E402
 
 DICTS = rime_paths.DICTS
 OUT_NAME = "egret_wubi_words_wb86_mined4"
@@ -143,6 +144,18 @@ def main():
     if args.dry_run:
         print("（dry-run，未写入）")
         return
+
+    # 键名字优先：四字词的 1+1+1+1 码撞上键名字时让字在前（如 恭恭敬敬 aaaa 不能压住 工，§4.76）
+    kcaps = keyname_caps(DICTS)
+    capped = 0
+    fixed = []
+    for w, code, wt in out:
+        new_wt, was_capped = cap_weight(code, wt, kcaps)
+        capped += 1 if was_capped else 0
+        fixed.append((w, code, new_wt))
+    out = fixed
+    if capped:
+        print(f"  键名字优先：压权重 {capped} 条")
 
     path = os.path.join(DICTS, args.out + ".dict.yaml")
     with open(path + ".tmp", "w", encoding="utf-8") as f:
