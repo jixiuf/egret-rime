@@ -2433,30 +2433,37 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 
 ### 4.76 用户两条体验反馈：① 长句页尾留字/词（先字修正） ② 键名字四连击要让字第 1
 
-#### ② 长句页尾留「字/词」——`lua/tail_word_filter.lua`（新）
+#### ② 长句页尾留「字 + 词」——`lua/tail_word_filter.lua`（新）
 
-**诉求**（用户原话）：打长句时每页最后两项要是字/词，只有前面几项是长句；这样长句首字词
-不合意时能先选字/词修正开头，不必退格重打。
+**诉求**（用户原话）：打长句时**每页最后两项要「一个是字、一个是词」**，前面几项才是长句；
+这样长句首字/首词不合意时能先选字或词修正开头，不必退格重打。
 
 **实现**：新增 `lua/tail_word_filter.lua`，挂在三个方案 filters **最末**（uniquifier 之后，
-只重排最终表），配置在 `egret.common.yaml: lua_config.tail_word_filter`
-（`page_size: 6` / `keep: 2` / `min_sentence_len: 4`）：
+只重排最终表），配置在 `egret.common.yaml: lua_config.tail_word_filter`：
+`page_size: 6` / `tail_spec: "char,word"` / `min_sentence_len: 4`。
 
-| 条件 | 行为 |
+| 位置 | 放什么 |
 |---|---|
-| 首候选是 Sentence 且字数 ≥ 4，且存在「匹配输入开头、未吃完整段」的非整句候选 | 每页前 `page_size-keep` 位放整句，**每页最后 `keep` 位放非整句候选**（字/词/前缀词） |
-| 其余（短输入、简码/全码/词组） | 原样输出，一行不动（不碰肌肉记忆层） |
+| 每页前 `page_size-2` 位 | **整句**（保持原有相对顺序）；整句不够时依次用词、字填 |
+| 每页倒数第 2 位 | **一个单字**（优先取**首句的第一个字**，如 jintiandetianqize… → 今；候选里没有就取最高权单字） |
+| 每页最后 1 位 | **一个词**（≥2 字的前缀候选，如 今天 / 我们在 / 他们） |
 
-**实测**（`data/rime-test`，console）：
+两种候选都是「匹配输入开头、未吃完整段」的前缀候选 ⇒ 选中只上屏前缀，余下输入继续组句。
+短输入（首候选不是整句）一律原样输出，不碰简码/全码/词组的肌肉记忆层。
 
-| 输入 | 改动前 | 改动后 |
-|---|---|---|
-| `womenzaiyiqi` | 6 个整句（无可选字词） | 1-4 整句，**5. 我们在 6. 我们再** |
-| `jintiandetianqizenmeyang` | 1-2 整句 + 今天的/今天… | 1. 今天的天气怎么样，**5. 今天 6. 津田** |
+**实测**（`data/rime-test`，console；格式：`N. 候选`）：
 
-**端到端**（先字修正真的可用）：console 送 `womenzaiyiqi` + 键 `5` ⇒ 上屏「我们在」，
-余下 `yi qi` 继续组句（`status: composing 我们在[yi qi]`、候选 `1.一起 …`）——只上屏前缀，
-这正是「先字修正」需要的语义。
+| 输入 | 页 1 候选 |
+|---|---|
+| `womenzaiyiqi` | 1.我们在一起 2.我们在一汽 3.… 4.… **5.我 6.我们在** |
+| `jintiandetianqizenmeyang` | 1.今天的天气怎么样 2.… 3.今天的 4.今天的 **5.今 6.今天** |
+| `tamenlailehenduoren` | 1.他们来了很多人 … **5.他 6.他们** |
+| `gdrnthtcsu`（整串五笔） | 1.天气怎么样 … **5.天 6.天气** |
+| `kkkk`（键名字，非长句） | 1.口 2.串串 …（filter 不触发，一行不动） |
+
+**端到端**（先字修正真的可用）：console 送 `womenzaiyiqi` + 键 `5` ⇒ 上屏「我」，
+余下输入继续组句；送 `womenzaiyiqi` + 键 `6` ⇒ 上屏「我们在」，余下 `yi qi` 继续组句
+（`status: composing 我们在[yi qi]`）——正是「先修正开头」需要的语义。
 
 #### ① 键名字优先（王码「25 键名字四连击」）——`scripts/keyname_priority.py`（新）
 

@@ -85,14 +85,15 @@ lua_config:
   long_word_filter:
     count: 2
     idx: 4
-  # Lua 配置：长句候选**页尾部**保留「字/词」候选（「先字修正」）
-  # 首候选是 ≥min_sentence_len 字的整句时，每页最后 keep 个位置放非整句候选
-  # （字/词/前缀词：选中只上屏开头，余下输入继续参与组句）——长句首字词
-  # 不合意时，可先点页尾的字/词修正开头，再连后续输入。见 lua/tail_word_filter.lua
+  # Lua 配置：长句候选**页尾部**保留「字 + 词」候选（「先字修正」）
+  # 首候选是 ≥min_sentence_len 字的整句时，每页末尾按 tail_spec 排：默认
+  # 倒数第 2 位放**单字**、最后 1 位放**词**（都是匹配输入开头的前缀候选：
+  # 选中只上屏开头，余下输入继续参与组句）—— 长句首字/首词不合意时，
+  # 可先点页尾的字或词修正开头，再继续输入。见 lua/tail_word_filter.lua
   tail_word_filter:
     enabled: true
     page_size: 6        # 与 default.custom.yaml 的 menu/page_size 一致
-    keep: 2             # 每页末尾留几个「字/词」候选
+    tail_spec: "char,word"  # 每页末尾槽位：char=单字，word=词（改成 "word,char" 即调换）
     min_sentence_len: 4 # 首候选整句字数 ≥ 此值才启用（短输入/简码全码不动）
     debug: false
     # Lua 配置：农历的触发关键字
