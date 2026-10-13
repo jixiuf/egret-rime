@@ -2537,7 +2537,7 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
   代码常量改为 `SYNC_MANIFEST`，路径改由环境变量 **`CORPUS_SYNC_MANIFEST`** 指定
   （默认 `../_sync_state/manifest.jsonl`；缺失时自动回退 sha256）。
   ⚠️ 本机若仍用旧路径，导出该环境变量指到旧 manifest 即恢复原行为；
-- 词库里作为**普通词**的该词（`813` 等）当然不动 ✓。
+- **数据文件**（词表 / n-gram 统计）里与被脱敏词**同形**的普通词属于语料数据，不在本次范围（见 §4.80）。
 
 **遗留（未做，等用户决定）**：本机 `data/input/` 下的目录名仍含品牌（`dedao-*`）——`data/` 已
 gitignore ✓ 不影响仓库；若要连目录名一起中性化，改本机目录名即可（代码按 `data/input/` 通用扫描，
@@ -2627,9 +2627,9 @@ copy 模式先备份到 `.egret-backup-<时间戳>/` · 装完**按清单**自�
 | 内部系统代号 | 同步服务代号 → `SYNC`：`<代号>_MANIFEST` → `SYNC_MANIFEST`、`<代号> 同步清单/清单` → `同步清单` |
 | 机器标识 | 两个目标机 hostname → `host-linux` / `host-mac`；个人 HOME 路径 → `$HOME`；内网代理 IP → `192.0.2.1`（RFC 5737 文档地址） |
 
-**关键设计：不碰 `dicts/`**。语料词表里的该词是**普通词**（`813`），且裸替换会重写
-29MB 的 `lm_rerank.tsv` 与 21MB 的 `lm_rerank.bin`（二进制、有长度字段）。所以替换表刻意**不含**
-裸的品牌词（实测该裸词会命中语料统计）；唯一会命中语料的那个短语（tsv/bin 各 2 条）也从表里去掉。
+**范围边界：只清文档与 commit message，不改 `dicts/`**。数据文件里可能存在与被脱敏词**同形**的
+普通词/短语（属于语料统计），而裸替换会重写 29MB 的 `lm_rerank.tsv` 与 21MB 的 `lm_rerank.bin`
+（定长二进制记录 + 按字节序排序，改写会破坏排序）⇒ 这类一律不碰。
 验证：4 个代表 blob 的 hash 与重写前**逐一相同**（`dicts/lm_rerank.{tsv,bin}`、`compose_table.bin`、
 `egret_wubi_sentence.dict.yaml`）。
 
