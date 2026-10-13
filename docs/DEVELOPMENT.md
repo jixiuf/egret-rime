@@ -11,7 +11,7 @@
 
 ```bash
 make setup      # 新机器第一次：拉依赖（锁定 commit）、编译 librime/kenlm、建 venv
-make test       # 黄金 38 条 + 4 条结构断言 + 契约测试。改任何东西之后都跑这个
+make test       # 黄金 41 条 + 4 条结构断言 + 契约测试。改任何东西之后都跑这个
 make lint       # 命名、路径、语法、部署清单一致性，秒级，不跑引擎
 make verify     # 契约 + 黄金 + 五笔能力 5 组 + 输入延迟门，全链验收
 bash scripts/refresh.sh      # 往 data/input 丢语料后，这一条就够：增量重出全部产物
@@ -139,7 +139,7 @@ make bundle   → scripts/deploy_bundle.sh 打 dist/*.tar.gz，包内 install.sh
 
 | 命令 | 管什么 |
 |---|---|
-| `make test` | `env-test` + `lint` + 黄金 38 条 + 4 条结构断言，用例表在 `scripts/regression_test.py` 的 `CASES` |
+| `make test` | `env-test` + `lint` + 黄金 41 条 + 4 条结构断言，用例表在 `scripts/regression_test.py` 的 `CASES` |
 | `make lint` | 命名、路径、语法、运行时文件是否入 git 且在清单里、`schema_list` 语义、键名字优先 |
 | `make verify` | 契约 + 黄金 + 五笔能力 + 延迟门，一条命令过全链 |
 | `make verify-wubi` | 五笔打词的五个 cohort，各带 top1/top8 阈值 |

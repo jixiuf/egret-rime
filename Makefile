@@ -96,6 +96,9 @@ env-test:
 	@# 测试环境专用：用户配置是「追加」语义（不动用户已有方案列表），但 console 只看
 	@# schema 列表顺序 ⇒ 把**测试目录的这份**改成替换式，保证测的是本方案（§4.78）
 	@$(PYTHON) $(REPO)/scripts/schema_env.py list-replace $(TEST_DIR)
+	@# 测试环境的 LM 必须与生产一致（`make eval` 会临时改成自训 gram 做 A/B，
+	@# 残留会让黄金/探针跑在错误的 LM 上 —— 真实踩过一次，见 §4.82）
+	@printf 'patch:\n  grammar/language: wanxiang-lts-zh-hans\n' > $(TEST_DIR)/egret_wubi_py.custom.yaml
 	@for d in dicts lua opencc; do $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$d $(REPO)/$$d --quiet; done
 	@mkdir -p $(SHARED_DIR)
 	@for f in default.yaml symbols.yaml essay.txt; do \

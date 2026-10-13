@@ -253,6 +253,16 @@ def run_suite(user_dir, cases, label):
     return hits
 
 
+def restore_schema_patch(user_dir):
+    """评测会临时改写 <方案>.custom.yaml 切 gram；跑完恢复成生产配置，避免残留。
+
+    （残留会让后续 `make test` / 探针跑在自训 gram 上 —— 真实踩过一次，见 §4.82）
+    """
+    path = os.path.join(user_dir, "egret_wubi_py.custom.yaml")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("patch:\n  grammar/language: wanxiang-lts-zh-hans\n")
+
+
 def main():
     global GLOBAL_ARGS
     ap = argparse.ArgumentParser()
@@ -364,6 +374,8 @@ def main():
                     # status 非 ok 时标出来：hang=答案其实对但进程不退；slow=没算出候选
                     tag = "" if h[4] == "ok" else f"  <{h[4]}>"
                     print(f"    ✗ {h[0][:36]:<36} 期望 {h[1]} 得到 {h[2]}{tag}")
+
+    restore_schema_patch(args.dir)      # 别把评测用的 gram 选择留给下一次 make test
 
 
 if __name__ == "__main__":

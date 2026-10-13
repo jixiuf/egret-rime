@@ -229,6 +229,16 @@ if os.path.exists(_ts_dc):
               "朙月拼音；`make env-test` 应调用 scripts/schema_env.py list-replace")
         err += 1
 
+# 4.6) 测试环境的 LM 必须与生产一致（`make eval` 会临时改成自训 gram 做 A/B；
+#      残留会让黄金/探针跑在错误的 LM 上 —— 真实踩过一次，见 §4.82）
+_ts_patch = os.path.join(ROOT, "data", "rime-test", "egret_wubi_py.custom.yaml")
+if os.path.exists(_ts_patch):
+    _txt = open(_ts_patch, encoding="utf-8").read()
+    if "zh-hans-egret" in _txt and "wanxiang" not in _txt:
+        print("  ✗ data/rime-test 的 LM patch 指向自训 gram（评测残留）⇒ 黄金/探针不是生产配置；"
+              "跑 make env-test 重置，或让 eval_gram.py 跑完自动恢复")
+        err += 1
+
 # 5) refresh.sh 里未提到的生成器（提示，不算错）
 rs = open("scripts/refresh.sh", encoding="utf-8").read()
 missing = [os.path.basename(p) for p in sorted(glob.glob("scripts/gen_*.py"))
