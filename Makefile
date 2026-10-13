@@ -8,10 +8,15 @@
 # 常用：
 #   make setup          一键搭环境（克隆+编译+venv+gram）
 #   make env-test       建仓库内测试用 Rime 用户目录 data/rime-test
-#   make test           跑回归（17+ 黄金用例）
+#   make test           跑回归（黄金 33 条 + 契约）
 #   make test-rebuild   清 build/用户词典后重新部署再跑
 #   make gen            由 scripts/gen_wubi_py_unified_dicts.py 重生成词库
-#   make deploy         软链到输入法用户目录（TARGET=... 可覆盖）
+#
+# 目标机部署（开发机只 push，目标机自己 pull）：
+#   git pull --ff-only && make deploy && make reload
+#     make deploy       软链 yaml/lua/opencc/dicts/gram 到输入法用户目录（TARGET=... 可覆盖）
+#     make reload       重建 Rime build + 重启输入法（Linux=fcitx5 / macOS=Squirrel）
+#   离线机器（无 git/无网）：make bundle 打运行时包 → 目标机 bash install.sh
 
 REPO       := $(CURDIR)
 THIRD      := $(REPO)/third-party
@@ -45,7 +50,7 @@ TARGET_DIR := $(patsubst %/,%,$(TARGET))
 GRAM_LM := $(GRAM_DIR)/wanxiang-lts-zh-hans.gram
 GRAM_LM_URL ?= https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram
 
-.PHONY: bundle deploy-remote setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle gram-lm gram-essay
+.PHONY: bundle reload setup setup-clone setup-build setup-gram env-test deploy test test-rebuild gen clean-test check paths corpus-extract corpus-dry-run corpus-status tiers tier refresh refresh-list reweight eval-gram verify-wubi bench verify verify-bundle gram-lm gram-essay
 
 # --- 环境搭建 ---------------------------------------------------------------
 setup:            ## 一键：克隆第三方 + 编译 + venv + gram
@@ -118,7 +123,7 @@ env-test:
 # --- 回归测试 ---------------------------------------------------------------
 verify: test verify-wubi bench  ## 全链验收：契约 + 黄金 33 + 五笔能力 + 延迟门
 
-verify-bundle:             ## 交付包验收（解包→装到空目录→部署→探针；目标机模拟）
+verify-bundle: bundle      ## 交付包验收（**先按当前工作区重打包** → 解包→装到空目录→探针）
 	@$(PYTHON) scripts/verify_bundle.py
 
 verify-wubi: env-test      ## 五笔能力验收（H11 五组 + 阈值，约 1 分钟；超阈 exit 1）
@@ -208,15 +213,16 @@ deploy:            ## 软链到输入法用户目录（TARGET=...；目标已有
 	@if [ ! -f "$(GRAM_LM)" ]; then echo "  语言模型缺失 → 自动下载（~400MB）…"; $(MAKE) -s gram-lm || true; fi
 	@if [ -f "$(GRAM_LM)" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/wanxiang-lts-zh-hans.gram" "$(GRAM_LM)" --quiet; \
 	 else echo "  ! 仍未取得 $(GRAM_LM)：可手动 curl 到该路径（见 README）"; fi
-	@echo "已部署到 $(TARGET_DIR) (重新部署/重启输入法后生效)"
+	@echo "已部署到 $(TARGET_DIR)"
+	@echo "  下一步：make reload   （重建 Rime build 并重启输入法；只重建可加 NO_RESTART=1）"
+
+reload:            ## 目标机：重建 Rime build 并重启输入法（Linux=fcitx5 / macOS=Squirrel）
+	bash scripts/reload_ime.sh "$(TARGET_DIR)" $(if $(NO_RESTART),--no-restart,)
 
 # --- 语料管线（阶段 A~E）----------------------------------------------------
 # 一键刷新：用 data/input 下最新语料增量刷新全部产物（抽取→清洗→词频→词典→gram→验证）
-bundle:           ## 打出可拷到其它机器的运行时部署包 (dist/*.tar.gz)
+bundle:           ## 打出可拷到其它机器的运行时部署包 (dist/*.tar.gz；离线机器用)
 	bash scripts/deploy_bundle.sh
-
-deploy-remote:    ## 部署到远程 Rime 机器（默认 jixiuf@localhost:8093）
-	bash scripts/deploy_remote.sh $(HOST) $(PORT)
 
 refresh:          ## 一键刷新全部产物（增量，可直接重跑）
 	bash scripts/refresh.sh

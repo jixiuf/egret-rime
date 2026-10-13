@@ -65,7 +65,7 @@ make test                           # 黄金用例（20 条），确认引擎仍
 ### 4.2 阶段 A 语料抽取（验收完成）
 - 单一入口 `extract.py` + 按文件类型自动分派 `formats.py`
   （epub / markdown / html / 纯文本 / jsonl，gzip 感知，全部流式）。
-- 增量：key 取 同步清单 `oss_key`（内容寻址 md5，免读几十 GB）或 sha256；
+- 增量：key 取同步清单 `oss_key`（内容寻址 md5，免读几十 GB）或 sha256；
   索引 append-only；产物丢失自动重抽。限流 `nice 15 + ioprio BE/7`。
 - **实测**：epub 4,287 本（10.7 亿汉字）+ 文稿 56,157 篇（1.8 亿汉字）
   = 60,458 篇 / 12.5 亿汉字 / 4.1 GB；epub 1.4 min、文稿 14 s。
@@ -433,8 +433,8 @@ cd third-party/librime/build && cmake --build . -j 8 --target rime
 
 | 源 | 体积 | 定位 |
 |---|---|---|
-| 电子书 epub | 13.5 亿字 | 自有：出版物级现代汉语 |
-| 文稿（听书+课程） | 2.1 亿字 | 自有：通俗口语讲解 |
+| 自有 epub 电子书 | 13.5 亿字 | 出版物级现代汉语 |
+| 自有文稿（听书+课程） | 2.1 亿字 | 通俗口语讲解 |
 | zhwiki dump | 3.4G | 百科（md5 已校验） |
 | THUCNews | 2.1G | 新闻 15 类 |
 | 人民日报 1946- | 2.0G | 时政社论 |
@@ -2508,6 +2508,64 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 
 **门禁**：黄金 **33/33**、`verify-wubi` 五组全过、`bench` **1.02x**（延迟门 1.5x）。
 
+### 4.77 部署收敛为一条链（`git pull` → `make deploy` → `make reload`）+ 文档中性化
+
+**① 部署脚本收敛**（用户要求：「之后我通过 git push / git pull + make deploy 在目标机部署」）
+
+先核对了一遍**可行性**：`bash scripts/deploy_bundle.sh --list` 的 64 个运行时文件
+**全部已入 git**（脚本自检），唯一不入库的是 400MB 的 `gram`（`make deploy` 会自动下载并软链），
+⇒ 「目标机 `git pull` + `make deploy`」本身就等价于过去那套「开发机打包/软链 → scp/远端安装」。
+
+据此删掉 4 个重复脚本（共 761 行），只留两条真实路径：
+
+| 保留 | 用途 |
+|---|---|
+| `make deploy` | 目标机软链（实体目录自动备份为 `*.bak-<时间戳>`）——**主路径** |
+| `make reload`（新，`scripts/reload_ime.sh`）| `rime_deployer --build` + 重启输入法（Linux=fcitx5 自动重启；macOS=Squirrel 默认只提示，`RESTART=1` 才 killall+open）；顺带把 deployer 可能挪进 `trash/` 的运行时表挪回 `dicts/` |
+| `make bundle` + `install.sh` | **离线机器**（无 git/无网）：自包含 tar.gz，仍是 `make verify-bundle` 的验收对象 |
+
+删除：`scripts/deploy_host-linux.sh`（vmacs 软链时代）、`deploy_host-linux_direct.sh`（实体化时代）、
+`deploy_host-mac.sh`（macOS 特化，知识并入 `reload_ime.sh`）、`deploy_remote.sh`（scp 时代）。
+`deploy_bundle.sh` 的清单仍是**唯一来源**（`make lint` 用它查「运行时文件必须入 git」）。
+
+**② 文档中性化**（用户要求：不把「电子书/文稿」这类品牌与内部系统名写进公开仓库）
+
+- `电子书 epub` → `自有 epub 电子书`；`文稿（听书+课程）` → `自有文稿（听书+课程）`；
+  `听书 + 课程文稿` → `自有听书+课程文稿`（AGENTS/HANDOFF/README/`docs/*`，共 7 个文件、21 处）；
+- 内部系统名 `SYNC` 一并中性化：注释里的「同步清单」→「同步清单」，
+  代码常量 `SYNC_MANIFEST` → `SYNC_MANIFEST`，路径改由环境变量指定
+  （`CORPUS_SYNC_MANIFEST`，默认 `../_sync_state/manifest.jsonl`；缺失时自动回退 sha256）。
+  ⚠️ 本机若仍用旧路径，导出 `CORPUS_SYNC_MANIFEST=/export/ebook/_epms_state/manifest.jsonl` 即恢复原行为；
+- 词库里作为**普通词**的该词（`813` 等）当然不动 ✓。
+
+**遗留（未做，等用户决定）**：本机 `data/input/` 下的目录名仍含品牌（`dedao-*`）——`data/` 已
+gitignore ✓ 不影响仓库；若要连目录名一起中性化，改本机目录名即可（代码按 `data/input/` 通用扫描，
+不认具体来源名，实测 `grep -rn dedao scripts/` 只剩注释）。
+
+### 4.78 ⭐ `default.custom.yaml` 的 `schema_list/+:` 会让新环境启动成朙月拼音（verify-bundle 抓到）
+
+**发现路径**：把 `make verify-bundle` 改成「**先按当前工作区重打包**再验收」（原来它挑 `dist/`
+里**最旧的现成包**——实测拿 10-11 的包验，改什么都过）后，探针立刻 **0/8**，而且实际候选全是
+**繁体**（`tffu → 他豐富`、`shehuizhuyi → 社會主義`）。
+
+**根因**：`tgt/build/luna_pinyin.schema.yaml` 的存在说明 console 加载的是**朙月拼音**。
+仓库里 `default.custom.yaml` 写的是 `schema_list/+:`（`/+:` = 追加），于是全局 schema 列表变成
+`[luna_pinyin, cangjie5, egret_wubi_py, egret_wubi, egret_py]` —— 本方案掉到第三位；
+console/deployer 取**列表首个可用方案**，共享数据里有 luna_pinyin（真机 `/usr/share/rime-data`
+同样有）⇒ 新装机器直接进朙月拼音（繁体）。旧交付包之所以 8/8，是因为它是按当时**工作区**那份
+「替换式」`schema_list:` 打的（工作区与提交版不一致，掩盖了这个 bug）。
+
+**修法**：`schema_list:`（替换，本方案排第一）。其余 `/+:` 合并（`switcher/+`、`ascii_composer/+`、
+`key_binder/+`）本身是对的——它们是「在共享数据默认值上追加/覆盖个别键」，保留。
+
+**防回归**：`check_consistency.py` 加守卫 —— `default.custom.yaml` 里出现 `schema_list/+:`
+即 `make lint` 失败；`make verify-bundle` 已经会先重打包（真机同构路径）。
+
+**验收**：`make test` 黄金 33/33；`make verify-bundle` **8/8**（新包）；另手工对照：
+同一 tgt 只把 `default.custom.yaml` 换回追加式 ⇒ 立刻回到 0/8（因果闭环）。
+
+**教训**：验收门如果拿「历史产物」当被测对象，它就退化成橡皮图章；门必须先**重建产物**再验收。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。
@@ -2596,7 +2654,7 @@ python3 scripts/rime_paths.py                                           # 路径
 | 缺 `librime-lua` 整方案不可用 | 报 `error creating translator: 'lua_translator'`；插件**必需** |
 | 测试目录软链仓库 `user.yaml` | console 回写污染仓库 → 改为复制（`make test` 有断言） |
 | `rm -rf build` 后首次 console 候选为空 | 维护竞态（陷阱 #2）→ 先 `rime_deployer` 部署再测 |
-| `mv A B` 且 B 已存在 | 会嵌套成 `B/A`（`extract/dedao`→`markdown` 踩过） |
+| `mv A B` 且 B 已存在 | 会嵌套成 `B/A`（`extract/文稿`→`markdown` 踩过） |
 | `du` 远大于 `ls` 大小 | XFS 预分配，非截断；判完整性用 `ls`/md5 |
 | `pkill -f "cargo build"` | 会杀掉自己（含同串）→ 用 `[c]argo` bracket 或分开执行 |
 | **`opencc-python-reimplemented` 慢 ~20 倍** | 纯 Python 实现；换 **C++ 绑定 `pip install OpenCC`**（1.4.2） |
@@ -2621,7 +2679,7 @@ egret-rime/
 ├─ docs/             知识库 + 本进度文档（git）
 ├─ third-party/      依赖源码与构建（gitignore，make setup 重建）
 └─ data/             （gitignore）
-   ├─ input/{ebook,dedao-*,open}/              语料投放
+   ├─ input/{ebook,文稿-*,open}/               语料投放
    ├─ corpus/{raw,extract,clean,meta,log}/     原始包/抽取/清洗/索引/日志
    ├─ gram/  rime-test/  rime-shared/
 ```

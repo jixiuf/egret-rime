@@ -27,21 +27,36 @@ wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
 `wanxiang-lts-zh-hans.gram`（原生 octagram，约 400MB，需自行下载，见下文）。
 自训的字级 `zh-hans-egret.gram` 仍可选作对照（实测词级明显更好：整句 41% vs 27%）。
 
-## 部署到 host-linux（Gentoo + fcitx5，已验证）
+## 部署（推荐：目标机 `git pull` → `make deploy` → `make reload`）
+
+**开发机只 push，目标机自己拉**（仓库里已包含全部运行时文件：yaml/词库/lua/opencc/
+搜索器码表 + LM 重排表；只有 400MB 的 gram 不入库、由 `make deploy` 自动下载）：
 
 ```bash
-bash scripts/deploy_host-linux.sh --probe    # 先看远端环境
-bash scripts/deploy_host-linux.sh            # 完整部署（自动找 agent socket → 打包 → scp → 远端安装 → 重部署）
+# 目标机上（fcitx5 / Squirrel 都一样）：
+cd ~/repos/egret-rime && git pull --ff-only
+make deploy          # 软链到输入法用户目录（Linux 默认 ~/.local/share/fcitx5/rime；macOS 默认 ~/Library/Rime）
+make reload          # 重建 Rime build + 重启输入法（Linux=fcitx5 自动重启；macOS 默认只提示，加 RESTART 即 killall+open）
 ```
 
-细节：host-linux 的 `~/.local/share/fcitx5/rime` **全部软链**到 `~/vmacs/rime`，
-所以脚本更新的是 `~/vmacs/rime`（git 仓库，有 `.deploy-backup-<时间戳>/` 备份），
-再为新增的根级文件补软链；实测只需传 16 个文件。详见 docs/PROGRESS.md §4.15。
+- 换输入法/换目录：`make deploy TARGET=~/.config/ibus/rime/`（`make reload` 同样认 `TARGET=`）；
+- 目标目录里若是**实体** `dicts/ lua/ opencc/`（例如之前用拷贝方式装过），
+  `make deploy` 会先改名备份成 `*.bak-<时间戳>` 再建链，可随时 `mv` 回滚；
+- 只想重建不重启：`make reload NO_RESTART=1`；
+- **必须**有词级 gram（引擎 LM，缺它长句明显变差）：
 
-## 部署到其它机器（无直连时）
+```bash
+make gram-lm          # 下载万象词级 LM（~400MB，断点续传；已有则跳过）
+# 或直接 make deploy —— 发现缺失会自动调它下载
+```
 
-开发机与使用机可能没有直连（本项目实测：开发机连不上 host-linux 的 ssh），
-所以用「自包含运行时包」的方式交付：
+来源：`https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram`
+（`make setup-gram` 等价于 `make gram-lm`）。gram 存放在 `data/gram/`，部署时软链到 Rime
+用户目录（部署不复制 gram；**不随仓库/部署包分发**）。
+
+> 另有 `make gram-essay`（essay 字级 gram）**仅供评测 A/B**，方案运行时不再使用它。
+
+## 离线机器（无 git / 无网）：自包含运行时包
 
 ```bash
 # ① 开发机：打运行时包（含 yaml/词库/lua/opencc/搜索器码表+LM 表；**不含 gram**）
@@ -52,12 +67,12 @@ tar xzf egret-rime-runtime-*.tar.gz && cd egret-rime-runtime-*
 bash install.sh                  # macOS 默认 ~/Library/Rime
 bash install.sh --link ~/Library/Rime   # 软链模式（以后改本包即生效）
 
-# ③ 重新部署输入法（Squirrel 菜单栏图标 → 重新部署；fcitx5 → 托盘右键重新部署）
+# ③ 让输入法生效：Squirrel 菜单栏图标 →「重新部署」；fcitx5 → 托盘右键「重新部署」
 ```
 
 安装脚本会先把要覆盖的文件备份到 `<目标>/.egret-backup-<时间戳>/`，回滚只需拷回去。
 
-**重要（2026-10 已改）**：交付包**不带** `.gram`（400MB，请自行下载，见下文），
+**重要**：交付包**不带** `.gram`（400MB，请自行下载，见上节），
 但**必须有它**——引擎的语言模型就是 octagram + 万象词级 gram；
 Lua 侧的重排已**关闭**（`dynamic_translator/lm_rerank: false`），Lua 表只剩搜索器自用。
 librime 仍然**不需要打任何补丁**（上游 1.17.0 + 官方 octagram/lua 插件即可）。
@@ -99,33 +114,6 @@ RHEL/Rocky 8 需要 gcc-toolset-12、boost1.78（EPEL）与自建 glog 0.6.0
 third-party/  外部依赖源码与构建产物      data/  语料/词频/测试环境/gram
 dicts/        词库源与产物（入 git）      scripts/  生成与测试脚本
 ```
-
-## 部署
-
-macOS（Squirrel）:
-
-```
-make deploy        # 软链 yaml/lua/opencc/dicts/gram 到 ~/Library/Rime
-```
-
-Linux 按输入法覆盖 TARGET（默认 fcitx5 的 `~/.local/share/fcitx5/rime`）：
-
-```
-make deploy TARGET=~/.config/ibus/rime/
-```
-
-**必须**准备词级 gram（引擎 LM，缺它长句会明显变差）：
-
-```bash
-make gram-lm          # 下载万象词级 LM（~400MB，断点续传；已有则跳过）
-# 或直接 make deploy —— 发现缺失会自动调它下载
-```
-
-来源：`https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram`
-（`make setup-gram` 等价于 `make gram-lm`）。gram 存放在 `data/gram/`，部署时软链到 Rime
-用户目录（部署不复制 gram；**不随仓库/部署包分发**）。
-
-> 另有 `make gram-essay`（essay 字级 gram）**仅供评测 A/B**，方案运行时不再使用它。
 
 ## 词库再生成
 

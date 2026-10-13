@@ -30,8 +30,9 @@ STAGE="$DIST/$NAME"
 LIST_ONLY=0
 [ "${1:-}" = "--list" ] && LIST_ONLY=1
 
-# 运行时清单：这是**唯一来源**，deploy_host-linux_direct.sh / deploy_host-mac.sh 都从
-# 这里取，避免各自 glob 时把中间产物也打进去（曾把 632MB 的
+# 运行时清单：这是**唯一来源** —— `make deploy`（软链）、`install.sh`（离线包）、
+# 以及 `make lint` 的「运行时文件必须入 git」检查都对齐这份清单，避免各自 glob
+# 时把中间产物也打进去（曾把 632MB 的
 # data/gram/zh-hans-egret.2_6gram.tsv 当运行文件部署出去）。
 # 输出格式: 仓库内路径|目标相对路径
 manifest() {
