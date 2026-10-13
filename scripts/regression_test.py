@@ -89,7 +89,20 @@ CASES = [
     ("owfhtc", "为什么", "整句词库(五笔短码->整句 §4.16)"),
     # --- 混流多读法（§4.41）：整串五笔读法时补 wubi tag，让 86 库的组句胜出 ---
     ("gdrnthtcsu", "天气怎么样", "混流多读法: 整串五笔 -> 补 tag(§4.41)"),
+
+    # --- 2026-10 session 里用户报的问题，逐条钉住（§4.76/§4.81）---
+    ("kkkk", "口", "键名字四连击: 用户报「应是口，不是串串」(§4.76)"),
+    ("aaaa", "工", "键名字四连击: 用户报「前两项都是工」——同码词压制 + 去重(§4.76)"),
+    ("womenzaiyiqi", "我们在一起", "长句; 页尾留字+词的展示用例(§4.76, 结构断言见下)"),
+    ("ghdqusvfryyif", "正确新建的方法", "用户报: 选 6 后页尾失效(段起点 bug, §4.76)"),
+    ("ililfbyivbb", "渐渐地就好了", "纯五笔路径(用户展示例; 混打 ililfbyihaole 仍属 LM 残余误差)"),
 ]
+
+# 混打/全拼的同句仍是模型能力边界（2026-10-13 实测）：
+#   ililfbyihaole        → 渐渐地主不好了 ✗
+#   jianjiandejiuhaole   → 见见得就好了   ✗
+# 纯五笔 ililfbyivbb     → 渐渐地就好了   ✓（已作为用例钉住）
+# 这类不写进 CASES（会红），只在 §4.81 记录；要改得从词级 LM 与混读法裁决下手。
 
 # 已知 LM 级问题: wanxiang 官方模型=才最, 自训 jixiuf gram=都不可能。
 # 切 egret.common.yaml 的 grammar/language 后期望值不同, 不作为失败项, 仅报告。
@@ -175,6 +188,58 @@ def deploy(user_dir, shared_dir):
     print("部署完成" if r.returncode == 0 else "部署异常(仍继续测试)")
 
 
+def candidate_page(code, extra_key="", user_dir="."):
+    """返回最后一屏候选的 (文本, 注释) 列表；连跑两次取第二次（测量纪律）。"""
+    page = []
+    for _ in range(2):
+        p = subprocess.run([LIBRIME_CONSOLE], input=code + "\n" + extra_key + "\n\n",
+                           capture_output=True, text=True, cwd=user_dir, timeout=180)
+        pages, cur = [], None
+        for line in p.stdout.splitlines():
+            if line.startswith("page:"):
+                cur = []
+                pages.append(cur)
+            elif cur is not None:
+                m = re.match(r"^\s*\d+\.\s*(?:\[([^\]]*)\]|(\S+))\s*(.*)$", line)
+                if m:
+                    cur.append(((m.group(1) or m.group(2) or "").strip(),
+                                (m.group(3) or "").strip()))
+        if pages:
+            page = pages[-1]
+    return page
+
+
+def struct_checks(user_dir):
+    """候选表结构断言：这些是「首候选等于什么」拦不住、但用户报过的问题。
+
+    返回 [(名称, 通过?, 说明)]。
+    """
+    out = []
+
+    pg = candidate_page("aaaa", user_dir=user_dir)
+    n_gong = sum(1 for t, _ in pg if t == "工")
+    out.append(("aaaa 去重", n_gong == 1,
+                f"首页「工」出现 {n_gong} 次（期望 1；曾出现两个，§4.76）"))
+
+    pg = candidate_page("womenzaiyiqi", user_dir=user_dir)
+    tail = [t for t, _ in pg[-2:]]
+    ok = len(tail) == 2 and len(tail[0]) == 1 and len(tail[1]) >= 2
+    out.append(("长句页尾=字+词", ok,
+                f"页尾两项 {tail}（期望 单字 + 词，§4.76）"))
+
+    pg = candidate_page("ghdqusvfryyif", extra_key="6", user_dir=user_dir)
+    tail = [t for t, _ in pg[-2:]]
+    ok = len(tail) == 2 and len(tail[0]) == 1 and len(tail[1]) >= 2
+    out.append(("选掉一段后页尾仍=字+词", ok,
+                f"选 6 之后页尾两项 {tail}（段起点不是 0 时的回归，§4.76）"))
+
+    pg = candidate_page("tffu", user_dir=user_dir)
+    cmt = pg[0][1] if pg else ""
+    out.append(("候选带五笔编码注释", "tffu" in cmt,
+                f"tffu 首候选注释 = {cmt!r}（期望含 tffu，用户要过「显示五笔编码」）"))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default=rime_paths.RIME_TEST_DIR,
@@ -239,7 +304,16 @@ def main():
         tag = "✓(已知)" if got in accepts else "⚠ 新结果(记录到 AGENTS.md)"
         print(f"{code:<28} {'/'.join(accepts)[:18]:<20} {(got or '?'):<10} {tag} {note}")
 
-    total = len(CASES)
+    print("-" * 78)
+    print("候选表结构断言:")
+    struct = struct_checks(user_dir)
+    for name, ok, desc in struct:
+        passed += ok
+        if not ok:
+            failed.append((name, "", "", desc))
+        print(f"  {name:<22} {'✓' if ok else '✗'} {desc}")
+
+    total = len(CASES) + len(struct)
     print(f"\n通过 {passed}/{total}")
     if failed:
         print("失败用例:")

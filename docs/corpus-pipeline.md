@@ -95,7 +95,7 @@ make corpus-status      # 语料账本
   类词级 gram 盲区）。
 - **成语 top-N**：语料频次 ≥3/百万者显式入传统库。
 - 工具：`scripts/gen_wubi_py_unified_dicts.py`（生成）、
-  `scripts/reweight_words.py`（用语料词频重写权重）、
+  `scripts/reweight_from_corpus.py`（用语料词频重写权重；默认 `REWEIGHT=off`）、
   `third-party/rime-corpus-processing/frequency`（Aho–Corasick 全量重扫词频）。
 
 ## 5. 阶段 D：gram（自训 LM）
