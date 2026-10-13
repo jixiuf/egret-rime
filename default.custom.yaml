@@ -9,7 +9,10 @@
 #   · ascii_composer/switch_key —— 五笔用户的常见偏好：Shift 不做中英切换（避免打码时误切），
 #     Caps Lock 直接上屏原始码。**不习惯就删掉这一段**（回到 Shift 切换中英）。
 patch:
-  schema_list/+:
+  # ⚠ 必须是**替换**（不能写 `schema_list/+:`）：`/+:` 是追加，会把本方案排在
+  # 共享数据里 luna_pinyin/cangjie5 之后 ⇒ 新建环境/新机器会启动成朙月拼音（繁体）。
+  # 实测：verify-bundle 探针 0/8（全出繁体），见 §4.78。
+  schema_list:
     - schema: egret_wubi_py   # 混流（五笔+拼音，主方案）
     - schema: egret_wubi      # 纯五笔（86 造词码 + 长尾 + 四字词）
     - schema: egret_py        # 纯全拼（也是 `+拼音 反查的词典来源）

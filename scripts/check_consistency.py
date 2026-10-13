@@ -188,6 +188,17 @@ try:
 except Exception as _e:
     print(f"  · 键名字优先检查跳过（{_e}）") ; warn += 1
 
+# 4.5) default.custom.yaml 的 schema_list 必须是**替换**而非 `/+:` 追加
+# （追加会把本方案排在共享数据的 luna_pinyin/cangjie5 之后 ⇒ 新环境启动成朙月拼音，
+#   verify-bundle 探针 0/8 全繁体；见 §4.78）
+_dc = os.path.join(ROOT, "default.custom.yaml")
+if os.path.exists(_dc):
+    _txt = open(_dc, encoding="utf-8").read()
+    if re.search(r"^\s*schema_list/\+:", _txt, re.M):
+        print("  ✗ default.custom.yaml 用了 `schema_list/+:`（追加）⇒ 新环境会启动成朙月拼音，"
+              "必须是 `schema_list:`（替换）")
+        err += 1
+
 # 5) refresh.sh 里未提到的生成器（提示，不算错）
 rs = open("scripts/refresh.sh", encoding="utf-8").read()
 missing = [os.path.basename(p) for p in sorted(glob.glob("scripts/gen_*.py"))
