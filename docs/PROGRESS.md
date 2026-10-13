@@ -1002,7 +1002,7 @@ wojintianmeiyoukong        -> 我今天没有空
 **症状**：表没了 ⇒ dynamic_translator 关掉原生 grammar 后没有 LM ⇒ 长句出垃圾
 （自检「今天的天气怎么仰卧 / 今天没有空」）。
 
-**已做（不够）**：部署脚本在 `rime_deployer --build` 之后补回（commit 7b0b0a4）。
+**已做（不够）**：部署脚本在 `rime_deployer --build` 之后补回（commit 9cdb6fe）。
 但这挡不住"fcitx 重启触发的部署"。
 
 **下一轮要做的（两条路，都需在真机验证）**：
@@ -1818,8 +1818,8 @@ H2 也一并落地：包内 `install.sh` 安装后自检——必需运行时文
 | 2 | scratch 目录（`shared_data_dir="."`）缺 `default.yaml/symbols.yaml/essay.txt`（`[ -e ] \|\|` 守卫没生效） | `import_preset: default:key_binder` 取不到 ⇒ `error building config: egret_wubi_py.schema` ⇒ 引擎降级 |
 
 ⇐ 现象与"方案选错 + schema 构建失败"完全吻合，**部署本身一直是好的**。
-两处已修（`d60b472`）；host-linux 脚本有同源风险（自检不固定方案、只测拼音长句），
-也一并补上（`3f1032b`，离线**未验证**）。
+两处已修（`2dc2df8`）；host-linux 脚本有同源风险（自检不固定方案、只测拼音长句），
+也一并补上（`8a93c82`，离线**未验证**）。
 
 ### 4.58 用户报「候选重复」（nihao 出多个 你好）——两个独立原因
 
@@ -2660,6 +2660,11 @@ git fetch origin && git reset --hard origin/main    # 该机上若没有本地�
 
 任何机器上**未推送的本地 commit 会丢**（重写前已确认三台目标机的 clone 均无本地提交）。
 以后若要再脱敏：把新模式追加到同一份替换表，重跑上面四条命令即可（记得重新备份）。
+
+**文档里的旧 commit 引用**：重写后老 hash 自然失效。filter-repo 会写一份映射
+`.git/filter-repo/commit-map`（old→new），已据此把文档里引用的**本仓库**旧 hash 换成新 hash
+（PROGRESS 里 4 处）；引用的**上游仓库** hash（如 librime 的 pin）无关本次重写，保持原样。
+想看某个旧 hash 对应的内容，用备份镜像：`git --git-dir=<backup>.git show <old-hash>`。
 
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
