@@ -1,141 +1,160 @@
-# egret-rime
+# egret-rime（白鹭五笔·拼音流）
 
-白鹭五笔·拼音混流输入方案（egret_wubi_py）的独立仓库。
+一句话里可以随便换着打五笔和拼音的 Rime 输入方案。
 
-在一句话里同时打五笔（形码）和拼音（音节），由 script_translator +
-octagram 语法模型（gram）混流组句。传统结构五笔库保证简码/全码确定性
-首候选，混合库负责五笔/拼音混流与 LM 组句。
-
-## 架构
+五笔的简码、全码、键名字都还是老样子，长句和拼音歧义交给一个词级语言模型去组。
+适合已经会五笔、又不想为长句背码的人；Linux 上用 fcitx5，macOS 上用 Squirrel。
 
 ```
-engine.translators (dynamic_translator lua 调度):
-  first  table_translator@egret_wubi   传统库: 简码/全码/词组显式码, 确定性
-  then   table_translator@custom_phrase        用户词组
-  then   script_translator@translator          混合库: 五笔字词 + 拼音音节 + gram 组句
-  last   type=completion 补全候选(沉底)
+qktnqnr                  → 我吃饭          （纯五笔短码序列）
+jintiandetianqizenmeyang → 今天的天气怎么样   （纯拼音）
+trwuchifan               → 我们吃饭        （五笔词 + 拼音混着打）
 ```
 
-词库由 `scripts/gen_wubi_py_unified_dicts.py` 生成：
+## 特色
 
-```
-wubi86(简码表) + wb86_wangxiang(词源) + 知频8105 + 万象8105
-  → dicts/*.dict.yaml (传统库字/词 + 混合库字/词 + 拼音字/词)
-```
+**一句话里混打。** 上面第三个例子就是重点：`trwu` 是五笔的「我们」，
+`chifan` 是拼音，中间不用切模式、也不用按分隔符。方案会自动判断整串是哪种读法
+（判定只影响候选排序，不会把你的输入切成几段）。
 
-权重沿用万象/86 词库原值（字表另有分层：见下）；LM **默认用万象词级 gram**
-`wanxiang-lts-zh-hans.gram`（原生 octagram，约 400MB，需自行下载，见下文）。
-自训的字级 `zh-hans-egret.gram` 仍可选作对照（实测词级明显更好：整句 41% vs 27%）。
+**五笔手感保留。** 25 个键名字用四连击打，首候选永远是键名字本身：
+`kkkk` 出「口」，`dddd` 出「大」，`tttt` 出「禾」。一/二/三级简码、全码、词组显式码
+都是 86 标准，重码时按权重排，简码该出什么就出什么。
 
-## 部署（推荐：目标机 `git pull` → `make deploy` → `make reload`）
+**长句靠语言模型。** 引擎侧用万象的词级 gram（400MB，octagram 直接读），
+不用打补丁、也不用改名成 `.gram` 之外的东西。词库分三档，默认档约 6.3 万词。
 
-**开发机只 push，目标机自己拉**（仓库里已包含全部运行时文件：yaml/词库/lua/opencc/
-搜索器码表 + LM 重排表；只有 400MB 的 gram 不入库、由 `make deploy` 自动下载）：
+**长句页尾留一个字和一个词。** 这是为「首字打错」准备的：打长句时每页最后两项
+一个是单字、一个是词，按数字键选它只上屏开头那部分，剩下的输入继续留在组字区。
+比如 `womenzaiyiqi` 打出「我们在一起」，但你想打的是「我们在一起过」以外的东西，
+就可以先选页尾的「我」把开头一个字数下来，再接着打。
+
+**候选旁边带五笔编码。** 每个候选注释里是它的五笔码，认码和查错都方便。
+
+**用户词典是纯文本。** 三个 user_dict 都落在用户目录下的 `*.user.dict.txt`，
+可以直接看、直接改，也可以跟着 git 走。造词按 86 规则自动编码。
+
+**三个方案可选。** `egret_wubi_py` 是混流主方案，另有纯五笔 `egret_wubi` 和纯全拼
+`egret_py`。F4 菜单里能切，三个方案共用同一套词库。
+
+简繁切换、emoji、以词定字（C-h / C-l）都有，按键和开关见下。
+
+## 安装
+
+需要机器上已经有 Rime 前端：Linux 的 fcitx5，或者 macOS 的 Squirrel。
 
 ```bash
-# 目标机上（fcitx5 / Squirrel 都一样）：
-cd ~/repos/egret-rime && git pull --ff-only
-make deploy          # 软链到输入法用户目录（Linux 默认 ~/.local/share/fcitx5/rime；macOS 默认 ~/Library/Rime）
-make reload          # 重建 Rime build + 重启输入法（Linux=fcitx5 自动重启；macOS 默认只提示，加 RESTART 即 killall+open）
+cd ~/repos && git clone https://github.com/jixiuf/egret-rime.git && cd egret-rime
+make deploy      # 把方案文件装到输入法用户目录
+make reload      # 重建 build，然后重启输入法
 ```
 
-- 换输入法/换目录：`make deploy TARGET=~/.config/ibus/rime/`（`make reload` 同样认 `TARGET=`）；
-- 目标目录里若是**实体** `dicts/ lua/ opencc/`（例如之前用拷贝方式装过），
-  `make deploy` 会先改名备份成 `*.bak-<时间戳>` 再建链，可随时 `mv` 回滚；
-- 只想重建不重启：`make reload NO_RESTART=1`；
-- **必须**有词级 gram（引擎 LM，缺它长句明显变差）：
+`make deploy` 在 Linux 上默认装到 `~/.local/share/fcitx5/rime`，macOS 上默认装到
+`~/Library/Rime`。用 ibus 或者想装到别处就指定目录：
 
 ```bash
-make gram-lm          # 下载万象词级 LM（~400MB，断点续传；已有则跳过）
-# 或直接 make deploy —— 发现缺失会自动调它下载
+make deploy TARGET=~/.config/ibus/rime/
+make reload TARGET=~/.config/ibus/rime/
 ```
 
-来源：`https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram`
-（`make setup-gram` 等价于 `make gram-lm`）。gram 存放在 `data/gram/`，部署时软链到 Rime
-用户目录（部署不复制 gram；**不随仓库/部署包分发**）。
+文件是用软链装过去的，以后 `git pull` 完执行 `make deploy && make reload` 即可生效。
+如果目标目录里原来是实体文件（以前用拷贝方式装过），`make deploy` 会先把它们改名成
+`*.bak-<时间戳>` 再建链，想回滚就把备份 `mv` 回来。
 
-> 另有 `make gram-essay`（essay 字级 gram）**仅供评测 A/B**，方案运行时不再使用它。
+第一次安装时脚本会做三件事：缺 `user.yaml` / `default.custom.yaml` 就补一份；
+把默认方案设成本方案（你已有的其它方案列表不会被动）；缺语言模型就提示下载。
 
-## 离线机器（无 git / 无网）：自包含运行时包
+语言模型单独说一句：它不在仓库里，约 400MB：
 
 ```bash
-# ① 开发机：打运行时包（含 yaml/词库/lua/opencc/搜索器码表+LM 表；**不含 gram**）
+make gram-lm      # 断点续传，已有就跳过；装完 make deploy 会自动软链过去
+```
+
+来源是 [RIME-LMDG](https://github.com/amzxyz/RIME-LMDG) 的
+`wanxiang-lts-zh-hans.gram`。不装也能用，但长句会明显变差。
+
+装完随便打几个字自查：
+
+```
+e                        → 有
+jintiandetianqizenmeyang → 今天的天气怎么样
+kkkk                     → 口
+```
+
+## 无网 / 离线机器
+
+开发机上打个自包含的运行时包，拷到目标机执行脚本就行。包里不含 400MB 的语言模型。
+
+```bash
 make bundle                      # 产出 dist/egret-rime-runtime-<日期>.tar.gz
 
-# ② 把包拷到目标机（微信/网盘/U 盘 均可），然后：
+# 目标机上
 tar xzf egret-rime-runtime-*.tar.gz && cd egret-rime-runtime-*
-bash install.sh                  # macOS 默认 ~/Library/Rime
-bash install.sh --link ~/Library/Rime   # 软链模式（以后改本包即生效）
-
-# ③ 让输入法生效：Squirrel 菜单栏图标 →「重新部署」；fcitx5 → 托盘右键「重新部署」
+bash install.sh                  # 默认装到 ~/Library/Rime 或 ~/.local/share/fcitx5/rime
+bash install.sh --link ~/Library/Rime   # 用软链装，改包即生效
+bash install.sh --download-lm    # 顺便把语言模型下下来
 ```
 
-安装脚本会先把要覆盖的文件备份到 `<目标>/.egret-backup-<时间戳>/`，回滚只需拷回去。
+安装前会先把要覆盖的文件备份到 `<目标>/.egret-backup-<时间戳>/`。装完在输入法菜单里
+点一次「重新部署」。
 
-**重要**：交付包**不带** `.gram`（400MB，请自行下载，见上节），
-但**必须有它**——引擎的语言模型就是 octagram + 万象词级 gram；
-Lua 侧的重排已**关闭**（`dynamic_translator/lm_rerank: false`），Lua 表只剩搜索器自用。
-librime 仍然**不需要打任何补丁**（上游 1.17.0 + 官方 octagram/lua 插件即可）。
+## 按键和开关
 
-验证：输入 `e` 应出「有」，`jintiandetianqizenmeyang` 应出「今天的天气怎么样」。
+方案自己加上的：
 
-## 一条命令出产物（推荐入口）
+| 按键 | 作用 |
+|---|---|
+| F4 / Ctrl+` | 方案菜单（切方案、切简繁、开关 emoji） |
+| Ctrl+h / Ctrl+l | 以词定字：取当前候选的第一个字 / 最后一个字 |
+| Caps Lock | 把当前输入的原码直接上屏，不切中英 |
+| Shift | 不切中英（打码时不容易误切） |
 
-```
-make setup                    # 新机器首次：依赖 + 编译 + venv
-bash scripts/refresh.sh       # 之后只跑这条：用最新语料增量出全部产物
-bash scripts/refresh.sh --deploy     # 出完部署到输入法
-bash scripts/refresh.sh --loop 30    # 常驻增量刷新（语料持续下载中）
-bash scripts/refresh.sh --tier full  # 换档（core/base/full）
-```
+其余（翻页、光标移动、编辑）沿用 Rime 默认：`-` `=` 或 `,` `.` 翻页，
+Ctrl+p/n/b/f 上下左右，Ctrl+a/e 行首行尾，Ctrl+d 删除，Ctrl+k 删除到行尾，Esc 取消。
 
-产物：三档词库（每档含五笔码 + 拼音码）、86 造词码词库、字级 gram。
-清单：`bash scripts/refresh.sh --only artifacts`。
+## 换词库档位
 
-## 环境搭建（Linux 自包含）
+词库有三档，改的是两个 wrapper 的 `import_tables`：
 
-所有外部依赖与数据都在仓库内（`third-party/`、`data/`），均不入 git，
-一条命令重建：
-
-```
-make setup            # 克隆锁定 commit 的依赖 + 编译 librime/kenlm + venv + gram
-make env-test         # 建仓库内测试环境 data/rime-test
-make test             # 跑回归（默认测 data/rime-test）
+```bash
+make tier TIER=core    # 约 2 万词，最小
+make tier TIER=base    # 约 6.3 万词（默认）
+make tier TIER=full    # 约 78 万词，最全
+make tiers             # 只重新生成三档文件，不动当前档位
 ```
 
-第三方仓库 commit 经**三通道交叉校验**（直连 GitHub API / socks 代理 /
-gh-proxy 三方 SHA 一致），pin 在 `scripts/setup_env.sh`，clone 后逐一比对。
-RHEL/Rocky 8 需要 gcc-toolset-12、boost1.78（EPEL）与自建 glog 0.6.0
-（原因见脚本内注释与 AGENTS.md）。
+换完记得 `make deploy && make reload`。
 
-路径统一由 `scripts/rime_paths.py` 解析（以仓库根为基准，不依赖 cwd）：
+## 常见问题
 
-```
-third-party/  外部依赖源码与构建产物      data/  语料/词频/测试环境/gram
-dicts/        词库源与产物（入 git）      scripts/  生成与测试脚本
-```
+**长句不准。** 先确认语言模型在不在：`ls ~/Library/Rime/wanxiang-lts-zh-hans.gram`
+（Linux 换成 fcitx5 目录）。缺就 `make gram-lm`。
 
-## 词库再生成
+**我想保留自己原来的方案。** `default.custom.yaml` 里用的是追加写法
+（`schema_list/+:`），只把本方案加进你的列表，不会删掉 luna_pinyin、仓颉这些。
+首次装完的默认方案是本方案，F4 里随时能换，换了以后不会被覆盖。
 
-```
-python3 scripts/gen_wubi_py_unified_dicts.py
-```
+**打长句时页尾那个字/词不想要。** 页尾两项只在长句（首候选四字以上的整句）时出现，
+短码、全码、词组那几屏不会这样排。
 
-数据源都在 dicts/ 下（wb86_wangxiang_cn_dicts 只入了 gen 用到的
-base/base.small/chars 三个文件）。
+**想彻底卸掉。** 把用户目录里指向本仓库的软链删掉，再把 `.bak-<时间戳>` 或
+`.egret-backup-<时间戳>` 里的东西挪回来，重启输入法。
 
-## 回归测试
+## 数据来源
 
-```
-make test              # 回归（默认测 <仓库>/data/rime-test）
-make test-rebuild      # 清 build + 用户词典后重新部署再跑
-python3 scripts/regression_test.py --dir ~/Library/Rime   # 测其他环境（macOS）
-```
+方案的词库和语言模型不是凭空来的，主要来自这几处，都在文档里写了出处：
 
-默认测仓库内 `data/rime-test`（由 `make env-test` 生成，等价于旧 macOS 的
-`~/rime-test`）。librime 工具按 `LIBRIME_BIN` > `third-party/librime` >
-`~/repos/librime` 依次查找。改词库/gen 脚本/schema 后必跑；
-新增修复时把用例加进 CASES 表。
+- [RIME-LMDG](https://github.com/amzxyz/RIME-LMDG)／万象词库与词级语言模型
+- [rime-wubi](https://github.com/rime/rime-wubi) 等 86 五笔字词表
+- [白霜拼音](https://github.com/gaboolic/rime-frost) 等拼音字表
+- [librime](https://github.com/rime/librime) 与其 octagram / lua 插件
+- 自有的 epub 与文稿语料（只用来统计词频、挖四字词和整句，原始文件不进仓库）
 
-设计调研与取舍分析见 `docs/design-weights-jianma-grammar.md`。
-Rime 知识库（引擎/词库/gram/lua/调试）见 `docs/README.md` 索引。
+再分发前请确认各上游项目的许可。
+
+## 开发者
+
+架构、词库生成、部署机制、门禁命令都挪到 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) 了。
+接手会话先看 [docs/HANDOFF.md](docs/HANDOFF.md)，历史决策和踩坑在
+[docs/PROGRESS.md](docs/PROGRESS.md)，Rime 引擎/词库/gram 的知识库索引在
+[docs/README.md](docs/README.md)。

@@ -90,8 +90,15 @@ def build_tasks(roots, force=False, limit=0):
     hints = C.load_sync_keys()
     idx = {} if force else C.load_index()
     tasks, unknown, skipped, dup = [], [], 0, 0
+    # （dangling 在扫描时统计，见下）
     seen = set()
+    dangling = 0
     for path in iter_files(roots):
+        # 断链软链（例如 wikiextract 产物被删后留下的 input 链接）会让 os.stat 抛错；
+        # 这类条目直接跳过：input 目录常被人手工整理，管线不该因此整轮失败
+        if not os.path.exists(path):
+            dangling += 1
+            continue
         rel = os.path.relpath(path, os.path.commonpath(roots)
                               if len(roots) > 1 else roots[0])
         handler, ext, _head = probe(path)
@@ -112,6 +119,8 @@ def build_tasks(roots, force=False, limit=0):
         tasks.append((path, key, rel, handler.name))
         if limit and len(tasks) >= limit:
             break
+    if dangling:
+        print(f"  跳过 {dangling} 个断链/缺失文件（input 目录里指向已删目标的软链）")
     return tasks, unknown, skipped, dup
 
 

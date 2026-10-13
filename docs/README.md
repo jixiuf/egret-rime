@@ -18,6 +18,7 @@
 | [dict-reference.md](dict-reference.md) | 词库：.dict.yaml 格式、编译产物（table/prism/reverse）、import_tables、造词规则、用户词典 |
 | [lm-grammar.md](lm-grammar.md) | 语言模型：octagram 插件、poet 组句算法、grammar 配置、gram 文件、训练管线 |
 | [deployment-debugging.md](deployment-debugging.md) | 部署流程、build 产物、调试方法（rime_api_console 等）、本项目踩坑清单 |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | **本项目的开发文档**：真实引擎管线、词库生成、部署机制、门禁命令、改动约定（用户向文档在仓库根 README） |
 | [lua-scripting.md](lua-scripting.md) | librime-lua：挂载方式、API 速查、实战范式（取自雾凇/万象/墨奇）、陷阱 |
 | [reference-projects.md](reference-projects.md) | 参考项目分析（雾凇/万象/RIME-LMDG/墨奇/白霜）及词库构建、优化、评测工作流 |
 | [patch方法论.md](patch方法论.md) | YAML __include/__patch 语法速查 |
