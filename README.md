@@ -11,6 +11,11 @@ jintiandetianqizenmeyang → 今天的天气怎么样   （纯拼音）
 trwuchifan               → 我们吃饭        （五笔词 + 拼音混着打）
 ```
 
+<p align="center">
+  <img src="screenshots/screenshot-jian-jian-de.jpg" width="600"
+       alt="ilil de yi qi zai yi le → 渐渐地就不在意了">
+</p>
+
 ## 特色
 
 **一句话里混打。** 上面第三个例子就是重点：`trwu` 是五笔的「我们」，
@@ -44,7 +49,7 @@ trwuchifan               → 我们吃饭        （五笔词 + 拼音混着打�
 需要机器上已经有 Rime 前端：Linux 的 fcitx5，或者 macOS 的 Squirrel。
 
 ```bash
-cd ~/repos && git clone https://github.com/jixiuf/egret-rime.git && cd egret-rime
+cd ~/repos && git clone --depth 1 https://github.com/jixiuf/egret-rime.git && cd egret-rime
 make deploy      # 把方案文件装到输入法用户目录
 make reload      # 重建 build，然后重启输入法
 ```
@@ -98,19 +103,6 @@ bash install.sh --download-lm    # 顺便把语言模型下下来
 安装前会先把要覆盖的文件备份到 `<目标>/.egret-backup-<时间戳>/`。装完在输入法菜单里
 点一次「重新部署」。
 
-## 按键和开关
-
-方案自己加上的：
-
-| 按键 | 作用 |
-|---|---|
-| F4 / Ctrl+` | 方案菜单（切方案、切简繁、开关 emoji） |
-| Ctrl+h / Ctrl+l | 以词定字：取当前候选的第一个字 / 最后一个字 |
-| Caps Lock | 把当前输入的原码直接上屏，不切中英 |
-| Shift | 不切中英（打码时不容易误切） |
-
-其余（翻页、光标移动、编辑）沿用 Rime 默认：`-` `=` 或 `,` `.` 翻页，
-Ctrl+p/n/b/f 上下左右，Ctrl+a/e 行首行尾，Ctrl+d 删除，Ctrl+k 删除到行尾，Esc 取消。
 
 ## 换词库档位
 
