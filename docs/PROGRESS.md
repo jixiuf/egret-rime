@@ -2614,6 +2614,53 @@ copy 模式先备份到 `.egret-backup-<时间戳>/` · 装完**按清单**自�
 手测：link 模式新目标（含首次 pin + gram 软链）、实体目录自动备份（3 个 `.bak-<时间戳>`）、
 包 copy 模式（32 个 dict 文件为实体、自检 64/64 就位、gram 缺失提示正确）。
 
+### 4.80 ⭐ 历史脱敏：`git filter-repo --replace-text`（品牌/内部系统名/内网 IP/机器标识）
+
+**目标**（用户要求）：把语料来源的品牌名、内部系统代号、内网 IP、机器标识从**全部历史**里替换掉
+（此前只清了工作树，`git log -S` 仍能搜到）。
+
+**做法**：17 条 literal 替换（`old==>new`，同表同时用于 `--replace-text` 与 `--replace-message`）：
+
+| 类别 | 替换（写成表格方便审计，原名已不在仓库里） |
+|---|---|
+| 语料来源品牌 | `X电子书 epub`→`电子书 epub`、`epub（X电子书）`→`epub（电子书）`、`X电子书/文稿`→`电子书/文稿`、`X听书+课程文稿`→`听书 + 课程文稿`、`X课程文稿`→`课程文稿`、`X文稿（听书+课程）`→`文稿（听书+课程）`、`X文稿`→`文稿`、`X语料`→`自有语料`、`X/epub/社区`→`epub/社区` |
+| 内部系统代号 | `<代号>_MANIFEST`→`SYNC_MANIFEST`、`<代号> 同步清单`→`同步清单`、`<代号> 清单`→`同步清单`、`<代号>`→`SYNC` |
+| 机器标识 | `host-a`→`host-linux`、`host-b`→`host-mac`、`/Users/<me>`→`$HOME`、`192.0.2.1`→`192.0.2.1`（RFC 5737 文档地址） |
+
+**关键设计：不碰 `dicts/`**。语料词表里的该词是**普通词**（`813`），且裸替换会重写
+29MB 的 `lm_rerank.tsv` 与 21MB 的 `lm_rerank.bin`（二进制、有长度字段）。所以替换表刻意**不含**
+裸的「品牌名」；唯一会命中语料的 `品牌词`（tsv/bin 各 2 条）也从表里去掉。
+验证：4 个代表 blob 的 hash 与重写前**逐一相同**（`dicts/lm_rerank.{tsv,bin}`、`compose_table.bin`、
+`egret_wubi_sentence.dict.yaml`）。
+
+**执行与验证**：
+
+```bash
+# 备份（镜像，含全部旧 hash，出问题可整体还原）
+git clone --mirror . /export/ebook/egret-rime-history-backup-<时间戳>.git          # 61MB
+# 重写（同一份替换表同时作用于内容与 commit message；literal 语法）
+git filter-repo --force --replace-text /tmp/egret-replace.txt \
+                --replace-message /tmp/egret-replace.txt
+git remote add origin git@github.com:jixiuf/egret-rime.git   # filter-repo 会摘掉 origin
+git push --force origin main
+```
+
+结果：**175 个 commit 全部重写**（4.75s）；非 `dicts` 路径里 9 类关键词命中数 **全 0**；
+内容真正变化的只有 7 个文件（AGENTS/HANDOFF/lm-grammar/PROGRESS/reference-projects/
+deploy_bundle.sh/rel_symlink.py）；`make lint` + 黄金 **33/33** 通过；pack 57.3 → 60.0 MB
+（14 个 blob 新写，属正常）。
+
+**⚠️ 影响面（重要）**：远端已 **force-push**，所有其它 clone（host-linux / mac / 任何拷出去的副本）
+必须重新同步——旧历史与新历史无法自动合并：
+
+```bash
+git fetch origin && git reset --hard origin/main    # 该机上若没有本地未推送的 commit，用这条
+# 更稳（清掉所有旧对象/旧分支）：重新 clone 一遍
+```
+
+任何机器上**未推送的本地 commit 会丢**（重写前已确认三台目标机的 clone 均无本地提交）。
+以后若要再脱敏：把新模式追加到同一份替换表，重跑上面四条命令即可（记得重新备份）。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。
