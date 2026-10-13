@@ -2528,14 +2528,15 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 `deploy_host-mac.sh`（macOS 特化，知识并入 `reload_ime.sh`）、`deploy_remote.sh`（scp 时代）。
 `deploy_bundle.sh` 的清单仍是**唯一来源**（`make lint` 用它查「运行时文件必须入 git」）。
 
-**② 文档中性化**（用户要求：不把「电子书/文稿」这类品牌与内部系统名写进公开仓库）
+**② 文档中性化**（用户要求：不把语料来源的品牌名与内部系统名写进公开仓库）
 
-- `电子书 epub` → `自有 epub 电子书`；`文稿（听书+课程）` → `自有文稿（听书+课程）`；
-  `听书 + 课程文稿` → `自有听书+课程文稿`（AGENTS/HANDOFF/README/`docs/*`，共 7 个文件、21 处）；
-- 内部系统名 `SYNC` 一并中性化：注释里的「同步清单」→「同步清单」，
-  代码常量 `SYNC_MANIFEST` → `SYNC_MANIFEST`，路径改由环境变量指定
-  （`CORPUS_SYNC_MANIFEST`，默认 `../_sync_state/manifest.jsonl`；缺失时自动回退 sha256）。
-  ⚠️ 本机若仍用旧路径，导出 `CORPUS_SYNC_MANIFEST=/export/ebook/_epms_state/manifest.jsonl` 即恢复原行为；
+- 语料来源的**品牌名**统一改成「自有 epub 电子书 / 自有听书 + 课程文稿」这类中性表述
+  （AGENTS/HANDOFF/README/`docs/*`，共 7 个文件、21 处；具体品牌与内部系统名在 §4.80
+  用 `git filter-repo --replace-text` 从**全部历史**里一并替换掉，故本文不再复述原名）；
+- **内部系统名**（同步服务代号）一并中性化：注释里的「同步清单」保持中性，
+  代码常量改为 `SYNC_MANIFEST`，路径改由环境变量 **`CORPUS_SYNC_MANIFEST`** 指定
+  （默认 `../_sync_state/manifest.jsonl`；缺失时自动回退 sha256）。
+  ⚠️ 本机若仍用旧路径，导出该环境变量指到旧 manifest 即恢复原行为；
 - 词库里作为**普通词**的该词（`813` 等）当然不动 ✓。
 
 **遗留（未做，等用户决定）**：本机 `data/input/` 下的目录名仍含品牌（`dedao-*`）——`data/` 已
@@ -2692,7 +2693,7 @@ python3 scripts/rime_paths.py                                           # 路径
 
 | 现象 | 结论 |
 |---|---|
-| GitHub 直连不通 | 用 `proxychains4`（socks5 192.0.2.1:8088）；pip 用 tuna 镜像 |
+| GitHub 直连不通 | 用 `proxychains4`（socks5 **内网代理**，地址见本机配置）；pip 用 tuna 镜像 |
 | tuna 的 crates 镜像 dl 指向被墙的 `static.crates.io` | cargo 换 **ustc** 源 |
 | 系统 glog 0.3.5 缺 `IsGoogleLoggingInitialized` | 自建 glog 0.6.0 到 `third-party/prefix` |
 | boost 1.66 < librime 要求 1.74 | EPEL 的 `boost1.78-devel` + `-DBoost_DIR` |
