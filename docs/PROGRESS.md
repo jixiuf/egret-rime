@@ -2659,6 +2659,16 @@ git fetch origin && git reset --hard origin/main    # 该机上若没有本地�
 ```
 
 任何机器上**未推送的本地 commit 会丢**（重写前已确认三台目标机的 clone 均无本地提交）。
+**迭代记录（教训）**：脱敏做了**三轮**——第 1 轮把工作树里的品牌清掉；第 2 轮重写历史；
+第 3 轮是因为**本节最初的「替换表」把原词又写回了文档**（还有个带反引号的写法漏网）。
+教训：**脱敏表本身就是泄漏源** —— 最终做法是本节只描述「形状」（品牌名 + 后缀），
+真正的模式表放在 `/tmp/egret-replace.txt`，并把「带引号/反引号的原词」也一并列入替换。
+
+**最终校验（非 `dicts` 路径，全历史）**：9 类关键词命中数 **全 0**；`dicts/` 代表 blob
+（`lm_rerank.{tsv,bin}`、`compose_table.bin`、`egret_wubi_sentence.dict.yaml`）hash 与重写前相同；
+`make lint` + 黄金 **33/33** + `verify-bundle` **8/8** 通过；文档里引用的**本仓库**旧 hash 已按
+`commit-map` 映射到现存 commit（**上游** librime 的 hash 引用保持原样）。
+
 以后若要再脱敏：把新模式追加到同一份替换表，重跑上面四条命令即可（记得重新备份）。
 
 **文档里的旧 commit 引用**：重写后老 hash 自然失效。filter-repo 会写一份映射
