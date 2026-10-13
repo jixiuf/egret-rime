@@ -2542,29 +2542,35 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 gitignore ✓ 不影响仓库；若要连目录名一起中性化，改本机目录名即可（代码按 `data/input/` 通用扫描，
 不认具体来源名，实测 `grep -rn dedao scripts/` 只剩注释）。
 
-### 4.78 ⭐ `default.custom.yaml` 的 `schema_list/+:` 会让新环境启动成朙月拼音（verify-bundle 抓到）
+### 4.78 ⭐ schema 列表「追加 vs 替换」：用户配置不动，测试改环境、首次安装 pin 方案
 
 **发现路径**：把 `make verify-bundle` 改成「**先按当前工作区重打包**再验收」（原来它挑 `dist/`
-里**最旧的现成包**——实测拿 10-11 的包验，改什么都过）后，探针立刻 **0/8**，而且实际候选全是
-**繁体**（`tffu → 他豐富`、`shehuizhuyi → 社會主義`）。
+里**最旧的现成包**——实测拿 10-11 的包验，改什么都过）后，探针立刻 **0/8**，候选全是**繁体**
+（`tffu → 他豐富`、`shehuizhuyi → 社會主義`）。
 
-**根因**：`tgt/build/luna_pinyin.schema.yaml` 的存在说明 console 加载的是**朙月拼音**。
-仓库里 `default.custom.yaml` 写的是 `schema_list/+:`（`/+:` = 追加），于是全局 schema 列表变成
-`[luna_pinyin, cangjie5, egret_wubi_py, egret_wubi, egret_py]` —— 本方案掉到第三位；
-console/deployer 取**列表首个可用方案**，共享数据里有 luna_pinyin（真机 `/usr/share/rime-data`
-同样有）⇒ 新装机器直接进朙月拼音（繁体）。旧交付包之所以 8/8，是因为它是按当时**工作区**那份
-「替换式」`schema_list:` 打的（工作区与提交版不一致，掩盖了这个 bug）。
+**根因**：`default.custom.yaml` 里是 `schema_list/+:`（`/+:` = 追加）⇒ 全局 schema 列表变成
+`[luna_pinyin, cangjie5, egret_wubi_py, …]`，本方案掉到第三位；而 **console / 部署器取的是
+「列表首个可用方案」**，共享数据（真机 `/usr/share/rime-data`）里就有 luna_pinyin ⇒ 新建的
+测试目录/交付验收目录直接进朙月拼音（繁体）。旧交付包 8/8，是因为它按当时**工作区**那份
+「替换式」配置打的（工作区与提交版不一致，掩盖了问题）。
 
-**修法**：`schema_list:`（替换，本方案排第一）。其余 `/+:` 合并（`switcher/+`、`ascii_composer/+`、
-`key_binder/+`）本身是对的——它们是「在共享数据默认值上追加/覆盖个别键」，保留。
+**决策（用户指正，采纳）**：`default.custom.yaml` 是**给用户用的配置**，`/+:` 追加语义是**对**的
+——只把本方案加进用户已有的方案列表（不删他的 luna/仓颉），不该为了测试方便改成替换。
+于是把问题拆成两件事，各用最小手段解决：
 
-**防回归**：`check_consistency.py` 加守卫 —— `default.custom.yaml` 里出现 `schema_list/+:`
-即 `make lint` 失败；`make verify-bundle` 已经会先重打包（真机同构路径）。
+| 场景 | 做法 | 实现 |
+|---|---|---|
+| 测试环境（`data/rime-test`、交付包验收目录） | 把**该目录那份**的 `schema_list/+:` 改成替换式（console 只看列表顺序） | `scripts/schema_env.py list-replace <dir>`，由 `make env-test` 与 `scripts/verify_bundle.py` 调用 |
+| 目标机首次安装 | 在 `user.yaml` 写/修正 `previously_selected_schema: egret_wubi_py`（真实输入法按它恢复方案；F4 随时可换；已是本方案三选一则尊重不动） | `scripts/schema_env.py pin <dir>`，由 `make deploy` 与离线包 `install.sh` 调用 |
 
-**验收**：`make test` 黄金 33/33；`make verify-bundle` **8/8**（新包）；另手工对照：
-同一 tgt 只把 `default.custom.yaml` 换回追加式 ⇒ 立刻回到 0/8（因果闭环）。
+**防回归**：`check_consistency.py` 守卫「**测试目录**的 `default.custom.yaml` 不得残留追加式」
+（用户配置本身允许追加）；`make verify-bundle` 保持「先重打包再验收」。
 
-**教训**：验收门如果拿「历史产物」当被测对象，它就退化成橡皮图章；门必须先**重建产物**再验收。
+**验收**：`make test` 黄金 **33/33**（用户配置仍是追加式）；`make verify-bundle` **8/8**；
+`pin` 四种输入自检通过（缺 key→补、空→补、是 luna→改、已是 egret_wubi→不动）。
+
+**教训**：① 验收门若拿「历史产物」当被测对象就退化成橡皮图章，必须先**重建产物**；
+② 「为测试方便」的改动不要写进**用户配置**——测试改测试环境，用户可见的行为交给部署脚本。
 
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；

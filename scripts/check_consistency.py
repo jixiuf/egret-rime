@@ -188,15 +188,16 @@ try:
 except Exception as _e:
     print(f"  · 键名字优先检查跳过（{_e}）") ; warn += 1
 
-# 4.5) default.custom.yaml 的 schema_list 必须是**替换**而非 `/+:` 追加
-# （追加会把本方案排在共享数据的 luna_pinyin/cangjie5 之后 ⇒ 新环境启动成朙月拼音，
-#   verify-bundle 探针 0/8 全繁体；见 §4.78）
-_dc = os.path.join(ROOT, "default.custom.yaml")
-if os.path.exists(_dc):
-    _txt = open(_dc, encoding="utf-8").read()
+# 4.5) 测试环境必须是「替换式」schema_list
+# 用户配置 default.custom.yaml 用 `/+:`（追加，尊重用户已有方案）是有意的；但 console
+# 只看列表首个可用方案 ⇒ 测试目录必须由 scripts/schema_env.py list-replace 改成替换式，
+# 否则黄金/探针会静默地测成朙月拼音（繁体，曾全过不去，见 §4.78）。
+_ts_dc = os.path.join(ROOT, "data", "rime-test", "default.custom.yaml")
+if os.path.exists(_ts_dc):
+    _txt = open(_ts_dc, encoding="utf-8").read()
     if re.search(r"^\s*schema_list/\+:", _txt, re.M):
-        print("  ✗ default.custom.yaml 用了 `schema_list/+:`（追加）⇒ 新环境会启动成朙月拼音，"
-              "必须是 `schema_list:`（替换）")
+        print("  ✗ data/rime-test/default.custom.yaml 仍是追加式 schema_list ⇒ console 会选到"
+              "朙月拼音；`make env-test` 应调用 scripts/schema_env.py list-replace")
         err += 1
 
 # 5) refresh.sh 里未提到的生成器（提示，不算错）

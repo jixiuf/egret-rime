@@ -93,6 +93,9 @@ env-test:
 	@# 用户态配置用复制而非软链: console/deployer 会回写这两个文件,
 	@# 软链会把改动写到仓库里(见 AGENTS.md 陷阱 #1)
 	@cp -f $(REPO)/user.yaml $(REPO)/default.custom.yaml $(TEST_DIR)/
+	@# 测试环境专用：用户配置是「追加」语义（不动用户已有方案列表），但 console 只看
+	@# schema 列表顺序 ⇒ 把**测试目录的这份**改成替换式，保证测的是本方案（§4.78）
+	@$(PYTHON) $(REPO)/scripts/schema_env.py list-replace $(TEST_DIR)
 	@for d in dicts lua opencc; do $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$d $(REPO)/$$d --quiet; done
 	@mkdir -p $(SHARED_DIR)
 	@for f in default.yaml symbols.yaml essay.txt; do \
@@ -213,6 +216,9 @@ deploy:            ## 软链到输入法用户目录（TARGET=...；目标已有
 	@if [ ! -f "$(GRAM_LM)" ]; then echo "  语言模型缺失 → 自动下载（~400MB）…"; $(MAKE) -s gram-lm || true; fi
 	@if [ -f "$(GRAM_LM)" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/wanxiang-lts-zh-hans.gram" "$(GRAM_LM)" --quiet; \
 	 else echo "  ! 仍未取得 $(GRAM_LM)：可手动 curl 到该路径（见 README）"; fi
+	@# 首次安装：user.yaml 没有/不是本方案时 pin 上（追加式 schema_list 下 console/部署器
+	@# 只看列表首个可用方案，会落到共享数据的朙月拼音；F4 菜单随时可换回，§4.78）
+	@$(PYTHON) scripts/schema_env.py pin $(TARGET_DIR)
 	@echo "已部署到 $(TARGET_DIR)"
 	@echo "  下一步：make reload   （重建 Rime build 并重启输入法；只重建可加 NO_RESTART=1）"
 

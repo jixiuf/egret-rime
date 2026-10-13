@@ -70,6 +70,11 @@ def main():
     if miss:
         sys.exit("包内缺必需文件：\n" + "\n".join(miss))
 
+    # 交付包里的 default.custom.yaml 是**用户配置**（`schema_list/+:` 追加语义，不动用户
+    # 已有方案列表）；console 只看列表顺序 ⇒ 测试目录里改成替换式（只影响本目录，§4.78）
+    subprocess.run([sys.executable, os.path.join(REPO, "scripts", "schema_env.py"),
+                    "list-replace", tgt], capture_output=True)
+
     # 目标机自己准备的东西：400MB 语言模型 + rime 共享数据 + 选中本方案
     if os.path.exists(GRAM):
         os.symlink(GRAM, os.path.join(tgt, os.path.basename(GRAM)))

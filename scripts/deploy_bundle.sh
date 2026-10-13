@@ -175,6 +175,26 @@ else
   fi
 fi
 echo
+# ---- 首次安装：把 previously_selected_schema 指到本方案 ----
+# 交付包里的 default.custom.yaml 是**用户配置**（`schema_list/+:` 追加语义，不动用户
+# 已有方案列表），而 librime 只看列表首个可用方案（共享数据里有 luna_pinyin）⇒ 首次
+# 安装要让本方案成为默认，就在 user.yaml 里 pin 一行（F4 菜单随时可换，见 §4.78）。
+UY="$TARGET/user.yaml"
+if [ -e "$UY" ] && grep -qE "^[[:space:]]*previously_selected_schema:" "$UY"; then
+  if grep -qE "^[[:space:]]*previously_selected_schema:[[:space:]]*egret_wubi_py[[:space:]]*$" "$UY"; then
+    echo "  ok 默认方案已是 egret_wubi_py（user.yaml）"
+  else
+    sed -i.egretbak -E "s/^([[:space:]]*previously_selected_schema:).*/\1 egret_wubi_py/" "$UY" \
+      && rm -f "$UY.egretbak" && echo "  ok 默认方案已改成 egret_wubi_py（user.yaml）"
+  fi
+elif [ -e "$UY" ] && grep -qE "^var:[[:space:]]*$" "$UY"; then
+  awk '/^var:[[:space:]]*$/{print; print "  previously_selected_schema: egret_wubi_py"; next} {print}' \
+    "$UY" > "$UY.tmp" && mv -f "$UY.tmp" "$UY" \
+    && echo "  ok 默认方案写入 egret_wubi_py（user.yaml）"
+else
+  printf 'var:\n  previously_selected_schema: egret_wubi_py\n' >> "$UY" \
+    && echo "  ok 默认方案写入 egret_wubi_py（user.yaml）"
+fi
 
 echo "安装完成。接下来："
 case "$(uname -s)" in
