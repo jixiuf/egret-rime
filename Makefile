@@ -129,6 +129,12 @@ verify: test verify-wubi bench  ## 全链验收：契约 + 黄金 33 + 五笔能
 verify-bundle: bundle      ## 交付包验收（**先按当前工作区重打包** → 解包→装到空目录→探针）
 	@$(PYTHON) scripts/verify_bundle.py
 
+verify-repro:      ## 复现性门：用当前语料重跑 dict 阶段，产物必须与仓库逐字一致（需本地 data/corpus）
+	@bash scripts/refresh.sh --from dict
+	@git diff --exit-code -- dicts/ data/gram/ \
+	  && echo "✓ 产物可复现（与仓库一致）" \
+	  || { echo "✗ 产物与仓库不一致：要么生成器/管线参数变了但没重出产物，要么语料有新增（后者应把新产物提交）"; exit 1; }
+
 verify-wubi: env-test      ## 五笔能力验收（H11 五组 + 阈值，约 1 分钟；超阈 exit 1）
 	@$(PYTHON) scripts/verify_wubi.py
 

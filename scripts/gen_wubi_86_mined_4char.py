@@ -91,7 +91,9 @@ def main():
     ap.add_argument("--tsv", default="", help="已挖好的 词\\t计数 文件")
     ap.add_argument("--min-count", type=int, default=50)
     ap.add_argument("--w-lo", type=int, default=300, help="长尾权重下界")
-    ap.add_argument("--w-hi", type=int, default=450, help="长尾权重上界（必须 < base 阈值 451）")
+    # 上界必须与 refresh.sh 传参一致：实测 700 时四字词 top1 86%、压到 450 只有 68%
+    # （四字词要能压过同码的 2+2 读法），见 docs/PROGRESS.md §4.81
+    ap.add_argument("--w-hi", type=int, default=700, help="权重上界（默认 700，与 refresh.sh 传参一致）")
     ap.add_argument("--out", default=OUT_NAME)
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()

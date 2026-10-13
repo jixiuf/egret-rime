@@ -14,9 +14,21 @@ make setup      # 新机器第一次：拉依赖（锁定 commit）、编译 lib
 make test       # 黄金 33 条 + 契约测试。改任何东西之后都跑这个
 make lint       # 命名、路径、语法、部署清单一致性，秒级，不跑引擎
 make verify     # 契约 + 黄金 + 五笔能力 5 组 + 输入延迟门，全链验收
-bash scripts/refresh.sh      # 用 data/input 里的语料增量重出全部产物
+bash scripts/refresh.sh      # 往 data/input 丢语料后，这一条就够：增量重出全部产物
 bash scripts/refresh.sh --list   # 看各阶段状态：fetch → extract → clean → freq → dict → gram → artifacts
+make verify-repro   # 复现性门：重跑 dict 阶段，产物必须与仓库逐字一致
 ```
+
+`refresh.sh` 是「语料进、产物出」的唯一入口，可直接反复重跑。实测耗时（135GB 语料、3 并发）：
+extract 约 1 分钟（**前提是同步清单能被找到**，见下）、clean 秒级、freq 约 30 分钟（Aho-Corasick
+全量重扫，不是增量的）、dict 约 15 分钟（其中四字词挖掘占 10 分钟）、gram 视需要
+（它顺带重出搜索器的 `lm_rerank.*`、`compose_table.bin`、`py_words` 等表）。
+
+两个容易踩的点。一是同步清单：`scripts/corpus/common.py` 默认去
+`../_sync_state/manifest.jsonl` 找内容寻址 key，找不到就对每个输入文件算 sha256
+（135GB 输入要读很久）；本机旧路径是 `_epms_state` 的话，跑之前
+`export CORPUS_SYNC_MANIFEST=/export/ebook/_epms_state/manifest.jsonl`，或者把目录改名对齐。
+二是 input 目录里的**断链软链**：过去会让 extract 整轮崩掉（已在扫描时跳过并打印条数）。
 
 路径不要写死，`scripts/rime_paths.py` 是唯一入口（以仓库根为基准，可用环境变量覆盖）。
 librime 的命令行工具按 `LIBRIME_BIN`、`third-party/librime`、`~/repos/librime` 的
@@ -133,6 +145,7 @@ make bundle   → scripts/deploy_bundle.sh 打 dist/*.tar.gz，包内 install.sh
 | `make verify-wubi` | 五笔打词的五个 cohort，各带 top1/top8 阈值 |
 | `make bench` | 三串固定输入整串重放，超基线 1.5 倍算失败 |
 | `make verify-bundle` | 先重打包，再解包装到空目录跑 8 条探针 |
+| `make verify-repro` | 重跑 dict 阶段后 `git diff --exit-code`：产物必须与仓库一致（防「改了生成器没重出产物」） |
 | `make eval` | 160 句整句评测，另有 200 句留出集 |
 
 二进制读端有两个专门的契约测试（`check_lm_table.lua`、`check_compose_table.lua`），

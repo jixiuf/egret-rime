@@ -186,7 +186,9 @@ for i in "${!STAGES[@]}"; do
       # 四字词（§4.67）：词库/仓库都没有四字词源，用**自有语料 jieba 挖掘**
       # （`社会主义/人工智能/也就是说`…）；五笔码=每字首码，权重按 log 词频映射到 300~700。
       if [ -d "$ROOT/data/corpus/clean/para" ]; then
-        "$PY" "$ROOT/scripts/gen_wubi_86_mined_4char.py" --mine-mb 800 >>"$RUNLOG" 2>&1 \
+        # 权重上界 700 是实测值（450 → 四字词 top1 68%，700 → 86%），改了要重跑 verify-wubi
+        "$PY" "$ROOT/scripts/gen_wubi_86_mined_4char.py" --mine-mb 800 \
+          --w-lo 300 --w-hi 700 >>"$RUNLOG" 2>&1 \
           && ok "四字词（语料挖掘）已生成" || warn "四字词挖掘失败"
       else
         ok "跳过四字词挖掘（无 data/corpus，用仓库内已有产物）"

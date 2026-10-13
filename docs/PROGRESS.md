@@ -2680,6 +2680,42 @@ git fetch origin && git reset --hard origin/main    # 该机上若没有本地�
 （PROGRESS 里 4 处）；引用的**上游仓库** hash（如 librime 的 pin）无关本次重写，保持原样。
 想看某个旧 hash 对应的内容，用备份镜像：`git --git-dir=<backup>.git show <old-hash>`。
 
+### 4.81 复现性验证：从语料重出产物 → 发现两类「产物与管线不同步」
+
+用户要求：语料没变时，从语料重跑一遍产物应该与仓库里的一致；顺带把历史 session 里报过的问题
+逐条复验。这次真跑了一遍（`refresh.sh --from extract`，135GB 语料、3 并发）。
+
+**耗时实测**（时间预算用得上）：extract ~1 分钟（有同步清单时；没清单要对每个输入算 sha256，
+实测卡在 23GB 读取上 20 分钟还没完）、clean 秒级、**freq ~30 分钟**（Aho-Corasick 全量重扫，
+非增量；脚本头注释里旧的「2 分钟」是 3.6GB 时代的数字，已改）、dict ~15 分钟（四字词挖掘占 10 分钟）、
+gram 阶段重出搜索器各表。整轮 `--from extract` 到 artifacts 约 **50 分钟**。
+
+**复现结果**：60 多个产物里 **3 个与仓库不一致**，且都不是随机性（同一输入连跑两次逐字一致）：
+
+| 产物 | 差异 | 根因 |
+|---|---|---|
+| `dicts/egret_wubi_words_wb86_{core,full}.dict.yaml` | 一批键名字同码词的权重没被压制（大大 731→705 等） | 我在 §4.76 只重跑了 `base` 档，**core/full 漏了**⇒ 产物落后于生成器 |
+| `dicts/egret_{wubi_words_wb86,py_words}_mined4.dict.yaml` | 权重区间 300~**700** vs 生成器默认 300~**450** | 产物是当初用非默认参数生成的，生成器默认值从 `dc2e180` 起就与产物不符（四字词挖掘 `--w-hi`） |
+
+第二条影响真实能力：按生成器默认（450）重出后 `make verify-wubi` 的四字组 **35/40 (86%) → 27/40 (68%)**，
+**低于 72% 阈值**。⇒ 以产物为准：把生成器默认值改成 700，并让 `refresh.sh` **显式传**
+`--w-lo 300 --w-hi 700`（本项目约定「管线参数写在 refresh.sh 头部」），重出后门禁全过
+（四字回到 35/40）。修完再跑一遍 dict：mined4 与仓库逐字一致、core/full 只剩键名字压制这一处预期差异。
+
+**顺带修的问题**（都是这次跑出来的）：
+1. `data/input` 下 4551 个断链软链（zhwiki 遗留）让 `extract.py` 在 `os.stat` 处整轮崩掉 ⇒ 扫描时
+   跳过不存在的条目并打印跳过条数；
+2. 中性化把同步清单默认路径改成 `_sync_state` 后，本机旧路径 `_epms_state` 不再被识别 ⇒
+   优化静默失效、extract 变很慢。已在 `DEVELOPMENT.md` 写明用 `CORPUS_SYNC_MANIFEST` 指回去；
+3. `recount.sh` 头注释里的耗时数字过期（3.6GB 时代），改成实测值。
+
+**新增门禁**：`make verify-repro` = 重跑 dict 阶段后 `git diff --exit-code -- dicts/ data/gram/`。
+它正是这次问题的探测器——以前没人把「重出产物」和「仓库内容」对一下，漂移就一直没人发现。
+
+**历史 session 问题复验**：从 `~/.pi/agent/sessions/--export-ebook-egret-rime--/` 里挑出
+14 条**可验证**的用户报告（qktqn/qktnqnr/uwycuklf/gdrnthtcsu/ronghe/kkkk/wan/aaaa/长句页尾…），
+用当前 build 逐条重跑：**15/15 未复现**（脚本见 `/tmp/verify_history.py` 的思路：每条连跑两次取第二次）。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。
