@@ -28,12 +28,6 @@ local function first_char(s)
     return nxt and s:sub(1, nxt - 1) or s
 end
 
-local function pass(cands)
-    for _, cand in ipairs(cands) do
-        yield(cand)
-    end
-end
-
 local function parse_spec(spec)
     local out = {}
     for cat in tostring(spec):gmatch("[^,%s]+") do
@@ -57,6 +51,8 @@ function M.init(env)
     env.tail_spec = parse_spec(config:get_string("tail_word_filter/tail_spec")
                                or "char,word")
     env.tail_min_len = config:get_int("tail_word_filter/min_sentence_len") or 4
+    env.tail_dedupe = config:get_bool("tail_word_filter/dedupe")
+    if env.tail_dedupe == nil then env.tail_dedupe = true end
     env.tail_debug = config:get_bool("tail_word_filter/debug")
     -- schema 自己配了 menu/page_size 时以它为准（避免与界面实际分页不一致）
     local ps = config:get_int("menu/page_size")
@@ -66,21 +62,42 @@ function M.init(env)
 end
 
 function M.func(input, env)
-    -- rime 的 translation 是一次性流：必须先收集再 yield
-    local cands = {}
-    for cand in input:iter() do
-        cands[#cands + 1] = cand
-    end
-    local n = #cands
-    if not env.tail_enabled or n == 0 then
-        return pass(cands)
+    -- 注意：input:iter() 是 C 迭代器，只能由 `for ... in` 驱动（手动 it() 会报
+    -- "bad argument #2 ... Translation expected"）。所以用一趟循环 + mode 状态：
+    --   pass   = 非长句：逐条惰性 yield（不缓冲，不拖累下游 filter）
+    --   buffer = 长句：缓存整份候选后重排（顺便按文本去重，见下）
+    local first, mode = nil, nil
+    local seen, cands = {}, {}
+
+    local function not_seen(c)
+        if env.tail_dedupe and seen[c.text] then
+            return false
+        end
+        seen[c.text] = true
+        return true
     end
 
-    -- 只在「长句」时启用：首候选为整句且字数足够
-    local first = cands[1]
-    if first:get_dynamic_type() ~= "Sentence"
-        or utf8len(first.text) < env.tail_min_len then
-        return pass(cands)
+    for cand in input:iter() do
+        if mode == nil then
+            first = cand
+            mode = (env.tail_enabled
+                    and cand:get_dynamic_type() == "Sentence"
+                    and utf8len(cand.text) >= env.tail_min_len) and "buffer" or "pass"
+        end
+        if mode == "pass" then
+            if not_seen(cand) then
+                yield(cand)
+            end
+        elseif not_seen(cand) then
+            cands[#cands + 1] = cand
+        end
+    end
+    if mode ~= "buffer" then
+        return          -- 非长句：已惰性透传完毕
+    end
+    local n = #cands
+    if n == 0 then
+        return
     end
 
     -- 整段输入的覆盖范围（候选 _end 的最大值）
@@ -106,7 +123,8 @@ function M.func(input, env)
         end
     end
     if #sents == 0 or (prefix_count.char == 0 and prefix_count.word == 0) then
-        return pass(cands)
+        for _, c in ipairs(cands) do yield(c) end
+        return
     end
 
     -- 「字」优先取**首句的第一个字**（先字修正就该修它）：
@@ -162,7 +180,7 @@ function M.func(input, env)
             "[TAIL] page=%d spec=%s sents=%d chars=%d words=%d",
             page_size, table.concat(spec, ","), #sents, #chars, #words))
     end
-    pass(out)
+    for _, c in ipairs(out) do yield(c) end
 end
 
 return M

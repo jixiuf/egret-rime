@@ -86,8 +86,9 @@ engine:
     - lua_filter@*long_word_filter
     - lua_filter@*reduce_emoji_filter
     - simplifier@traditionalize
-    - uniquifier                        # 放最后：实测放中间去不掉重复（§4.58）
+    # tail_word_filter 必须在 uniquifier 之前（eager filter 挂在它之后会让去重失效，§4.76）
     - lua_filter@*tail_word_filter      # 长句页尾留「字/词」候选（可先字修正）
+    - uniquifier                        # 放最后：实测放中间去不掉重复（§4.58）
 
 abc_segmentor:
   extra_tags:

@@ -95,6 +95,7 @@ lua_config:
     page_size: 6        # 与 default.custom.yaml 的 menu/page_size 一致
     tail_spec: "char,word"  # 每页末尾槽位：char=单字，word=词（改成 "word,char" 即调换）
     min_sentence_len: 4 # 首候选整句字数 ≥ 此值才启用（短输入/简码全码不动）
+    dedupe: true        # 按文本去重（本 filter 是 eager 的，会让 uniquifier 失效 ⇒ 自己兜一次）
     debug: false
     # Lua 配置：农历的触发关键字
   lunar: nl  # 农历： 二〇二三年冬月二十 癸卯年（兔）冬月二十

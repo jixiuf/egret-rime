@@ -105,8 +105,10 @@ engine:
     # 放在最后：前面的 long_word_filter 会重排候选，若放在它前面，改写会被覆盖
     - lua_filter@*dump_cands_filter    # 调试：打印整份候选表（默认关）
     - lua_filter@*compose_filter
-    - uniquifier                # 去重（移到最末：实测放中间去不掉重复，见 §4.58）
-    - lua_filter@*tail_word_filter  # 长句页尾留「字/词」候选（可先字修正）——须在 uniquifier 之后（只重排最终表）
+    # 必须在 uniquifier **之前**：本 filter 要缓冲整份候选（重排），而 eager filter
+    # 若挂在 uniquifier 之后，会让它看不到「已产出候选表」⇒ 去重静默失效（§4.58 机制）
+    - lua_filter@*tail_word_filter
+    - uniquifier                # 去重（必须在 filter 链最外层：见上，§4.58/§4.76）
 
 # ---- 顶层调度：first=传统五笔库，先于混合库，保证简码/全码首候选确定 ----
 dynamic_translator:

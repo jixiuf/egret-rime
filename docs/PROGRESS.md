@@ -2461,6 +2461,14 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 | `gdrnthtcsu`（整串五笔） | 1.天气怎么样 … **5.天 6.天气** |
 | `kkkk`（键名字，非长句） | 1.口 2.串串 …（filter 不触发，一行不动） |
 
+**踩坑（实现细节，务必保留）**：`tail_word_filter` 要重排就必须**缓冲整份候选**（eager），
+而 `uniquifier` 的去重依赖「菜单已产出候选表」（§4.58）⇒ **eager filter 挂在它之后会让去重静默失效**
+（用户实测报来：`aaaa` 前两个候选都是「工」——`工` 有 `a/aaa/aaaa` 三个码，
+精确匹配 + 补全各出一条，本该被 uniquifier 合并）。
+修法两条一起上：① filter 移到 `uniquifier` **之前**（schema 注释已写明原因）；
+② filter 内部先按文本去重（`tail_word_filter/dedupe: true`），保证页尾槽位不会被下游合并挪位。
+附带发现：去掉重复的孤字后，`verify-wubi` 的长尾组 top8 反而从 38/40、39/40 升到 39/40、40/40。
+
 **端到端**（先字修正真的可用）：console 送 `womenzaiyiqi` + 键 `5` ⇒ 上屏「我」，
 余下输入继续组句；送 `womenzaiyiqi` + 键 `6` ⇒ 上屏「我们在」，余下 `yi qi` 继续组句
 （`status: composing 我们在[yi qi]`）——正是「先修正开头」需要的语义。
