@@ -2623,13 +2623,13 @@ copy 模式先备份到 `.egret-backup-<时间戳>/` · 装完**按清单**自�
 
 | 类别 | 替换（写成表格方便审计，原名已不在仓库里） |
 |---|---|
-| 语料来源品牌 | `X电子书 epub`→`电子书 epub`、`epub（X电子书）`→`epub（电子书）`、`X电子书/文稿`→`电子书/文稿`、`X听书+课程文稿`→`听书 + 课程文稿`、`X课程文稿`→`课程文稿`、`X文稿（听书+课程）`→`文稿（听书+课程）`、`X文稿`→`文稿`、`X语料`→`自有语料`、`X/epub/社区`→`epub/社区` |
-| 内部系统代号 | `<代号>_MANIFEST`→`SYNC_MANIFEST`、`<代号> 同步清单`→`同步清单`、`<代号> 清单`→`同步清单`、`<代号>`→`SYNC` |
-| 机器标识 | `host-a`→`host-linux`、`host-b`→`host-mac`、`/Users/<me>`→`$HOME`、`192.0.2.1`→`192.0.2.1`（RFC 5737 文档地址） |
+| 语料来源品牌（**本文不复述原名**，模式表在 `/tmp/egret-replace.txt` 与本节命令里） | 品牌名 + `电子书 epub` → `电子书 epub`；品牌名 + `文稿` → `文稿`；品牌名 + `听书 + 课程文稿` → `听书 + 课程文稿`；品牌名 + `语料` → `自有语料`；品牌名 + `/epub/社区` → `epub/社区` |
+| 内部系统代号 | 同步服务代号 → `SYNC`：`<代号>_MANIFEST` → `SYNC_MANIFEST`、`<代号> 同步清单/清单` → `同步清单` |
+| 机器标识 | 两个目标机 hostname → `host-linux` / `host-mac`；个人 HOME 路径 → `$HOME`；内网代理 IP → `192.0.2.1`（RFC 5737 文档地址） |
 
 **关键设计：不碰 `dicts/`**。语料词表里的该词是**普通词**（`813`），且裸替换会重写
 29MB 的 `lm_rerank.tsv` 与 21MB 的 `lm_rerank.bin`（二进制、有长度字段）。所以替换表刻意**不含**
-裸的「品牌名」；唯一会命中语料的 `品牌词`（tsv/bin 各 2 条）也从表里去掉。
+裸的品牌词（实测该裸词会命中语料统计）；唯一会命中语料的那个短语（tsv/bin 各 2 条）也从表里去掉。
 验证：4 个代表 blob 的 hash 与重写前**逐一相同**（`dicts/lm_rerank.{tsv,bin}`、`compose_table.bin`、
 `egret_wubi_sentence.dict.yaml`）。
 
@@ -2650,7 +2650,7 @@ git push --force origin main
 deploy_bundle.sh/rel_symlink.py）；`make lint` + 黄金 **33/33** 通过；pack 57.3 → 60.0 MB
 （14 个 blob 新写，属正常）。
 
-**⚠️ 影响面（重要）**：远端已 **force-push**，所有其它 clone（host-linux / mac / 任何拷出去的副本）
+**⚠️ 影响面（重要）**：远端已 **force-push**，所有其它 clone（两台目标机 / 任何拷出去的副本）
 必须重新同步——旧历史与新历史无法自动合并：
 
 ```bash
