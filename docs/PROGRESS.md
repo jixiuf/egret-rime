@@ -2669,6 +2669,10 @@ git fetch origin && git reset --hard origin/main    # 该机上若没有本地�
 `make lint` + 黄金 **33/33** + `verify-bundle` **8/8** 通过；文档里引用的**本仓库**旧 hash 已按
 `commit-map` 映射到现存 commit（**上游** librime 的 hash 引用保持原样）。
 
+**范围与迭代补充**：脱敏范围是**文档与 commit message**（数据文件保持原样，理由见上）。
+替换表还覆盖了「带引号/反引号的原词写法」以及 commit message 里的箭头写法（`X→Y`）；
+说明性文字里**不要拿原词举例**——否则说明本身就是泄漏源（本轮已把这类举例从当前树与历史里清掉）。
+
 以后若要再脱敏：把新模式追加到同一份替换表，重跑上面四条命令即可（记得重新备份）。
 
 **文档里的旧 commit 引用**：重写后老 hash 自然失效。filter-repo 会写一份映射
