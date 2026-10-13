@@ -192,35 +192,11 @@ gram-lm:           ## 下载万象词级语言模型（~400MB；断点续传，�
 	  echo "已下载 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)）"; \
 	fi
 
-deploy:            ## 软链到输入法用户目录（TARGET=...；目标已有实体目录 dicts/lua/opencc 会先改名备份为 *.bak-<时间戳>）
-	@mkdir -p $(TARGET_DIR)
-	@for d in dicts lua opencc; do $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$d" "$(REPO)/$$d" --quiet --backup-existing; done
-	@# user.yaml / default.custom.yaml 是**用户态**（Rime 会回写）：软链会把改动写回仓库、
-	@# 并丢掉目标机原有配置（同 env-test 的口径）⇒ 只在缺失时复制一份，不建链
-	@# installation.yaml 同理是**机器态**（install_time/installation_id，已 gitignore）：
-	@# 绝不能把它软链/拷成开发机那份，否则两台机器 sync 到同一个 id 会互相覆盖
-	@for f in $(REPO)/*.yaml; do \
-	  case "$$(basename $$f)" in \
-	    installation.yaml) ;; \
-	    user.yaml|default.custom.yaml) \
-	      [ -e "$(TARGET_DIR)/$$(basename $$f)" ] || cp -f "$$f" "$(TARGET_DIR)/";; \
-	    *) $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$(basename $$f)" "$$f" --quiet;; \
-	  esac; \
-	done
-	@# 运行时二进制/元数据：优先 git 跟踪的 dicts/，再回退 data/gram/
-	@for f in lm_rerank.tsv py_words.tsv py_syllables.txt lm_rerank.bin lm_rerank.meta compose_table.bin py_meta.txt; do \
-		if [ -f "$(DICTS)/$$f" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$f" "$(DICTS)/$$f" --quiet; \
-		elif [ -f "$(GRAM_DIR)/$$f" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/$$f" "$(GRAM_DIR)/$$f" --quiet; fi; \
-	done
-	@# 语言模型（400MB，不随仓库分发）：缺了就**自动下载**（断点续传），再软链过去
+deploy:            ## 按运行时清单装到输入法用户目录（TARGET=...；--link 软链；实体目录自动备份）
+	@# 唯一部署引擎（清单来自 scripts/deploy_bundle.sh --list）；离线包 install.sh 走同一个脚本
+	@# 语言模型（400MB，不随仓库分发）：缺了就自动下载（断点续传），引擎再负责软链
 	@if [ ! -f "$(GRAM_LM)" ]; then echo "  语言模型缺失 → 自动下载（~400MB）…"; $(MAKE) -s gram-lm || true; fi
-	@if [ -f "$(GRAM_LM)" ]; then $(PYTHON) scripts/rel_symlink.py "$(TARGET_DIR)/wanxiang-lts-zh-hans.gram" "$(GRAM_LM)" --quiet; \
-	 else echo "  ! 仍未取得 $(GRAM_LM)：可手动 curl 到该路径（见 README）"; fi
-	@# 首次安装：user.yaml 没有/不是本方案时 pin 上（追加式 schema_list 下 console/部署器
-	@# 只看列表首个可用方案，会落到共享数据的朙月拼音；F4 菜单随时可换回，§4.78）
-	@$(PYTHON) scripts/schema_env.py pin $(TARGET_DIR)
-	@echo "已部署到 $(TARGET_DIR)"
-	@echo "  下一步：make reload   （重建 Rime build 并重启输入法；只重建可加 NO_RESTART=1）"
+	@bash scripts/deploy_runtime.sh "$(REPO)" "$(TARGET_DIR)" --link
 
 reload:            ## 目标机：重建 Rime build 并重启输入法（Linux=fcitx5 / macOS=Squirrel）
 	bash scripts/reload_ime.sh "$(TARGET_DIR)" $(if $(NO_RESTART),--no-restart,)

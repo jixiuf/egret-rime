@@ -83,12 +83,20 @@ fi
 # --- 重建可能把「运行时才读、schema 没引用」的表挪进 trash/ --------------
 # TARGET/dicts 通常软链到仓库 dicts/：deployer 若把它们挪走，动的是仓库里的实体文件
 # ⇒ 这里从 trash/ 挪回来（历史上 lm_rerank.bin/.meta 中过招）。
-for f in lm_rerank.bin lm_rerank.meta compose_table.bin py_meta.txt; do
-  if [ ! -e "$TARGET/dicts/$f" ] && [ -e "$TARGET/trash/$f" ]; then
-    mkdir -p "$TARGET/dicts"
-    mv -f "$TARGET/trash/$f" "$TARGET/dicts/$f" && echo "    已从 trash/ 挪回 dicts/$f"
-  fi
-done
+# 名字**不再硬编码**：清单里 dicts/ 下的运行时表就是「可能被挪」的集合（清单唯一来源）。
+MANIFEST_LIST="$ROOT/scripts/deploy_bundle.sh"
+if [ -f "$MANIFEST_LIST" ]; then
+  while IFS='|' read -r _src dst; do
+    case "${dst:-}" in
+      dicts/*)
+        f="$(basename "$dst")"
+        if [ ! -e "$TARGET/dicts/$f" ] && [ -e "$TARGET/trash/$f" ]; then
+          mkdir -p "$TARGET/dicts"
+          mv -f "$TARGET/trash/$f" "$TARGET/dicts/$f" && echo "    已从 trash/ 挪回 dicts/$f"
+        fi ;;
+    esac
+  done < <(bash "$MANIFEST_LIST" --list 2>/dev/null)
+fi
 
 # --- 重启输入法 ---------------------------------------------------------
 if [ "$UNAME" = "Darwin" ]; then

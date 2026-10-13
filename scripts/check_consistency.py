@@ -87,6 +87,35 @@ for _lua in glob.glob("lua/*.lua"):
             continue
         print(f"  ✗ {_lua} 运行时读 {_fn}，但部署清单里没有"); err += 1
 
+# 2.75) 「运行时清单」只能有一处来源（§4.79）：Makefile/包安装脚本都不得再硬编码文件名
+#       此前同一份知识散在 5 处（Makefile deploy/env-test、manifest、install.sh 自检、
+#       reload 的 trash 回补），任一处漏更新就是「本地过、真机缺文件」。
+_eng = os.path.join(ROOT, "scripts", "deploy_runtime.sh")
+if not os.path.exists(_eng):
+    print("  ✗ 缺唯一部署引擎 scripts/deploy_runtime.sh"); err += 1
+# 只看 deploy 规则本身（env-test 是**测试夹具**，链接的集合与部署清单本意不同，不算重复）
+_mk_lines = open(os.path.join(ROOT, "Makefile"), encoding="utf-8").read().splitlines()
+try:
+    _i = next(k for k, l in enumerate(_mk_lines) if l.startswith("deploy:"))
+    _j = next((k for k in range(_i + 1, len(_mk_lines))
+               if _mk_lines[k] and not _mk_lines[k][0].isspace()), len(_mk_lines))
+    _deploy_rule = "\n".join(_mk_lines[_i:_j])
+except StopIteration:
+    _deploy_rule = ""
+if "deploy_runtime.sh" not in _deploy_rule:
+    print("  ✗ Makefile 的 deploy 规则没有调用 scripts/deploy_runtime.sh（清单唯一来源，§4.79）")
+    err += 1
+_hard = [n for n in ("compose_table.bin", "lm_rerank.bin", "lm_rerank.meta", "py_meta.txt")
+         if n in _deploy_rule]
+if _hard:
+    print(f"  ✗ Makefile 的 deploy 规则里仍硬编码运行时文件名 {_hard} ⇒ 应由"
+          " scripts/deploy_runtime.sh（清单 deploy_bundle.sh --list）派生")
+    err += 1
+_bundle = open(os.path.join(ROOT, "scripts", "deploy_bundle.sh"), encoding="utf-8").read()
+for _need in ("runtime_manifest.txt", "deploy_runtime.sh"):
+    if _need not in _bundle:
+        print(f"  ✗ 交付包未带上 {_need}（离线安装会退回各自实现，§4.79）"); err += 1
+
 # 2.8) 五笔 86 码口径契约（§4.61）：三字词必须是**标准** 1+1+2。
 #      本仓库旧数据用的是 2+1+1（如 爱可视 epsp），实测用户按标准码打三字词
 #      top1 = 0/50、top8 = 2% —— 肌肉记忆直接失效。改回旧口径会让这条又静默退化。

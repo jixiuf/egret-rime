@@ -43,7 +43,7 @@ def list_replace(user_dir):
     return 0
 
 
-def pin(user_dir, schema=DEFAULT_SCHEMA):
+def _pin_removed(user_dir, schema=DEFAULT_SCHEMA):
     """目标机：user.yaml 里 `previously_selected_schema` 缺失/非本方案时设为 schema。"""
     path = os.path.join(user_dir, "user.yaml")
     if os.path.exists(path):
@@ -81,7 +81,7 @@ def main():
     if cmd == "list-replace":
         return list_replace(user_dir)
     if cmd == "pin":
-        return pin(user_dir, sys.argv[3] if len(sys.argv) > 3 else DEFAULT_SCHEMA)
+        sys.exit("`pin` 已并入唯一部署引擎 scripts/deploy_runtime.sh（pin_schema）")
     sys.exit(f"未知子命令：{cmd}\n{__doc__}")
 
 

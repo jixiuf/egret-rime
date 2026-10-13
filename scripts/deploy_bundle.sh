@@ -87,125 +87,20 @@ while IFS='|' read -r src dst; do
 done < <(manifest)
 [ -f "$ROOT/data/gram/lm_rerank.bin" ] || echo "  ! 缺少 data/gram/lm_rerank.bin（先跑 scripts/gen_lm_rerank.py）"
 
+# 5b) 清单 + 唯一部署引擎进包：目标机用同一套逻辑安装（见 scripts/deploy_runtime.sh）
+manifest > "$STAGE/runtime_manifest.txt"
+cp -a "$ROOT/scripts/deploy_runtime.sh" "$STAGE/deploy_runtime.sh"
+chmod +x "$STAGE/deploy_runtime.sh"
+
 # 6) 安装脚本
 cat > "$STAGE/install.sh" <<'INSTALL'
 #!/usr/bin/env bash
 # 在目标机器上安装 egret-rime 运行时产物
-#   bash install.sh [Rime用户目录] [--link]
+#   bash install.sh [Rime用户目录] [--link] [--download-lm]
+# 实际安装逻辑在包内的 deploy_runtime.sh（与仓库 `make deploy` 共用同一份实现）
 set -uo pipefail
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-MODE=copy
-DL_LM=0
-TARGET=""
-for a in "$@"; do
-  case "$a" in
-    --link) MODE=link ;;
-    --download-lm) DL_LM=1 ;;
-    *) TARGET="$a" ;;
-  esac
-done
-if [ -z "$TARGET" ]; then
-  case "$(uname -s)" in
-    Darwin) TARGET="$HOME/Library/Rime" ;;
-    *)      TARGET="$HOME/.local/share/fcitx5/rime" ;;
-  esac
-fi
-
-echo "源:   $SRC"
-echo "目标: $TARGET  (模式: $MODE)"
-# 防呆：目标就是包目录本身 → 下面的 rm -rf 会把源删掉，再 cp 就没了（踩过：包会自毁）
-if [ "$(cd "$TARGET" 2>/dev/null && pwd)" = "$SRC" ]; then
-  echo "✗ 目标目录与包目录相同（$SRC）：会先删后拷把自己清空。请换个目标目录。"
-  exit 1
-fi
-mkdir -p "$TARGET"
-BAK="$TARGET/.egret-backup-$(date +%Y%m%d-%H%M%S)"
-NEED_BAK=0
-# 按 $SRC 里实际有的东西遍历（包内就是完整运行时清单，别再手写文件名）
-for f in "$SRC"/*; do
-  b="$(basename "$f")"
-  if [ -e "$TARGET/$b" ] || [ -L "$TARGET/$b" ]; then NEED_BAK=1; fi
-done
-if [ "$NEED_BAK" = 1 ]; then
-  mkdir -p "$BAK"
-  for f in "$SRC"/*; do
-    b="$(basename "$f")"
-    if [ -e "$TARGET/$b" ] || [ -L "$TARGET/$b" ]; then
-      cp -a "$TARGET/$b" "$BAK/" 2>/dev/null || true
-    fi
-  done
-  echo "已备份原文件到: $BAK"
-  echo "  （回滚：把 $BAK/ 里的东西拷回 $TARGET/）"
-fi
-
-for f in "$SRC"/*; do
-  b="$(basename "$f")"
-  rm -rf "$TARGET/$b"
-  if [ "$MODE" = link ]; then ln -sfn "$SRC/$b" "$TARGET/$b"
-  else cp -a "$SRC/$b" "$TARGET/"; fi
-done
-
-echo
-# ---- 自检（H2）：必需运行时文件 + 引擎 LM ----
-# 400MB 的词级 gram **不随包分发**（见上方注释）；缺它 = grammar 加载失败 = 没有语言模型。
-echo
-miss=0
-for f in egret_wubi_py.schema.yaml egret_wubi_py.dict.yaml lua/py_composer.lua \
-         dicts/compose_table.bin dicts/lm_rerank.bin dicts/lm_rerank.meta dicts/py_meta.txt; do
-  if [ ! -e "$TARGET/$f" ]; then echo "  x 缺必需文件: $f"; miss=1; fi
-done
-[ "$miss" = 0 ] && echo "  ok 必需运行时文件齐全"
-GRAM="wanxiang-lts-zh-hans.gram"
-if [ -e "$TARGET/$GRAM" ] || [ -L "$TARGET/$GRAM" ]; then
-  echo "  ok 语言模型 $GRAM 已在目标目录"
-else
-  echo "  !  缺少引擎语言模型（约 400MB，本包不分发）: $TARGET/$GRAM"
-  echo "     不装它的后果：grammar 加载失败 -> 没有语言模型，整句准确率明显下降"
-  echo "     （实测：万象词级 gram 41~46% vs 无 LM / 字级重排 27%）"
-  echo "     获取： curl -fL -C - -o \"$TARGET/$GRAM\" \\
-           https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/$GRAM"
-  echo "           （或重跑本脚本并加 --download-lm，我来自动下）"
-  if [ "$DL_LM" = 1 ]; then
-    echo "  --> --download-lm：开始下载 $GRAM（~400MB，断点续传）"
-    curl -fL --retry 3 -C - -o "$TARGET/$GRAM.part" \
-      "https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/$GRAM" \
-      && mv -f "$TARGET/$GRAM.part" "$TARGET/$GRAM" && echo "  ok 语言模型已就位" \
-      || { echo "  !  下载失败（网络受限可先在别处下好再拷进来）"; rm -f "$TARGET/$GRAM.part"; }
-  fi
-fi
-echo
-# ---- 首次安装：把 previously_selected_schema 指到本方案 ----
-# 交付包里的 default.custom.yaml 是**用户配置**（`schema_list/+:` 追加语义，不动用户
-# 已有方案列表），而 librime 只看列表首个可用方案（共享数据里有 luna_pinyin）⇒ 首次
-# 安装要让本方案成为默认，就在 user.yaml 里 pin 一行（F4 菜单随时可换，见 §4.78）。
-UY="$TARGET/user.yaml"
-if [ -e "$UY" ] && grep -qE "^[[:space:]]*previously_selected_schema:" "$UY"; then
-  if grep -qE "^[[:space:]]*previously_selected_schema:[[:space:]]*egret_wubi_py[[:space:]]*$" "$UY"; then
-    echo "  ok 默认方案已是 egret_wubi_py（user.yaml）"
-  else
-    sed -i.egretbak -E "s/^([[:space:]]*previously_selected_schema:).*/\1 egret_wubi_py/" "$UY" \
-      && rm -f "$UY.egretbak" && echo "  ok 默认方案已改成 egret_wubi_py（user.yaml）"
-  fi
-elif [ -e "$UY" ] && grep -qE "^var:[[:space:]]*$" "$UY"; then
-  awk '/^var:[[:space:]]*$/{print; print "  previously_selected_schema: egret_wubi_py"; next} {print}' \
-    "$UY" > "$UY.tmp" && mv -f "$UY.tmp" "$UY" \
-    && echo "  ok 默认方案写入 egret_wubi_py（user.yaml）"
-else
-  printf 'var:\n  previously_selected_schema: egret_wubi_py\n' >> "$UY" \
-    && echo "  ok 默认方案写入 egret_wubi_py（user.yaml）"
-fi
-
-echo "安装完成。接下来："
-case "$(uname -s)" in
-  Darwin) echo "  1) 点菜单栏 Squirrel 图标 → 重新部署（或 \"/Library/Input Methods/Squirrel.app/Contents/MacOS/rime_deployer\" --build \"$TARGET\"）"
-          echo "  2) 若在系统里还没加过输入法：系统设置 → 键盘 → 输入法 → 添加「白鹭五笔·拼音流」" ;;
-  *)      echo "  1) 重新部署 Rime（fcitx5: 右键托盘图标 → 重新部署；ibus: ibus-daemon -drx）" ;;
-esac
-echo "  验证：输入 e → 应出「有」；输入 jintiandetianqizenmeyang → 应出「今天的天气怎么样」"
-echo
-echo "切换词库档位：编辑 $TARGET/egret_wubi_py.dict.yaml 里的 import_tables"
-echo "  （core / base / full 三档，见产物包内 dicts/*_words_*.dict.yaml）"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec bash "$HERE/deploy_runtime.sh" "$HERE" "$@"
 INSTALL
 chmod +x "$STAGE/install.sh"
 

@@ -2572,6 +2572,47 @@ gitignore ✓ 不影响仓库；若要连目录名一起中性化，改本机目
 **教训**：① 验收门若拿「历史产物」当被测对象就退化成橡皮图章，必须先**重建产物**；
 ② 「为测试方便」的改动不要写进**用户配置**——测试改测试环境，用户可见的行为交给部署脚本。
 
+### 4.79 ⭐ 部署收敛为「一个引擎 + 一份清单」（用户要求：后续维护要简单）
+
+**问题（实测的重复）**：同一份「运行时文件集合」此前硬编码在 **5 处**，形态还都不一样：
+
+| 位置 | 形态 |
+|---|---|
+| `deploy_bundle.sh` 的 `manifest()` | 64 条「源\|目标」——声明为唯一来源 |
+| `Makefile` 的 `deploy` 规则 | 8 个运行时刻表名 + `*.yaml` glob + 3 个目录名 |
+| `Makefile` 的 `env-test` | 上述的**子集**（4 个 + 另 cp 3 个） |
+| 包内 `install.sh` 自检 | 7 个「必需文件」 |
+| `reload_ime.sh` trash 回补 | 4 个表名 |
+
+再加上 `make deploy` 与包内 `install.sh` **各自实现**了一遍同样的语义（用户态/机器态不覆盖、
+首次安装 pin 方案、gram 检查/下载、备份、自检），任一处漏更新 = 「本地过、真机缺文件」。
+
+**现在（唯一引擎 + 唯一清单）**：
+
+```
+scripts/deploy_runtime.sh <src_root> <target_dir> [--link|--copy] [--download-lm]
+   清单：<src>/runtime_manifest.txt（包内） 或 scripts/deploy_bundle.sh --list（仓库）
+   调用方：make deploy → --link（软链，git pull 即生效）
+           包内 install.sh → exec 同一脚本 --copy（或 --link）
+```
+
+引擎集中负责：按清单安装（目录整目录软链／包模式逐文件拷贝）· 用户态/机器态不覆盖 ·
+首次安装把 `previously_selected_schema` pin 到本方案 · 400MB gram 检查/下载 ·
+copy 模式先备份到 `.egret-backup-<时间戳>/` · 装完**按清单**自检（不再硬编码文件名）·
+下一步提示（`make reload` / 各输入法「重新部署」）。
+
+**简化量**：`Makefile` 的 deploy 规则 **30 行 → 6 行**；包内 `install.sh` **119 行 → 9 行**
+（薄壳 `exec`）；硬编码清单 **5 处 → 1 处**（`deploy_bundle.sh --list`，包内落盘成
+`runtime_manifest.txt`）；`reload_ime.sh` 的 trash 回补也改成清单派生。
+
+**防漂移（新 lint 守卫）**：`deploy` 规则必须调用 `deploy_runtime.sh` 且不得出现运行时文件名；
+交付包必须带 `runtime_manifest.txt` + `deploy_runtime.sh`。（`env-test` 不算重复——它是**测试
+夹具**，链接集合与部署清单本意不同。）
+
+**验收**：黄金 **33/33**、`verify-bundle` **8/8**（走新引擎的 copy 模式）；
+手测：link 模式新目标（含首次 pin + gram 软链）、实体目录自动备份（3 个 `.bak-<时间戳>`）、
+包 copy 模式（32 个 dict 文件为实体、自检 64/64 就位、gram 缺失提示正确）。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。

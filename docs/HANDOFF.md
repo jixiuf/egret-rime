@@ -137,7 +137,7 @@ engine.segmentors
 - 本机（RHEL8，仓库所在）：`third-party/librime` = 1.17.0 + 插件 octagram/lua（**零本地补丁**）
   → `build/bin/{rime_api_console, rime_deployer, build_grammar}`
 - 测试用户目录 `data/rime-test`（`make env-test` 生成；会把万象 gram 拷进去）
-- 部署（唯一流程，§4.77）：目标机 `git pull --ff-only` → `make deploy` → `make reload`
+- 部署（唯一流程，§4.77/§4.79）：目标机 `git pull --ff-only` → `make deploy` → `make reload`
   （`reload` = `rime_deployer --build` + 重启 fcitx5/Squirrel）。旧的
   `deploy_{host-linux,host-linux_direct,host-mac,remote}.sh` 已删除；离线机器走 `make bundle` + `install.sh`
 - 语料：`data/input/*`（自有 epub / 听书 + 课程文稿 / 开源）→ `data/corpus/{extract,clean,freq}` → `data/gram/`
