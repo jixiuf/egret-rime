@@ -2469,6 +2469,12 @@ non_collocation_penalty -12 · weak_collocation_penalty -24 · rear_penalty -30`
 ② filter 内部先按文本去重（`tail_word_filter/dedupe: true`），保证页尾槽位不会被下游合并挪位。
 附带发现：去掉重复的孤字后，`verify-wubi` 的长尾组 top8 反而从 38/40、39/40 升到 39/40、40/40。
 
+**踩坑 2（选掉一段后失效）**：用户实测 `ghdqusvfryyif` 选第 6 项（词）之后，新一屏 6 个
+候选又全是整句、页尾没有字/词，没法继续「选字成句」。原因：整句被选掉一段后，组合区段
+**不再从 0 开始**（dump 实测 `start=4`），而 filter 里判定「前缀候选」写的是 `cand.start == 0`
+⇒ 一个都不算数 ⇒ 不重排。修法：以**段起点** `first.start` 为基准（`max_end` 也同理初始化）。
+修后同一操作链：`ghdqusvfryyif` → 5.正 6.正确 → 选 6 ⇒ 新屏 1.新建的方法 … 5.亲 6.新建 ✓。
+
 **端到端**（先字修正真的可用）：console 送 `womenzaiyiqi` + 键 `5` ⇒ 上屏「我」，
 余下输入继续组句；送 `womenzaiyiqi` + 键 `6` ⇒ 上屏「我们在」，余下 `yi qi` 继续组句
 （`status: composing 我们在[yi qi]`）——正是「先修正开头」需要的语义。

@@ -100,8 +100,11 @@ function M.func(input, env)
         return
     end
 
-    -- 整段输入的覆盖范围（候选 _end 的最大值）
-    local max_end = 0
+    -- 整段输入的覆盖范围（候选 _end 的最大值）。注意：整句被选掉一段后，
+    -- 组合区段不再从 0 开始（实测 start=4），所以「前缀候选」的判定要用**段起点**
+    -- `first.start` 作基准，写死 0 会让「先选一个词再继续修正」的后续一屏完全失效。
+    local seg_start = first.start or 0
+    local max_end = seg_start
     for _, cand in ipairs(cands) do
         if cand._end > max_end then max_end = cand._end end
     end
@@ -111,7 +114,7 @@ function M.func(input, env)
     for _, cand in ipairs(cands) do
         if cand:get_dynamic_type() == "Sentence" then
             sents[#sents + 1] = cand
-        elseif cand.start == 0 and cand._end < max_end then
+        elseif cand.start == seg_start and cand._end < max_end then
             -- 能「先修正」的候选：匹配输入开头且未吃完整段
             if utf8len(cand.text) == 1 then
                 chars[#chars + 1] = cand
