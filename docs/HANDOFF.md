@@ -14,6 +14,7 @@ make test                                  # 黄金 33 条 + 契约测试（必�
 make lint                                  # 命名/路径/契约/运行时文件一致性
 bash scripts/probe.sh qktnqnr gdrnthtcsu ronghe   # 混流短码 / 整串五笔 / 自动上屏
 make eval                                  # 160 句整句评测（并行 6，当前 74/160 = 46%）
+make deploy && make reload                 # 目标机部署（先 git pull --ff-only，§4.77）
 bash scripts/refresh.sh --only dict        # 重建词库产物（可复现，秒级）
 bash scripts/refresh.sh --loop 30          # 常驻增量刷新（语料在持续增长）
 ```
@@ -136,8 +137,10 @@ engine.segmentors
 - 本机（RHEL8，仓库所在）：`third-party/librime` = 1.17.0 + 插件 octagram/lua（**零本地补丁**）
   → `build/bin/{rime_api_console, rime_deployer, build_grammar}`
 - 测试用户目录 `data/rime-test`（`make env-test` 生成；会把万象 gram 拷进去）
-- 三处部署目标：本机 / `host-linux`（Gentoo + fcitx5）/ `host-mac`（macOS + Squirrel，用 `deploy_host-mac.sh`）
-- 语料：`data/input/{ebook,dedao-*,open}` → `data/corpus/{extract,clean,freq}` → `data/gram/`
+- 部署（唯一流程，§4.77）：目标机 `git pull --ff-only` → `make deploy` → `make reload`
+  （`reload` = `rime_deployer --build` + 重启 fcitx5/Squirrel）。旧的
+  `deploy_{host-linux,host-linux_direct,host-mac,remote}.sh` 已删除；离线机器走 `make bundle` + `install.sh`
+- 语料：`data/input/*`（自有 epub / 听书 + 课程文稿 / 开源）→ `data/corpus/{extract,clean,freq}` → `data/gram/`
 
 ## 8. 工作纪律（本会话反复吃亏得来的）
 

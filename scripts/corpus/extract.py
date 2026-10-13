@@ -9,7 +9,7 @@
 输出: data/corpus/extract/<格式>/<key 前两位>/<key>.txt
 索引: data/corpus/meta/extract_index.jsonl（append-only，中断可续）
 
-增量：key 优先取 同步清单的内容寻址 md5（免读大文件），否则 sha256。
+增量：key 优先取同步清单（可选）的内容寻址 md5（免读大文件），否则 sha256。
       索引命中且产物仍在 => 跳过；产物丢失则自动重抽。
 
 限流：默认 nice=15 + ioprio best-effort/7，进程数默认 3。
@@ -87,7 +87,7 @@ def extract_one(task):
 
 
 def build_tasks(roots, force=False, limit=0):
-    hints = C.load_epms_keys()
+    hints = C.load_sync_keys()
     idx = {} if force else C.load_index()
     tasks, unknown, skipped, dup = [], [], 0, 0
     seen = set()

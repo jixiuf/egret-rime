@@ -58,8 +58,7 @@ egret-rime/
 │  ├─ prefix/            glog 等自建库安装前缀
 │  └─ venv/              python 虚拟环境
 └─ data/           语料/词频/测试环境（不入 git）
-   ├─ ebook -> /export/ebook/ebook   （2754 本 epub，软链，持续增长）
-   ├─ dedao -> /export/ebook/dedao   （听书+课程文稿，软链）
+   ├─ input/       语料投放（自有 epub 电子书 / 听书 + 课程文稿 / 开源语料）
    ├─ corpus/      抽取/清洗/计数中间产物
    ├─ gram/        gram 模型文件
    ├─ rime-test/   测试用 Rime 用户目录（make env-test 生成）

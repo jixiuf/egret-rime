@@ -15,7 +15,7 @@
     data/corpus/freq/      词频中间产物
 
 增量策略：
-- key 优先取 同步清单里的 oss_key（内容是内容寻址的 md5），
+- key 优先取同步清单（可选，环境变量 CORPUS_SYNC_MANIFEST）里的 oss_key（md5），
   这样不必为了算 hash 去读全部 epub；清单里没有的来源（手工放入/其他语料）
   才回退到 sha256(文件内容)。
 - 索引 append-only，命中 key 即跳过；`--force` 可重抽。
@@ -45,9 +45,10 @@ LOG = os.path.join(CORPUS, "log")
 INDEX = os.path.join(META, "extract_index.jsonl")
 
 INPUT = rime_paths._env_dir("EGRET_INPUT_DIR", os.path.join(rime_paths.DATA, "input"))
-# 同步清单（内容寻址 key 的来源）；不在仓库内，允许缺失
-SYNC_MANIFEST = os.path.join(os.path.dirname(rime_paths.REPO), "_epms_state",
-                             "manifest.jsonl")
+# 同步清单（内容寻址 key 的来源，可选）：路径由环境变量指定；不在仓库内，允许缺失
+SYNC_MANIFEST = os.environ.get(
+    "CORPUS_SYNC_MANIFEST",
+    os.path.join(os.path.dirname(rime_paths.REPO), "_sync_state", "manifest.jsonl"))
 
 for d in (INPUT, RAW, EXTRACT, CLEAN, FREQ, META, LOG):
     os.makedirs(d, exist_ok=True)
@@ -144,7 +145,7 @@ def file_key(path, hints=None):
     return f"sz{st.st_size}-mt{int(st.st_mtime)}"
 
 
-def load_epms_keys(manifest=SYNC_MANIFEST):
+def load_sync_keys(manifest=SYNC_MANIFEST):
     """同步清单: 文件名 -> 内容寻址 key（oss_key 的 md5 段）。"""
     keys = {}
     if not os.path.exists(manifest):
