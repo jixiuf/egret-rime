@@ -47,6 +47,8 @@ trwuchifan               → 我们吃饭        （五笔词 + 拼音混着打�
 ## 安装
 
 需要机器上已经有 Rime 前端：Linux 的 fcitx5，或者 macOS 的 Squirrel。
+另外前端内置的 librime 要 **≥ 1.17**：低于这个版本时整句只给一个候选，语言模型没法参与组句，
+长句会明显退化（`make reload` 会把版本打出来，低了会提醒）。
 
 ```bash
 cd ~/repos && git clone --depth 1 https://github.com/jixiuf/egret-rime.git && cd egret-rime
