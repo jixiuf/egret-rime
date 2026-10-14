@@ -2782,9 +2782,14 @@ gram 阶段重出搜索器各表。整轮 `--from extract` 到 artifacts 约 **5
    另外**两条路径（共识重排 + 注入）必须同一判据**：只约束注入时，`kkkk`（4 码纯形码）
    被共识重排把「咒骂」前移成首候选 ✗。
 
-**连带修**：`tail_word_filter` 的触发原来只看 `type == "Sentence"`，而搜索器注入的整句候选
-dynamic_type 不是 Sentence ⇒ 页尾「字+词」排布静默失效（结构断言 `选掉一段后页尾仍=字+词`
-当场抓到）⇒ 改成「首候选**覆盖整串** 或 type=Sentence」。
+**连带修两处（都是 `tail_word_filter` 与注入候选打架）**：
+1. 触发原来只看 `type == "Sentence"`，而注入候选的 dynamic_type 不是 Sentence ⇒ 页尾排布
+   静默失效（结构断言 `选掉一段后页尾仍=字+词` 抓到）⇒ 改成「首候选**覆盖整串** 或 Sentence」；
+2. 分类里只收 `Sentence` 与前缀字/词，**整串但非 Sentence** 的注入候选被整个丢掉
+   （症状：调试日志明示 `NEW cand OK: 渐渐地就好了 ... top=渐渐地就好了`，可 console 首页还是
+   「渐渐地一号了」）⇒ 整串候选并入长句队列。
+3. 另外 `env-test` 的运行时文件拷贝清单也要带 `py_syllables.txt`（漏了 ⇒ 测试环境没音节表 ⇒
+   判据不成立、静默不注入；只有 `make test` 才暴露）。
 
 **结果**：`ililfbyihaole → 渐渐地就好了` ✓（新增回归用例，共 46 项全过）；
 `make verify-wubi` 五组全过；`make bench` 1.11×（门限 1.5）；纯拼音输入不注入 ⇒

@@ -113,7 +113,8 @@ env-test:
 	@cp -f $(REPO)/data/gram/wanxiang-lts-zh-hans.gram $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
 	@# 运行时文件优先取 **git 跟踪的 dicts/**（新 clone 也有），没有再回退 data/gram/
-	@for f in lm_rerank.meta lm_rerank.bin compose_table.bin py_meta.txt; do \
+	@# py_syllables.txt 是 lua/compose_filter.lua 判「混打」用的音节表（§4.83）
+	@for f in lm_rerank.meta lm_rerank.bin compose_table.bin py_meta.txt py_syllables.txt; do \
 		if [ -f $(DICTS)/$$f ]; then cp -f $(DICTS)/$$f $(TEST_DIR)/; \
 		elif [ -f $(GRAM_DIR)/$$f ]; then cp -f $(GRAM_DIR)/$$f $(TEST_DIR)/; fi; \
 	done

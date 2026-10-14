@@ -120,7 +120,9 @@ function M.func(input, env)
     local sents, chars, words = {}, {}, {}
     local prefix_count = { char = 0, word = 0 }
     for _, cand in ipairs(cands) do
-        if cand:get_dynamic_type() == "Sentence" then
+        -- 整串候选（真整句，或搜索器注入的整句 —— dynamic_type 可能不是 Sentence）
+        -- 与整句同队：它们就是「长句」本体，必须占前排，不能被丢弃
+        if cand:get_dynamic_type() == "Sentence" or cand._end >= max_end then
             sents[#sents + 1] = cand
         elseif cand.start == seg_start and cand._end < max_end then
             -- 能「先修正」的候选：匹配输入开头且未吃完整段
