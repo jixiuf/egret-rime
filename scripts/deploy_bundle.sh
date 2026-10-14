@@ -59,7 +59,7 @@ manifest() {
   #   · py_meta.txt：搜索器的一元归一化常数（total_tokens -> LOG_N）
   # 放 dicts/ 而不是用户目录根：fcitx 每次重启都会跑一遍部署，deployer 会把根下
   # 不认识的 .bin 当无主文件移进 trash/（实测每次重启 lm_rerank.bin 都被移走）。
-  for f in lm_rerank.meta lm_rerank.bin compose_table.bin py_meta.txt; do
+  for f in lm_rerank.meta lm_rerank.bin compose_table.bin py_meta.txt py_syllables.txt; do
     if [ -f "$ROOT/dicts/$f" ]; then
       echo "dicts/$f|dicts/$f"
     elif [ -f "$ROOT/data/gram/$f" ]; then

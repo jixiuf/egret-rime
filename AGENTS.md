@@ -92,7 +92,7 @@ RIME_SHARED_DIR / RIME_FROST_DIR / RIME_WANXIANG_DIR / EGRET_GRAM_DIR。
 **75/160 (47%)**（万象词级 gram + 长尾拼音词 + 词组感知注音，§4.55/§4.56；`make eval` 可重测。
 §4.44 首次接入万象 gram 时是 66/160，旧的 Lua 字级重排只有 27%）。
 
-黄金用例要点（41 条 + 4 条结构断言，含下面这些 + 简码/全码/词组/混句/整句词库/成语/混流多读法）：
+黄金用例要点（42 条 + 4 条结构断言，含下面这些 + 简码/全码/词组/混句/整句词库/成语/混流多读法）：
 
 e→有 q→我 yi→就 yl→为 kl→另 de→胡 tffu→等 khlg→中国 xciy→经济
 kdyc→顺序 trwu→我们 trwuchifan→我们吃饭 jfwaguangfnrt→时代广场

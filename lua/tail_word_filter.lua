@@ -80,9 +80,11 @@ function M.func(input, env)
     for cand in input:iter() do
         if mode == nil then
             first = cand
-            mode = (env.tail_enabled
-                    and cand:get_dynamic_type() == "Sentence"
-                    and utf8len(cand.text) >= env.tail_min_len) and "buffer" or "pass"
+            -- 先按「首候选够长」决定是否缓冲（缓冲在重排路径上本来就要做）；
+            -- 真正是否重排，等看到整份候选后按「覆盖整串 或 type=Sentence」判定 ——
+            -- 只看 type 会让搜索器注入的整句候选（§4.83）漏过，页尾排布静默失效。
+            mode = (env.tail_enabled and utf8len(cand.text) >= env.tail_min_len)
+                   and "buffer" or "pass"
         end
         if mode == "pass" then
             if not_seen(cand) then
@@ -107,6 +109,12 @@ function M.func(input, env)
     local max_end = seg_start
     for _, cand in ipairs(cands) do
         if cand._end > max_end then max_end = cand._end end
+    end
+
+    local covers_all = first._end >= max_end
+    if not covers_all and first:get_dynamic_type() ~= "Sentence" then
+        for _, c in ipairs(cands) do yield(c) end       -- 首候选既非整串也非整句：不重排
+        return
     end
 
     local sents, chars, words = {}, {}, {}

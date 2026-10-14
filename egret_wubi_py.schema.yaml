@@ -123,14 +123,15 @@ dynamic_translator:
   lm_rerank_table: lm_rerank.tsv
   lm_rerank_debug: false        # 调试开关（留 true 会让 mix_segmentor 每次按键打日志）
   lm_probe: false
-  lm_compose: false
+  lm_compose: true           # 让 compose_filter 载入搜索器（用于「混打注入」，见 §4.83）
   # 是否把搜索器结果**注入为候选**（默认关，见 docs/PROGRESS.md §4.40）：
   # 机制已跑通（filter 里用 Candidate("sentence",start,end,text,"") 新造候选**可行**，
   # 此前认为"新增候选会导致中途提交"是构造函数用错导致的误判），
   # 但搜索器本身只有约 26% 准确率，算错时没有任何外部信号能识别 →
   # 无条件注入会压掉引擎本来正确的答案（实测黄金 32->30）。
   # 关掉它时只保留"共识重排"（在既有候选里找同一句并前移，绝对安全）。
-  lm_compose_inject: false
+  lm_compose_inject: false    # 无条件注入：**开着会伤黄金**（§4.40），保持关
+  compose_inject_mixed: true  # 只对「混打」输入（含非拼音音节的形码片段）注入搜索器结果（§4.83）
   lm_compose_translator: false
   compose_beam: 8
   compose_log_n: 0            # >0 时覆盖一元 LM 的 log N（标定用）

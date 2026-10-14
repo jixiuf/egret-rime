@@ -11,7 +11,7 @@
 
 ```bash
 make setup      # 新机器第一次：拉依赖（锁定 commit）、编译 librime/kenlm、建 venv
-make test       # 黄金 41 条 + 4 条结构断言 + 契约测试。改任何东西之后都跑这个
+make test       # 黄金 42 条 + 4 条结构断言 + 契约测试。改任何东西之后都跑这个
 make lint       # 命名、路径、语法、部署清单一致性，秒级，不跑引擎
 make verify     # 契约 + 黄金 + 五笔能力 5 组 + 输入延迟门，全链验收
 bash scripts/refresh.sh      # 往 data/input 丢语料后，这一条就够：增量重出全部产物
@@ -77,6 +77,11 @@ simplifier@emoji → reverse_lookup_filter@wubi_comment → long_word_filter
 挪到中间就失效了。`tail_word_filter` 要重排就得把整份候选缓冲下来，
 所以它必须排在 `uniquifier` **前面**，否则去重会静默失效——这个坑在 §4.76 记着。
 
+还有一个兜底：搜索器（`py_composer`）的整句结果会在**混打输入**上进候选表。判据写在
+`lua/compose_filter.lua` 的 `want_inject()`：长度 ≥8、含拼音音节、且整串切不成纯拼音
+（即「形码片段 + 拼音」并存）。三条都拿真实数据验过：判据放宽到「非纯拼音」时五笔打词
+五组全线崩；只放开注入不放开共识重排时 `kkkk` 被搜索器的「咒骂」前移。
+
 语言模型分两块，别混。引擎侧是万象的词级 gram，原生 octagram 直接读；
 Lua 侧的重排已经关掉（`lm_rerank: false`）。`py_composer.lua` 加上
 `compose_table.bin`、`lm_rerank.{bin,meta}` 属于搜索器，只用来判读法和切分，
@@ -139,7 +144,7 @@ make bundle   → scripts/deploy_bundle.sh 打 dist/*.tar.gz，包内 install.sh
 
 | 命令 | 管什么 |
 |---|---|
-| `make test` | `env-test` + `lint` + 黄金 41 条 + 4 条结构断言，用例表在 `scripts/regression_test.py` 的 `CASES` |
+| `make test` | `env-test` + `lint` + 黄金 42 条 + 4 条结构断言，用例表在 `scripts/regression_test.py` 的 `CASES` |
 | `make lint` | 命名、路径、语法、运行时文件是否入 git 且在清单里、`schema_list` 语义、键名字优先 |
 | `make verify` | 契约 + 黄金 + 五笔能力 + 延迟门，一条命令过全链 |
 | `make verify-wubi` | 五笔打词的五个 cohort，各带 top1/top8 阈值 |
