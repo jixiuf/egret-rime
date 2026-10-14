@@ -106,18 +106,21 @@ env-test:
 	@printf 'patch:\n  grammar/language: wanxiang-lts-zh-hans\n' > $(TEST_DIR)/egret_wubi_py.custom.yaml
 	@for d in dicts lua opencc; do $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$d $(REPO)/$$d --quiet; done
 	@mkdir -p $(SHARED_DIR)
+	@# 共享数据**全量**软链（不只是三个）：librime 1.17 起 default.yaml 还会引用
+	@# punctuation / key_bindings / grammar 等资源，漏一个就是「deploy failure、
+	@# schema 变成 .default、console 一个候选都没有」（macOS 上真实踩过，§4.85）。
 	@if [ -z "$(SHARED_SRC)" ]; then echo "  ! 找不到共享数据来源，跳过 $(SHARED_DIR)"; else \
-	  for f in default.yaml symbols.yaml essay.txt; do \
-	    if [ -f "$(SHARED_SRC)/$$f" ]; then $(PYTHON) $(REPO)/scripts/rel_symlink.py $(SHARED_DIR)/$$f "$(SHARED_SRC)/$$f" --quiet; \
-	    else echo "  ! $(SHARED_SRC) 里没有 $$f"; fi; \
-	  done; fi
+	  n=0; for f in "$(SHARED_SRC)"/*.yaml "$(SHARED_SRC)"/essay.txt; do \
+	    [ -e "$$f" ] || continue; \
+	    $(PYTHON) $(REPO)/scripts/rel_symlink.py $(SHARED_DIR)/$$(basename $$f) "$$f" --quiet && n=$$((n+1)); \
+	  done; echo "  共享数据已链 $$n 个文件 → $(SHARED_DIR)"; fi
 	@# 关键: console 运行时 user_data_dir 与 shared_data_dir 均为 "."（librime 默认），
 	@# 所以 default.yaml/symbols.yaml 必须同时存在于用户目录，否则
 	@# `default:key_binder` 解析失败 → schema config 构建失败 → **grammar(LM) 静默失效**。
-	@for f in default.yaml symbols.yaml essay.txt; do \
-	  if [ -n "$(SHARED_SRC)" ] && [ -f "$(SHARED_SRC)/$$f" ]; then \
-	    $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$f "$(SHARED_SRC)/$$f" --quiet; fi; \
-	done
+	@if [ -n "$(SHARED_SRC)" ]; then for f in "$(SHARED_SRC)"/*.yaml "$(SHARED_SRC)"/essay.txt; do \
+	  [ -e "$$f" ] || continue; \
+	  $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$(basename $$f) "$$f" --quiet; \
+	done; fi
 	@cp -f $(REPO)/data/gram/wanxiang-lts-zh-hans.gram $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
 	@# 运行时文件优先取 **git 跟踪的 dicts/**（新 clone 也有），没有再回退 data/gram/
