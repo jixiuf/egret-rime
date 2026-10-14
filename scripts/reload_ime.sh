@@ -44,7 +44,7 @@ if [ -z "$TARGET" ]; then
   fi
 fi
 TARGET="${TARGET%/}"
-[ -d "$TARGET" ] || { echo "✗ 用户目录不存在：$TARGET（先跑 make deploy）"; exit 1; }
+[ -d "$TARGET" ] || { echo "✗ 用户目录不存在：${TARGET}（先跑 make deploy）"; exit 1; }
 
 # --- 找 rime_deployer 与共享数据 ----------------------------------------
 if [ "$UNAME" = "Darwin" ]; then
@@ -137,7 +137,10 @@ doctor() {
   local miss=0
   for f in lua/compose_filter.lua lua/tail_word_filter.lua lua/py_composer.lua \
            dicts/compose_table.bin dicts/lm_rerank.bin py_syllables.txt wanxiang-lts-zh-hans.gram; do
-    [ -e "$TARGET/$f" ] || { echo "    ✗ 缺 $f"; miss=1; }
+    # 运行时表按清单落在 dicts/ 里，两类位置都接受
+    if [ -e "$TARGET/$f" ] || [ -e "$TARGET/dicts/$(basename "$f")" ]; then :; else
+      echo "    ✗ 缺 $f"; miss=1
+    fi
   done
   [ "$miss" = 0 ] && echo "    关键文件齐全 ✓"
   # d) 用仓库里的回归脚本在**目标目录**上跑一遍（含混打用例）

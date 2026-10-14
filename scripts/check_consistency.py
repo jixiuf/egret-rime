@@ -250,6 +250,20 @@ for _sh in glob.glob("scripts/**/*.sh", recursive=True) + glob.glob("scripts/*.s
         print(f"  ✗ {_sh} 用了 bash 4 专属语法 {_hit}（macOS 自带 bash 3.2 会直接报错）")
         err += 1
 
+# 4.8) `$VAR` 后不能紧跟非 ASCII（bash 3.2 不把中日韩当分隔符，会把全角标点的字节
+#      并进变量名 ⇒ "GRAM\uff09: unbound variable"，macOS 上 `make deploy` 就这么挂的，§4.84）
+_ASCII_PAT = re.compile(rb"\$[A-Za-z_][A-Za-z0-9_]*")
+for _sh in sorted(set(glob.glob("scripts/**/*.sh", recursive=True) + glob.glob("scripts/*.sh"))):
+    _data = open(_sh, "rb").read()
+    _n = 0
+    for _m in _ASCII_PAT.finditer(_data):
+        _nxt = _data[_m.end():_m.end() + 1]
+        if _nxt and _nxt[0] >= 0x80:
+            _n += 1
+    if _n:
+        print(f"  ✗ {_sh} 有 {_n} 处 `$VAR` 紧跟非 ASCII 字符（bash 3.2 会解析错，需写成 ${VAR}）")
+        err += 1
+
 # 5) refresh.sh 里未提到的生成器（提示，不算错）
 rs = open("scripts/refresh.sh", encoding="utf-8").read()
 missing = [os.path.basename(p) for p in sorted(glob.glob("scripts/gen_*.py"))

@@ -21,7 +21,7 @@ BUILD_GRAMMAR="$ROOT/third-party/librime/build/bin/build_grammar"
 SRC="${3:-$GRAM/zh-hans-egret.2_6gram.tsv}"
 
 [ -x "$BUILD_GRAMMAR" ] || { echo "缺少 build_grammar"; exit 1; }
-[ -f "$SRC" ] || { echo "缺少聚合计数: $SRC（先跑 scripts/corpus/gram.sh）"; exit 1; }
+[ -f "$SRC" ] || { echo "缺少聚合计数: ${SRC}（先跑 scripts/corpus/gram.sh）"; exit 1; }
 
 if [ "${1:-}" = "--stats" ]; then
   echo "阈值 -> 保留条数 / 估算体积（按 ~6.8 B/条：实测 3470 万条 = 237MB）"

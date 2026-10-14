@@ -58,7 +58,7 @@ do_download() {
       [ "$want" = "$got" ] || { echo "  ✗ md5 不符: 官方=$want 本地=$got"; exit 1; }
       echo "  ✓ md5 $got"
     else
-      echo "  取不到官方 md5，跳过校验（本地 md5=$got）"
+      echo "  取不到官方 md5，跳过校验（本地 md5=${got}）"
     fi
     touch "$DUMP.md5ok"
   fi

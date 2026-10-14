@@ -127,4 +127,4 @@ while IFS=$'\t' read -r name ds glob size lic note; do
     esac
   done
 done < "$LIST"
-echo "完成（产物: $OUT）"
+echo "完成（产物: ${OUT}）"

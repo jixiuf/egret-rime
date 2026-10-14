@@ -99,7 +99,7 @@ do_build() {
   command -v g++ >/dev/null || die "找不到 g++（设置 GCC_TOOLSET 或安装 gcc）"
 
   log "构建 glog -> $PREFIX"
-  src="$THIRD/glog"; [ -d "$src" ] || die "缺少 $src（先跑 clone）"
+  src="$THIRD/glog"; [ -d "$src" ] || die "缺少 ${src}（先跑 clone）"
   rm -rf "$src/build"; mkdir -p "$src/build"; cd "$src/build"
   cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DWITH_GFLAGS=OFF -DWITH_UNWIND=OFF -DBUILD_TESTING=OFF \

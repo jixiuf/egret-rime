@@ -47,7 +47,7 @@ TARGET="${TARGET%/}"
 # --- 防呆：源=目标（拷贝模式会先删后拷，把自己清空。踩过：包会自毁）----------
 mkdir -p "$TARGET"
 if [ "$(cd "$TARGET" && pwd)" = "$SRC" ]; then
-  echo "✗ 目标目录与源目录相同（$SRC）：先删后拷会把源清空，请换目标目录。" >&2
+  echo "✗ 目标目录与源目录相同（${SRC}）：先删后拷会把源清空，请换目标目录。" >&2
   exit 1
 fi
 
@@ -168,14 +168,14 @@ pin_schema() {
     grep -qE "^[[:space:]]*previously_selected_schema:[[:space:]]*($ours)[[:space:]]*$" "$uy" \
       && return 0
     sed -i.egretbak -E "s/^([[:space:]]*previously_selected_schema:).*/\1 $schema/" "$uy" \
-      && rm -f "$uy.egretbak" && echo "  默认方案已改成 $schema（user.yaml；F4 菜单可换）"
+      && rm -f "$uy.egretbak" && echo "  默认方案已改成 ${schema}（user.yaml；F4 菜单可换）"
   elif [ -e "$uy" ] && grep -qE "^var:[[:space:]]*$" "$uy"; then
     awk -v s="  previously_selected_schema: $schema" \
       '/^var:[[:space:]]*$/{print; print s; next} {print}' "$uy" > "$uy.tmp" \
-      && mv -f "$uy.tmp" "$uy" && echo "  默认方案写入 $schema（user.yaml）"
+      && mv -f "$uy.tmp" "$uy" && echo "  默认方案写入 ${schema}（user.yaml）"
   else
     printf 'var:\n  previously_selected_schema: %s\n' "$schema" >> "$uy" \
-      && echo "  默认方案写入 $schema（user.yaml）"
+      && echo "  默认方案写入 ${schema}（user.yaml）"
   fi
 }
 pin_schema
@@ -184,11 +184,11 @@ pin_schema
 GRAM="wanxiang-lts-zh-hans.gram"
 GRAM_URL="https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/$GRAM"
 if [ -e "$TARGET/$GRAM" ] || [ -L "$TARGET/$GRAM" ]; then
-  echo "语言模型: 已就位（$GRAM）"
+  echo "语言模型: 已就位（${GRAM}）"
 elif [ -f "$SRC/data/gram/$GRAM" ]; then          # 仓库里已下载过
   if [ "$MODE" = link ]; then rel_link "$TARGET/$GRAM" "$SRC/data/gram/$GRAM"
   else cp -a "$SRC/data/gram/$GRAM" "$TARGET/$GRAM"; fi
-  echo "语言模型: 已安装（$GRAM）"
+  echo "语言模型: 已安装（${GRAM}）"
 else
   echo "语言模型: ⚠ 缺失（约 400MB，不随仓库/包分发）——缺它长句准确率明显下降"
   echo "          获取: curl -fL -C - -o \"$TARGET/$GRAM\" $GRAM_URL"

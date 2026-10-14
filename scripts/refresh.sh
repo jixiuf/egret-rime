@@ -122,7 +122,7 @@ for i in "${!STAGES[@]}"; do
     extract)
       log "阶段 extract：抽取（增量，按文件类型自动分派）"
       "$PY" "$ROOT/scripts/corpus/extract.py" --jobs "$JOBS" --nice "$NICE" >>"$RUNLOG" 2>&1 \
-        || die "extract 失败（见 $RUNLOG）"
+        || die "extract 失败（见 ${RUNLOG}）"
       ok "$("$PY" "$ROOT/scripts/corpus/status.py" 2>/dev/null | tail -1)"
       ;;
     clean)
@@ -143,14 +143,14 @@ for i in "${!STAGES[@]}"; do
         && ok "词频重扫完成" || warn "重扫失败（见日志；分片已保留）"
       ;;
     dict)
-      log "阶段 dict：分档 + 方案词库生成（档位 $TIER，权重回归 REWEIGHT=$REWEIGHT）"
+      log "阶段 dict：分档 + 方案词库生成（档位 ${TIER}，权重回归 REWEIGHT=${REWEIGHT}）"
       git -C "$ROOT" checkout -- dicts/ 2>/dev/null || true   # 从干净词库出发，保证可复现
       if [ "$REWEIGHT" != "off" ] && [ -s "$ROOT/data/corpus/freq/recount_full.txt" ]; then
         local extra=""
         [ "$REWEIGHT" = "log1000" ] && extra="--char-from-lm $ROOT/data/gram/lm_rerank.tsv --char-shift $CHAR_SHIFT"
         "$PY" "$ROOT/scripts/reweight_from_corpus.py" \
           --freq "$ROOT/data/corpus/freq/recount_full.txt" --scale "$REWEIGHT" $extra \
-          >>"$RUNLOG" 2>&1 && ok "词权重已按语料回归（$REWEIGHT）" || warn "权重回归失败"
+          >>"$RUNLOG" 2>&1 && ok "词权重已按语料回归（${REWEIGHT}）" || warn "权重回归失败"
       else
         ok "权重回归: 关闭（保持仓库内词库原值；实测 log1000 会破黄金用例）"
       fi

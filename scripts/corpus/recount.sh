@@ -85,7 +85,7 @@ awk -F'\t' '
 ' "$PARTS"/*.out > "$FREQ/$NAME.unsorted"
 rc=$?
 if [ "$rc" -ne 0 ] || [ ! -s "$FREQ/$NAME.unsorted" ]; then
-  echo "==> 合并失败(rc=$rc)，分片保留在 $PARTS（已取消自动清理）"
+  echo "==> 合并失败(rc=$rc)，分片保留在 ${PARTS}（已取消自动清理）"
   trap - EXIT
   exit 1
 fi

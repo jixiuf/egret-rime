@@ -49,7 +49,7 @@ done
 IFS=':' read -r M2 M3 M4 M5 M6 <<<"$MINCOUNTS"
 
 mkdir -p "$WORK" "$OUT" "$LOG"
-[ -x "$BUILDER" ] || { echo "缺少 gram 构建器: $BUILDER（先 make setup-build）"; exit 1; }
+[ -x "$BUILDER" ] || { echo "缺少 gram 构建器: ${BUILDER}（先 make setup-build）"; exit 1; }
 [ -x "$BUILD_GRAMMAR" ] || { echo "缺少 build_grammar: $BUILD_GRAMMAR"; exit 1; }
 
 if [ -n "$SAMPLE" ]; then
@@ -76,7 +76,7 @@ else
   echo "$FP" > "$FP_FILE"
 fi
 
-echo "==> 字符 2-6gram 计数（threads=$THREADS, min-count=$MINCOUNTS）"
+echo "==> 字符 2-6gram 计数（threads=$THREADS, min-count=${MINCOUNTS}）"
 nice -n 15 "$BUILDER" \
   --corpus "$CORPUS" \
   --work-dir "$WORK" \
@@ -90,7 +90,7 @@ nice -n 15 "$BUILDER" \
 
 if [ -s "$OUT/$LANGUAGE.gram" ]; then
   echo "==> 产出: $OUT/$LANGUAGE.gram ($(du -h "$OUT/$LANGUAGE.gram" | cut -f1))"
-  echo "    启用: egret.common.yaml 的 grammar/language: $LANGUAGE（并确保 .gram 在用户目录 build/）"
+  echo "    启用: egret.common.yaml 的 grammar/language: ${LANGUAGE}（并确保 .gram 在用户目录 build/）"
 else
   echo "==> 失败：未生成 $OUT/$LANGUAGE.gram"
   exit 1
