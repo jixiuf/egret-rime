@@ -133,6 +133,12 @@ doctor() {
   case "$ns_lang" in
     *zh-hans-egret*) echo "    ! 指向自训 gram：黄金/探针结论不可信，也与目标机生产配置不一致（§4.82）" ;;
   esac
+  # b2) 语言模型的指纹：它决定长句结果，**两台机不一致就会「同一条输入结果不同」**
+  if [ -e "$TARGET/wanxiang-lts-zh-hans.gram" ]; then
+    local gh
+    gh="$( (sha256sum "$TARGET/wanxiang-lts-zh-hans.gram" 2>/dev/null || shasum -a 256 "$TARGET/wanxiang-lts-zh-hans.gram") | cut -d" " -f1)"
+    echo "    万象 gram sha256: ${gh:0:16}…  （与其它机器比一比：不一致 ⇒ 长句结果会不同，§4.84）"
+  fi
   # c) 关键运行时文件（缺任何一个，混打注入/搜索器会静默不工作）
   local miss=0
   for f in lua/compose_filter.lua lua/tail_word_filter.lua lua/py_composer.lua \

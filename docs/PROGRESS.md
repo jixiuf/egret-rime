@@ -2802,6 +2802,34 @@ gram 阶段重出搜索器各表。整轮 `--from extract` 到 artifacts 约 **5
 **有意不做**：纯拼音的 `yihaole → 一号了`（「就/一」同音，无法与真拼音用户的意图区分，
 不注入）；以及用户否掉的「整句词库」路线。
 
+### 4.84 macOS 上「部署了却没变」的根因：bash 3.2 + 未钉的语言模型
+
+用户报：macOS 上 `git pull --ff-only && make deploy && make reload` 之后 `ililfbyihaole` /
+`qwuqdyn` 仍不是预期。远程查证后找到**两个真 bug**（都已修）：
+
+| # | 根因 | 影响 | 修法 |
+|---|---|---|---|
+| ① | `scripts/deploy_runtime.sh` 用 `declare -A`（关联数组，bash 4 起） | macOS 自带 **bash 3.2** 直接 `declare: -A: invalid option` ⇒ **整条 `make deploy` 中断**，新运行时文件从不落地（等于没部署） | 换普通数组 + 去重函数；`fetch_open.sh` 的 `mapfile` 同类一并换；lint 加守卫（`declare -A/-a`、`mapfile`、`readarray` 即失败） |
+| ② | `$VAR` 后紧跟全角标点/汉字（如 `$GRAM）`） | bash 3.2 不把 CJK 当分隔符 ⇒ 把标点字节并进变量名 ⇒ `GRAM）: unbound variable`，`make deploy` 又中断 | 全仓 17 处改成 `${VAR}`；lint 加守卫（`$VAR` 紧跟非 ASCII 即失败） |
+| ③ | 部署清单把 `py_syllables.txt` 放 `dicts/`，而 `compose_filter.lua` 只在用户目录根找它 | 目标机永远读不到音节表 ⇒ 混打注入**静默停用**（Mac 上两条用例不生效的直接原因） | 两处路径都找；都没有时打 warning（不再静默） |
+
+**另发现（重要，与代码无关）**：万象 gram 这个 400MB 资产**没有被钉住**，而 GitHub release
+上的文件会被上游替换 —— 实测两台机器同一 URL 下的文件相差 3KB（419,911,724 vs 398,357,548），
+同一个 `qwuqdyn` 的首候选就不同。现在 `make gram-lm` 会校验 **sha256**
+（`GRAM_LM_SHA256`，当前 `20aca767f06ab2ab…`），`make reload` 的自检会打印本机 gram 指纹，
+便于「两台机结果不同」时一句话定位。
+
+**修后实测**（Mac，仓库 a41171a + 重下 gram）：`make deploy`/`make reload` 正常，
+Squirrel librime 1.17.0，`ililfbyihaole → 渐渐地就好了` ✓、`kkkk → 口` ✓、`tffu → 等` ✓。
+
+**仍开着的一条**：`qwuqdyn`（q我+wu们+qd希+yn望 的简码序列）在 Mac 的运行目录出「欠希望／欠交态」，
+而开发机的 `data/rime-test` 出「我们希望」。已排除：仓库版本一致、dicts 的 sha256 一致、
+**build/egret_wubi_py.table.bin 的 sha256 也一致**、gram 的 sha256 一致、schema patch 一致。
+⇒ 差异只在 `~/Library/Rime` 这个**运行目录**自身的状态（同音/长码裁决的输入相同却输出不同，
+最可能是共享数据 `essay.txt`／`default.yaml` 的来源不同，或该目录里历史 build/用户态残留）。
+下一步最小实验：在 Mac 上 `make env-test && make test`（干净环境）看是否 46/46 —— 若是，
+再把运行目录里除运行时文件外的历史内容挪走重试。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。

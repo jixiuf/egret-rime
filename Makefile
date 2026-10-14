@@ -193,10 +193,20 @@ eval-gram:        ## AB 评测各套 gram（默认比 essay-bgc vs 自训）
 	$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 100
 
 # --- 部署到输入法 -----------------------------------------------------------
-gram-lm:           ## 下载万象词级语言模型（~400MB；断点续传，已有则跳过）
+# 语言模型**必须各机一致**：它直接决定长句结果，而 GitHub release 上的资产会被替换
+# （实测两台机同 URL 下的文件差 3KB，同一句子的首候选就不同 —— §4.84）。这里钉 sha256。
+GRAM_LM_SHA256 ?= 20aca767f06ab2abdccce5ea9c45af5364114a37e25bb7c6de40e4f328be029e
+
+gram-lm:           ## 下载万象词级语言模型（~400MB；断点续传，已有则跳过；sha256 校验）
 	@mkdir -p "$(GRAM_DIR)"
 	@if [ -f "$(GRAM_LM)" ]; then \
-	  echo "已存在 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)）"; \
+	  _h=$$(sha256sum "$(GRAM_LM)" | cut -d' ' -f1); \
+	  if [ "$$_h" = "$(GRAM_LM_SHA256)" ]; then \
+	    echo "已存在 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)，sha256 校验通过）"; \
+	  else \
+	    echo "  ! $(GRAM_LM) 的 sha256 与预期不符（可能被上游替换）：期望 $(GRAM_LM_SHA256)"; \
+	    echo "    实际 $$_h ⇒ 长句结果会与其它机器不同。要重下：rm \"$(GRAM_LM)\" && make gram-lm"; \
+	  fi; \
 	else \
 	  echo "下载 $(GRAM_LM_URL)"; \
 	  curl -fL --retry 3 --retry-delay 2 -C - -o "$(GRAM_LM).part" "$(GRAM_LM_URL)" \
