@@ -105,6 +105,27 @@ def build_mixed_cases(n):
     return cases[:n]
 
 
+def build_mixed_sentence_cases(n):
+    """混打整句评测集（scripts/gen_mixed_eval.py 生成，**冻结**，见 §4.87）。
+
+    与全拼句子集同一批句子，只把部分词换成五笔码 ⇒ 二者可直接对比，
+    差值就是「混打损失」。
+    """
+    path = os.path.join(HERE, "eval_sets", "mixed.tsv")
+    if not os.path.exists(path):
+        path = os.path.join(rime_paths.DATA, "corpus", "eval", "mixed.tsv")
+    if not os.path.exists(path):
+        return []
+    out = []
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("#"):
+            continue
+        p = line.rstrip("\n").split("\t")
+        if len(p) >= 3:
+            out.append((p[0], p[1], p[2]))      # 输入码, 期望整句, 混打模式
+    return out[:n] if n else out
+
+
 def build_sentence_cases(n, min_len=4, max_len=12, seed=20260927,
                          regen=False):
     """句子级 LM 判别集：语料短句 → 全拼输入 → 看能否还原原句。
@@ -269,6 +290,8 @@ def main():
     ap.add_argument("--cases", type=int, default=30, help="混合用例条数")
     ap.add_argument("--sentences", type=int, default=0,
                     help="句子级评测条数（>0 时用全拼还原，测真实 LM 能力）")
+    ap.add_argument("--mixed-sentences", type=int, default=0,
+                    help="混打整句评测条数（>0 时读固定集 data/corpus/eval/mixed.tsv，§4.87）")
     ap.add_argument("--regen-sentences", action="store_true",
                     help="重建固定评测集（默认为保证可比性不重建）")
     ap.add_argument("--dir", default=TEST_DIR)
@@ -310,8 +333,10 @@ def main():
     mixed = build_mixed_cases(args.cases)
     sentences = build_sentence_cases(args.sentences,
                                      regen=args.regen_sentences) if args.sentences else []
+    mixed_sent = build_mixed_sentence_cases(args.mixed_sentences) if args.mixed_sentences else []
     print(f"评测集：黄金 {len(GOLDEN)} 条 + 混合拼写 {len(mixed)} 条"
-          + (f" + 句子(全拼) {len(sentences)} 条" if sentences else ""))
+          + (f" + 句子(全拼) {len(sentences)} 条" if sentences else "")
+          + (f" + 混打整句 {len(mixed_sent)} 条" if mixed_sent else ""))
     if args.list:
         for c, w, wt in mixed[:args.cases]:
             print(f"  {c:<20} -> {w}  (权重 {wt})")
@@ -333,6 +358,8 @@ def main():
         }
         if sentences:
             results[label]["sent"] = run_suite(args.dir, sentences, "句子(全拼)")
+        if mixed_sent:
+            results[label]["mixsent"] = run_suite(args.dir, mixed_sent, "混打整句")
 
     if sentences:
         print("\n句子级对比（能还原原句记为 ✓）:")
@@ -368,6 +395,18 @@ def main():
             if bad:
                 line += "  [异常: " + " ".join(bad) + "]"
         print(line)
+        if mixed_sent:
+            ms = sum(1 for h in results[label]["mixsent"] if h[3])
+            print(f"{'':<28} 混打整句 {ms}/{len(mixed_sent)} ({ms/len(mixed_sent)*100:.0f}%)")
+            by = {}
+            for (code, expect, pat), h in zip(mixed_sent, results[label]["mixsent"]):
+                d = by.setdefault(pat, [0, 0])
+                d[1] += 1
+                d[0] += h[3]
+            for pat in ("head1", "head2", "tail1", "alt"):
+                if pat in by:
+                    print(f"{'':<30} {pat:<6} {by[pat][0]}/{by[pat][1]}"
+                          f" ({by[pat][0]/by[pat][1]*100:.0f}%)")
         if sentences:
             for h in results[label]["sent"]:
                 if not h[3]:

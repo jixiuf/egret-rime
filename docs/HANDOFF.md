@@ -14,6 +14,7 @@ make test                                  # 黄金 44 条 + 4 条结构断言 +
 make lint                                  # 命名/路径/契约/运行时文件一致性
 bash scripts/probe.sh qktnqnr gdrnthtcsu ronghe   # 混流短码 / 整串五笔 / 自动上屏
 make eval                                  # 160 句整句评测（并行 6，当前 74/160 = 46%）
+make eval-mixed                            # 混打整句评测（固定集 scripts/eval_sets/mixed.tsv，当前 164/640 = 26%，§4.87）
 make deploy && make reload                 # 目标机部署（先 git pull --ff-only，§4.77）
 bash scripts/refresh.sh --only dict        # 重建词库产物（可复现，秒级）
 bash scripts/refresh.sh --loop 30          # 常驻增量刷新（语料在持续增长）

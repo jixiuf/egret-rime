@@ -163,6 +163,12 @@ eval: env-test          ## 跑整句评测（160 句多来源；对比生产用�
 		--gram "万象=$$PWD/data/gram/wanxiang-lts-zh-hans.gram" \
 		--gram "自训=$$PWD/data/gram/zh-hans-egret.gram"
 
+eval-mixed: env-test      ## 混打整句评测（固定集 scripts/eval_sets/mixed.tsv，§4.87；含全拼对照）
+	@# 数据集入 git（data/ 会被 gitignore），跨机同题；重建：
+	@#   python3 scripts/gen_mixed_eval.py --force
+	@$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 160 --mixed-sentences 640 \
+		--jobs $${EVAL_JOBS:-6} --gram "万象=$$PWD/data/gram/wanxiang-lts-zh-hans.gram"
+
 lint:                     ## 结构与命名一致性检查（秒级，不跑引擎）
 	@$(PYTHON) scripts/check_consistency.py
 	@EGRET_ROOT=$(REPO) lua scripts/check_lm_table.lua
