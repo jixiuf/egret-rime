@@ -2815,8 +2815,7 @@ gram 阶段重出搜索器各表。整轮 `--from extract` 到 artifacts 约 **5
 
 **另发现（重要，与代码无关）**：万象 gram 这个 400MB 资产**没有被钉住**，而 GitHub release
 上的文件会被上游替换 —— 实测两台机器同一 URL 下的文件相差 3KB（419,911,724 vs 398,357,548），
-同一个 `qwuqdyn` 的首候选就不同。现在 `make gram-lm` 会校验 **sha256**
-（`GRAM_LM_SHA256`，当前 `20aca767f06ab2ab…`），`make reload` 的自检会打印本机 gram 指纹，
+同一个 `qwuqdyn` 的首候选就不同。**按用户决定：gram 不钉版本、始终跟上游最新**；`make reload` 的自检会打印本机 gram 指纹，跨机对比结论前先对一下它（上游替换资产时各机会不同），
 便于「两台机结果不同」时一句话定位。
 
 **修后实测**（Mac，仓库 a41171a + 重下 gram）：`make deploy`/`make reload` 正常，

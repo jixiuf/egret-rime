@@ -137,7 +137,7 @@ doctor() {
   if [ -e "$TARGET/wanxiang-lts-zh-hans.gram" ]; then
     local gh
     gh="$( (sha256sum "$TARGET/wanxiang-lts-zh-hans.gram" 2>/dev/null || shasum -a 256 "$TARGET/wanxiang-lts-zh-hans.gram") | cut -d" " -f1)"
-    echo "    万象 gram sha256: ${gh:0:16}…  （与其它机器比一比：不一致 ⇒ 长句结果会不同，§4.84）"
+    echo "    万象 gram sha256: ${gh:0:16}…  （不钉版本、跟上游最新；跨机对比结论前先对一下这个指纹，不一致 ⇒ 长句结果可能不同，§4.84）"
   fi
   # c) 关键运行时文件（缺任何一个，混打注入/搜索器会静默不工作）
   local miss=0

@@ -204,26 +204,22 @@ eval-gram:        ## AB 评测各套 gram（默认比 essay-bgc vs 自训）
 	$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 100
 
 # --- 部署到输入法 -----------------------------------------------------------
-# 语言模型**必须各机一致**：它直接决定长句结果，而 GitHub release 上的资产会被替换
-# （实测两台机同 URL 下的文件差 3KB，同一句子的首候选就不同 —— §4.84）。这里钉 sha256。
-GRAM_LM_SHA256 ?= 20aca767f06ab2abdccce5ea9c45af5364114a37e25bb7c6de40e4f328be029e
-
-gram-lm:           ## 下载万象词级语言模型（~400MB；断点续传，已有则跳过；sha256 校验）
+# 语言模型（万象 gram）：**不钉版本，始终跟上游最新**（用户定的）。
+# 注意 GitHub release 上的资产会被上游替换 ⇒ 各机器**可能拿到不同版本**，同一输入的长句
+# 结果就会不同（实测差 3KB 就会变，§4.84）。跨机对比结论前先用 sha256 指纹对一下
+# （make reload 的自检会打印）。想强制拿最新：make gram-lm FORCE=1
+gram-lm:           ## 下载万象词级语言模型（~400MB；断点续传；已有则跳过，FORCE=1 强制重下最新）
 	@mkdir -p "$(GRAM_DIR)"
-	@if [ -f "$(GRAM_LM)" ]; then \
-	  _h=$$(sha256sum "$(GRAM_LM)" | cut -d' ' -f1); \
-	  if [ "$$_h" = "$(GRAM_LM_SHA256)" ]; then \
-	    echo "已存在 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)，sha256 校验通过）"; \
-	  else \
-	    echo "  ! $(GRAM_LM) 的 sha256 与预期不符（可能被上游替换）：期望 $(GRAM_LM_SHA256)"; \
-	    echo "    实际 $$_h ⇒ 长句结果会与其它机器不同。要重下：rm \"$(GRAM_LM)\" && make gram-lm"; \
-	  fi; \
+	@if [ -f "$(GRAM_LM)" ] && [ "$(FORCE)" != "1" ]; then \
+	  echo "已存在 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)，sha256=$$(sha256sum "$(GRAM_LM)" | cut -c1-16)…）"; \
+	  echo "  想跟上游最新（上游会替换资产）：make gram-lm FORCE=1"; \
 	else \
+	  if [ -f "$(GRAM_LM)" ]; then echo "  FORCE=1：重新下载（上游可能已换过资产）"; mv -f "$(GRAM_LM)" "$(GRAM_LM).old"; fi; \
 	  echo "下载 $(GRAM_LM_URL)"; \
 	  curl -fL --retry 3 --retry-delay 2 -C - -o "$(GRAM_LM).part" "$(GRAM_LM_URL)" \
 	    && mv -f "$(GRAM_LM).part" "$(GRAM_LM)" \
-	    || { echo "✗ 下载失败：$(GRAM_LM_URL)"; echo "  国内网络可试：proxychains4 make gram-lm"; rm -f "$(GRAM_LM).part"; exit 1; }; \
-	  echo "已下载 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)）"; \
+	    || { echo "✗ 下载失败：$(GRAM_LM_URL)"; echo "  国内网络可试：proxychains4 make gram-lm FORCE=1"; rm -f "$(GRAM_LM).part"; exit 1; }; \
+	  echo "已下载 $(GRAM_LM)（$$(du -h "$(GRAM_LM)" | cut -f1)，sha256=$$(sha256sum "$(GRAM_LM)" | cut -c1-16)…）"; \
 	fi
 
 deploy:            ## 按运行时清单装到输入法用户目录（TARGET=...；--link 软链；实体目录自动备份）
