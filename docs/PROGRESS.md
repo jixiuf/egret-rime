@@ -2928,8 +2928,11 @@ sentence_over_completion: true     # table_translator.cc:296
    单字用短码）——不造怪输入；
 3. 四种模式：`head1` 首词五笔、`head2` 前两词五笔（用户报的那种）、`tail1` 末词五笔、
    `alt` 词级交替（§4.83 `ililfbyihaole` 那种分散混打）。
-4. 输出**入 git**：`scripts/eval_sets/mixed.tsv`（640 条，data/ 全被 gitignore，
-   评测集必须跨机同题，否则两台机不同题、分数不可比——句子集就是本地生成的教训）。
+4. 输出**入 git**：`scripts/eval_sets/mixed.tsv`（640 条）。同时把句子集
+   `scripts/eval_sets/sentences_v2.tsv`（160 句）也钉进 git——`data/` 全被 gitignore，
+   评测集不冻结就会两台机不同题、分数不可比（之前句子集就是本地生成的）。
+   `build_sentence_cases` 优先读这个冻结副本，`gen_mixed_eval.py` 也从它派生
+   （同一句子集 ⇒ 全拼与混打两个分数可直接相减）。
 
 **基线**（万象 gram，2026-10）：
 

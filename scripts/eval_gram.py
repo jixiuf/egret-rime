@@ -132,8 +132,8 @@ def build_sentence_cases(n, min_len=4, max_len=12, seed=20260927,
 
     **测评集必须固定**：否则语料一变、采样就变，两次评测不同题，
     分数不可比（这一坑已踩：16/100 与 12/100 实际是两套题）。
-    首次从 clean/short 采样并存到 data/corpus/eval/sentences.tsv，
-    之后固定复用；--regen-sentences 可重建。
+    优先读**入 git 的冻结集** `scripts/eval_sets/sentences_v2.tsv`（跨机同题）；
+    不在时才从 clean/short 采样并写到 data/corpus/eval/；--regen-sentences 可重建。
     """
     import random
     try:
@@ -142,7 +142,8 @@ def build_sentence_cases(n, min_len=4, max_len=12, seed=20260927,
         sys.exit("句子评测需要 pypinyin（第三方 venv 里有）")
 
     sent_file = os.environ.get("EVAL_SENT_FILE") or next(
-        (p for p in (os.path.join(rime_paths.DATA, "corpus", "eval", "sentences_v2.tsv"),
+        (p for p in (os.path.join(HERE, "eval_sets", "sentences_v2.tsv"),
+                     os.path.join(rime_paths.DATA, "corpus", "eval", "sentences_v2.tsv"),
                      os.path.join(rime_paths.DATA, "corpus", "eval", "sentences.tsv"))
          if os.path.exists(p)), "")
     if os.path.exists(sent_file) and not regen:

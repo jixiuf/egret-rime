@@ -40,7 +40,10 @@ import rime_paths  # noqa: E402
 ROOT = rime_paths.REPO
 DICTS = rime_paths.DICTS
 EVAL_DIR = os.path.join(rime_paths.DATA, "corpus", "eval")
-SENT = os.path.join(EVAL_DIR, "sentences_v2.tsv")
+SENT = os.environ.get("EVAL_SENT_FILE") or next(
+    (p for p in (os.path.join(HERE, "eval_sets", "sentences_v2.tsv"),
+                 os.path.join(EVAL_DIR, "sentences_v2.tsv"))
+     if os.path.exists(p)), os.path.join(EVAL_DIR, "sentences_v2.tsv"))
 # 输出**入 git**（data/ 全被 gitignore）：评测集要跨机一致，否则两台机不同题、
 # 分数不可比（句子集 sentences_v2.tsv 是本地生成，这里不再重蹈覆辙）
 OUT = os.environ.get("EVAL_MIXED_FILE") or os.path.join(HERE, "eval_sets", "mixed.tsv")
