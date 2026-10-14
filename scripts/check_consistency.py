@@ -239,6 +239,17 @@ if os.path.exists(_ts_patch):
               "跑 make env-test 重置，或让 eval_gram.py 跑完自动恢复")
         err += 1
 
+# 4.7) 脚本必须能在 bash 3.2 下跑（macOS 自带 bash 3.2；曾因 declare -A 让
+#      目标机 `make deploy` 整条失败 —— 见 §4.84）
+_BASH4 = ("declare -A", "declare -a", "mapfile", "readarray")
+for _sh in glob.glob("scripts/**/*.sh", recursive=True) + glob.glob("scripts/*.sh"):
+    _txt = "\n".join(l for l in open(_sh, encoding="utf-8", errors="ignore")
+                       if not l.lstrip().startswith("#"))
+    _hit = [k for k in _BASH4 if k in _txt]
+    if _hit:
+        print(f"  ✗ {_sh} 用了 bash 4 专属语法 {_hit}（macOS 自带 bash 3.2 会直接报错）")
+        err += 1
+
 # 5) refresh.sh 里未提到的生成器（提示，不算错）
 rs = open("scripts/refresh.sh", encoding="utf-8").read()
 missing = [os.path.basename(p) for p in sorted(glob.glob("scripts/gen_*.py"))

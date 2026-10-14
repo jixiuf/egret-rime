@@ -51,8 +51,15 @@ local syllables = nil
 local function load_syllables(dir)
     if syllables then return syllables end
     local set = {}
-    local f = io.open((dir or ".") .. "/py_syllables.txt")
-    if not f then return nil end
+    dir = dir or "."
+    -- 两个位置都试：部署清单把 py_syllables.txt 归到 dicts/（与其它运行时表同处，
+    -- 避免 fcitx 重启时被 deployer 当无主文件挪走），而 env-test 放在测试目录根。
+    -- 只认根路径时，目标机永远读不到音节表 ⇒ 混打注入静默失效（§4.84 的真实故障）。
+    local f = io.open(dir .. "/py_syllables.txt") or io.open(dir .. "/dicts/py_syllables.txt")
+    if not f then
+        log.warning("[compose_filter] 找不到 py_syllables.txt（根与 dicts/ 都没有）⇒ 混打注入停用")
+        return nil
+    end
     for line in f:lines() do
         local s = line:match("^%s*(%S+)")
         if s then set[s] = true end

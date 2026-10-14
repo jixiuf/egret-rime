@@ -72,13 +72,20 @@ echo "清单:   $(wc -l < "$MANIFEST") 项"
 USER_STATE_RE='^(user\.yaml|default\.custom\.yaml|installation\.yaml)$'
 
 # --- 分类：目录（整目录处理）vs 根级文件 ------------------------------------
-declare -A DIRS=()
+# 注意：macOS 自带的是 bash 3.2，**没有关联数组**（declare -A 会直接报错退出，
+# 曾经导致目标机 `make deploy` 整条失败、新运行时文件从不落地 —— 见 §4.84）。
+# 这里只用普通数组 + 去重函数。
+DIR_LIST=""
 ROOT_FILES=()
+add_dir() {
+  case " $DIR_LIST " in *" $1 "*) return 0 ;; esac
+  DIR_LIST="$DIR_LIST $1"
+}
 while IFS='|' read -r src dst; do
   [ -n "${src:-}" ] || continue
   case "$dst" in
-    */*) DIRS["${dst%%/*}"]=1 ;;
-    *)   ROOT_FILES+=("$dst") ;;
+    */*) add_dir "${dst%%/*}" ;;
+    *)   ROOT_FILES[${#ROOT_FILES[@]}]="$dst" ;;
   esac
 done < "$MANIFEST"
 
@@ -107,11 +114,11 @@ rel_link() {  # rel_link <目标路径> <源路径>
 if [ "$MODE" = copy ]; then
   BAK="$TARGET/.egret-backup-$(date +%Y%m%d-%H%M%S)"
   need=0
-  for d in "${!DIRS[@]}"; do [ -e "$TARGET/$d" ] && need=1; done
+  for d in $DIR_LIST; do [ -e "$TARGET/$d" ] && need=1; done
   for f in "${ROOT_FILES[@]}"; do [ -e "$TARGET/$f" ] && need=1; done
   if [ "$need" = 1 ]; then
     mkdir -p "$BAK"
-    for d in "${!DIRS[@]}"; do
+    for d in $DIR_LIST; do
       [ -e "$TARGET/$d" ] && cp -a "$TARGET/$d" "$BAK/" 2>/dev/null || true
     done
     for f in "${ROOT_FILES[@]}"; do
@@ -122,7 +129,7 @@ if [ "$MODE" = copy ]; then
 fi
 
 # --- 安装 -------------------------------------------------------------------
-for d in "${!DIRS[@]}"; do
+for d in $DIR_LIST; do
   if [ "$MODE" = link ]; then
     rel_link "$TARGET/$d" "$SRC/$d"
   else

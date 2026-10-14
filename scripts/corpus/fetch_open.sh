@@ -80,7 +80,9 @@ while IFS=$'\t' read -r name ds glob size lic note; do
     hit=0; for w in "${want[@]}"; do [ "$w" = "$name" ] && hit=1; done
     [ $hit -eq 1 ] || continue
   fi
-  mapfile -t files < <(hf_files "$ds" "$glob")
+  # 不用 mapfile（bash 4 才有；macOS 自带 bash 3.2 会直接报错，见 §4.84）
+  files=()
+  while IFS= read -r _line; do files[${#files[@]}]="$_line"; done < <(hf_files "$ds" "$glob")
   total=0; got=0
   for row in "${files[@]}"; do
     ok=1
