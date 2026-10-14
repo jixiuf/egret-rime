@@ -2838,6 +2838,43 @@ Squirrel librime 1.17.0，`ililfbyihaole → 渐渐地就好了` ✓、`kkkk →
 下一步最小实验：在 Mac 上 `make env-test && make test`（干净环境）看是否 46/46 —— 若是，
 再把运行目录里除运行时文件外的历史内容挪走重试。
 
+### 4.85 ⭐ wqskc 不出「你可以」：整串五笔组句被前缀补全埋没（wubi_route/sentence_over_completion）
+
+用户报：敲 `wqskc`（你 `wq` + 可 `sk` + 以 `c`，二级+二级+一级简码序列）不出「你可以」。
+
+**先定位（不猜）**：`rime_api_console` 翻到第 8 页才发现「你可以」确实被组出来了，
+只是排在第 **47** 名。同码的 40 条**前缀补全**候选（`你可以吗`/`你可以放心`/…，
+`egret_wubi_sentence` 里的整句词条，码长 8~20）把首屏占满。
+
+**根因链**（用 `dump_cands_filter` 打出 `type` 字段确认）：
+1. `mix_segmentor` 判 `wqskc` 是整串五笔读法 → 给整段补 `wubi` tag；
+2. `wubi_route`（`table_translator@…`，`enable_completion: true`，`initial_quality: 1000`）
+   先于 `dynamic_translator` 出候选，且它的**补全候选不受** `dynamic_translator` 的
+   「completion 一律挪到尾部」规则约束 → 40 条补全排在整串组句之前；
+3. 恰好覆盖整串的组句「你可以」由 `dynamic_translator` 的混合库 `script_translator`
+   产出（`type=phrase`），于是被埋在 40 条之后。
+
+**为什么不是把它加词库/提权（=修个例）**：任何「整串短码是某整句词条码前缀」的输入
+都会踩同一个坑（如 `wqskcy` 的前缀集）；根因是**补全候选压过整串组句**，不是词条缺失。
+
+**修法（用 librime 内建机制，一行配置）**：`egret_wubi_py.schema.yaml` 的 `wubi_route` 加
+```yaml
+sentence_over_completion: true     # table_translator.cc:296
+```
+内部实现：`if (sentence_over_completion_ && starts_with_completion(translation))
+  translation = MakeSentence(input) + translation;`
+→ 首候选是补全时，把**覆盖整串的组句**前置；`enable_completion` 仍为 true，补全从第 3 名起
+依然在首屏（不像「关掉 enable_completion」会把补全整体挪到尾部、并让 `qwuqdyn` 回落
+「我无希望」——那条试过、已否）。
+
+**实测**：`wqskc` → 第 1 候选 **你可以**（补全 `你可以吗` 在第 3）；
+黄金 **47/47**（新增 `wqskc` 用例钉住）、`verify-wubi` 五组数字与基线逐字相同
+（40/40、22/40、37/40、15/40、35/40）、`bench` 最坏 1.07×（门限 1.5×）。
+
+**已知取舍**（记录，不再当 bug 追）：`wqskcy` 这类「有长词前缀补全、但整串没有好组句」
+的输入，现在首候选是整串组句（如「你可驻」），补全（「你可以放心」）退到第 2 ——
+这是 `sentence_over_completion` 的语义：**整串读法优先于前缀补全**。
+
 ## 5. 待办（2026-10-01 复核重写 —— 旧表已过期，多项已完成或被推翻）
 > 复核结论：语料账本 **160,682 篇全部抽取成功、0 失败**（424 亿字符 / 352.75 亿汉字 / 113GB）；
 > 词库与 gram 产物都比源新 ✓；git 干净 ✓；方案无悬挂引用 ✓。

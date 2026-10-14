@@ -108,7 +108,7 @@ env-test:
 	@mkdir -p $(SHARED_DIR)
 	@# 共享数据**全量**软链（不只是三个）：librime 1.17 起 default.yaml 还会引用
 	@# punctuation / key_bindings / grammar 等资源，漏一个就是「deploy failure、
-	@# schema 变成 .default、console 一个候选都没有」（macOS 上真实踩过，§4.85）。
+	@# schema 变成 .default、console 一个候选都没有」（macOS 上真实踩过，§4.84）。
 	@if [ -z "$(SHARED_SRC)" ]; then echo "  ! 找不到共享数据来源，跳过 $(SHARED_DIR)"; else \
 	  n=0; for f in "$(SHARED_SRC)"/*.yaml "$(SHARED_SRC)"/essay.txt; do \
 	    [ -e "$$f" ] || continue; \

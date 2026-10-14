@@ -256,6 +256,14 @@ wubi_route:                 # 绑定 tag=wubi 的内建 table_translator（内�
   db_class: tabledb
   user_dict: egret_wubi.user.dict
   enable_sentence: true
+  # sentence_over_completion 必须开：wubi_route 的 initial_quality=1000 让它的一切候选
+  # 恒压混合库组句，而「补全候选」（输入是某整条词条码的前缀时给出的整词/整句）
+  # 会成批挤在最前，把**恰好覆盖整串输入**的组句候选埋到几十名开外。
+  # librime 的 table_translator 内置此开关（table_translator.cc:296）：
+  # 首候选是 completion 时，把组句结果 `sentence + translation` 前置 → 整串读法胜出。
+  # 实测 wqskc（你 wq + 可 sk + 以 c 简码序列）从「第 47 名（第 8 页）」变成第 1 名
+  # 「你可以」；补全候选仍紧随其后（第 3 名起），补全能力不丢。见 §4.85。
+  sentence_over_completion: true
   enable_completion: true
   initial_quality: 1000     # 关键：高于混合库(1) → 五笔读法在整句里胜出
 dump_cands_filter:
