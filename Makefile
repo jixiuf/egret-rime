@@ -144,9 +144,12 @@ verify-wubi: env-test      ## 五笔能力验收（H11 五组 + 阈值，约 1 �
 bench: env-test            ## 输入延迟基准（性能回归门；超基线 1.5x 即 exit 1）
 	@$(PYTHON) scripts/bench_typing.py
 
-eval: env-test          ## 跑整句评测（160 句多来源，对标基线 26%）
-	@$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 160 \
-		--gram "egret=$$PWD/data/gram/zh-hans-egret.gram"
+eval: env-test          ## 跑整句评测（160 句多来源；对比生产用的万象 gram 与自训 gram）
+	@# 必须包含**生产用的万象 gram**：此前默认只比 essay/自训，导致「生产的 160 句成绩」
+	@# 一直测不出来（HANDOFF 里 75/160 无法用 make eval 复现）——§4.83
+	@$(PYTHON) scripts/eval_gram.py --cases 0 --sentences 160 --jobs $${EVAL_JOBS:-6} \
+		--gram "万象=$$PWD/data/gram/wanxiang-lts-zh-hans.gram" \
+		--gram "自训=$$PWD/data/gram/zh-hans-egret.gram"
 
 lint:                     ## 结构与命名一致性检查（秒级，不跑引擎）
 	@$(PYTHON) scripts/check_consistency.py
