@@ -2822,7 +2822,16 @@ gram 阶段重出搜索器各表。整轮 `--from extract` 到 artifacts 约 **5
 **修后实测**（Mac，仓库 a41171a + 重下 gram）：`make deploy`/`make reload` 正常，
 Squirrel librime 1.17.0，`ililfbyihaole → 渐渐地就好了` ✓、`kkkk → 口` ✓、`tffu → 等` ✓。
 
-**仍开着的一条**：`qwuqdyn`（q我+wu们+qd希+yn望 的简码序列）在 Mac 的运行目录出「欠希望／欠交态」，
+**结论（用户授权我在 Mac 上清空重建后实测）**：把 `~/Library/Rime` 整目录移开、重新
+`make deploy && make reload` 后，**六条用例全部正确**（`qwuqdyn → 我们希望`、
+`ililfbyihaole → 渐渐地就好了`、`trwuqdyn`/`womenxiwang` ✓、`kkkk → 口`、`tffu → 等`）。
+再逐项恢复定位：只把 `*.user.dict.txt`（用户学习数据，其中 `egret_wubi.user.dict.txt` 有
+4436 条）放回去，`qwuqdyn` 立刻回到「欠交态」⇒ **触发者是用户词典的学习数据**（`qwuqdyn`
+判为形码读法，走 86 库组句，而该库的用户词典参与打分），不是代码/词库/gram 的错。
+—— 也就是说：**此前 macOS 上 `make deploy` 一直静默失败（bash 3.2），运行目录里攒了几周的
+旧 build/旧用户态**，两类问题叠在一起才表现为「部署了却没变 + 结果和开发机不同」。
+
+**仍开着的一条（已定位，非 bug）**：`qwuqdyn`（q我+wu们+qd希+yn望 的简码序列）在 Mac 的运行目录出「欠希望／欠交态」，
 而开发机的 `data/rime-test` 出「我们希望」。已排除：仓库版本一致、dicts 的 sha256 一致、
 **build/egret_wubi_py.table.bin 的 sha256 也一致**、gram 的 sha256 一致、schema patch 一致。
 ⇒ 差异只在 `~/Library/Rime` 这个**运行目录**自身的状态（同音/长码裁决的输入相同却输出不同，
