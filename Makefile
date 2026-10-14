@@ -38,6 +38,11 @@ GRAM_DIR    := $(DATA)/gram
 GRAM        := $(GRAM_DIR)/zh-hans-t-essay-bgc.gram
 TEST_DIR    := $(REPO)/data/rime-test
 SHARED_DIR  := $(REPO)/data/rime-shared
+# 共享数据（default.yaml/symbols.yaml/essay.txt）来源：按平台/存在性回退。
+# macOS 上这三个文件只在 Squirrel.app 里（librime 构建目录没有），写死会让目标机
+# `make env-test` 直接失败 —— §4.84
+SHARED_SRC := $(shell for d in $(LIBRIME_BIN) "/Library/Input Methods/Squirrel.app/Contents/SharedSupport" /usr/share/rime-data /usr/share/fcitx5/rime-data; do [ -f "$$d/symbols.yaml" ] && { echo "$$d"; break; }; done)
+
 PY          := $(THIRD)/venv/bin/python
 PYTHON      ?= $(if $(wildcard $(PY)),$(PY),python3)
 
@@ -108,7 +113,8 @@ env-test:
 	@# 所以 default.yaml/symbols.yaml 必须同时存在于用户目录，否则
 	@# `default:key_binder` 解析失败 → schema config 构建失败 → **grammar(LM) 静默失效**。
 	@for f in default.yaml symbols.yaml essay.txt; do \
-		$(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$f $(LIBRIME_BIN)/$$f --quiet; \
+	  if [ -n "$(SHARED_SRC)" ] && [ -f "$(SHARED_SRC)/$$f" ]; then \
+	    $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$f "$(SHARED_SRC)/$$f" --quiet; fi; \
 	done
 	@cp -f $(REPO)/data/gram/wanxiang-lts-zh-hans.gram $(TEST_DIR)/ 2>/dev/null || true
 	@# LM 重排表（纯 Lua 的 n-gram 表，见 scripts/gen_lm_rerank.py）
