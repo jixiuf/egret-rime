@@ -106,9 +106,11 @@ env-test:
 	@printf 'patch:\n  grammar/language: wanxiang-lts-zh-hans\n' > $(TEST_DIR)/egret_wubi_py.custom.yaml
 	@for d in dicts lua opencc; do $(PYTHON) $(REPO)/scripts/rel_symlink.py $(TEST_DIR)/$$d $(REPO)/$$d --quiet; done
 	@mkdir -p $(SHARED_DIR)
-	@for f in default.yaml symbols.yaml essay.txt; do \
-		$(PYTHON) $(REPO)/scripts/rel_symlink.py $(SHARED_DIR)/$$f $(LIBRIME_BIN)/$$f --quiet; \
-	done
+	@if [ -z "$(SHARED_SRC)" ]; then echo "  ! 找不到共享数据来源，跳过 $(SHARED_DIR)"; else \
+	  for f in default.yaml symbols.yaml essay.txt; do \
+	    if [ -f "$(SHARED_SRC)/$$f" ]; then $(PYTHON) $(REPO)/scripts/rel_symlink.py $(SHARED_DIR)/$$f "$(SHARED_SRC)/$$f" --quiet; \
+	    else echo "  ! $(SHARED_SRC) 里没有 $$f"; fi; \
+	  done; fi
 	@# 关键: console 运行时 user_data_dir 与 shared_data_dir 均为 "."（librime 默认），
 	@# 所以 default.yaml/symbols.yaml 必须同时存在于用户目录，否则
 	@# `default:key_binder` 解析失败 → schema config 构建失败 → **grammar(LM) 静默失效**。
