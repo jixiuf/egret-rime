@@ -159,6 +159,28 @@ make bundle   → scripts/deploy_bundle.sh 打 dist/*.tar.gz，包内 install.sh
 测量上有个规矩：新用例先手动跑一遍确认期望值再写进表；冷部署后的第一跑不算数
 （`scripts/probe.sh` 会连跑两次取第二次）；长输入区分「超时」和「真错」（§4.52）。
 
+## 目标机（尤其 macOS）的几个坑
+
+`make reload` 末尾会跑一段自检，先看它：librime 版本、仓库 HEAD 与未提交改动数、
+生效的 `grammar/language`、gram 的 sha256、关键运行时文件是否齐全。这四项覆盖了绝大多数
+「部署了却没变」。
+
+macOS 自带 bash 3.2，所以脚本里不能出现 `declare -A`、`mapfile`、`readarray`，也不能让
+`$VAR` 紧跟着全角标点或汉字（bash 3.2 不把它当分隔符，会把标点字节并进变量名）。这两类
+都会让 `make deploy` **报错中断**，文件一个都不落地 —— 表现就是「部署成功但行为没变」。
+lint 里有守卫，别绕过。
+
+共享数据要**全量**软链（`env-test` 现在会链共享目录下所有 `*.yaml` + `essay.txt`）：librime 1.17
+的 `default.yaml` 还引用 `punctuation.yaml`、`key_bindings.yaml` 等，少一个就是 deploy failure、
+console 出 `.default` 且没有候选。macOS 上这些文件在 Squirrel.app 的 SharedSupport 里。
+
+语言模型（万象 gram）**不钉版本、始终跟上游最新**，而上游会替换 release 资产 ⇒ 各机器可能拿到
+不同版本，同一输入的长句结果就不同。跨机对比结论前先对 `make reload` 自检里的 sha256。
+`make gram-lm FORCE=1` 可强制取最新。
+
+用户词典的学习数据会改变裁决（正常行为）。排查「两台机结果不同」时，先把 `*.user.dict.txt`
+移到一边再比一次 —— 本仓库就遇到过 4436 条学习数据把「我们希望」推成「欠交态」。
+
 ## 文档地图
 
 | 文档 | 看它想了解什么 |

@@ -134,6 +134,15 @@ jintiandetianqizenmeyang→今天的天气怎么样
   Gentoo 却 `HOME=$HOME`）——排查路径先 `readlink -f`。
 - translator 配置块键必须与 @name_space 完全一致，dictionary 不支持
   子目录路径（import_tables 支持）。
+- **目标机脚本别用 bash 4 语法**：macOS 自带 bash 3.2 —— `declare -A`、`mapfile` 会直接
+  报错并**中断整条 `make deploy`**（静默不生效，攒几周旧状态）；`$VAR` 后紧跟全角标点或汉字
+  也会被当成变量名的一部分（`$GRAM）` → unbound variable）。三条 lint 守卫已加，见 §4.84。
+- **共享数据要全量软链**：librime 1.17 的 `default.yaml` 还引用 `punctuation.yaml` 等资源，
+  只链 `default/symbols/essay` 三个会让目标机 `deploy failure`、console 出 `.default` 且无候选。
+- **语言模型（万象 gram）不钉版本、跟上游最新**：上游会替换 release 资产，各机器版本可能不同，
+  同一输入的长句结果就会不同。跨机对比结论前先对 `make reload` 自检里的 gram sha256。
+- **用户词典学习会改变裁决**：排查「两台机结果不同」时，先把 `*.user.dict.txt` 移开再比一次
+  （本会话的 `qwuqdyn` 就是被 4436 条学习数据从「我们希望」推成「欠交态」）。
 - 传统库与混合库对"字全码 vs 2+2 词码冲突"的处理语义相反
   （传统库不过滤靠权重，混合库过滤为 LM 分段保洁），
   改 gen 脚本时不要混同。

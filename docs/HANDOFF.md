@@ -100,6 +100,9 @@ engine.segmentors
 | `rime_deployer` 会把用户目录**根下**它不认识的 `.bin` 移进 `trash/` → 运行时表放 `dicts/` | 实测 |
 | 缺 `default.yaml`/`symbols.yaml` → schema config 构建失败 → **LM 静默失效** | `PROGRESS §4.7` |
 | 二进制读端极易 off-by-one：**必须配契约测试**（TSV 参考实现逐项比对） | §4.34 / §4.42 |
+| macOS 自带 **bash 3.2**：脚本里 `declare -A`/`mapfile`/`$VAR`紧跟全角标点都会让 `make deploy` **静默中断** | §4.84 |
+| 共享数据要**全量**软链（1.17 的 default.yaml 还引用 punctuation 等），只链三个会让目标机 deploy failure | §4.84 |
+| 万象 gram 不钉版本、跟上游最新 ⇒ 各机可能不同；跨机比结论前先对 `make reload` 自检里的 sha256 | §4.84 |
 
 ## 5. 工具清单（本轮新增）
 
