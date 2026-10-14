@@ -147,6 +147,26 @@ def main():
     # 4) 拼音词
     for w, code, _ in rows(os.path.join(D, f"egret_py_words_{args.tier}.dict.yaml")):
         add(w, code.replace(" ", ""), "pinyin")
+    # 5) 长尾/挖掘词表：与 schema 的 import_tables 保持一致
+    # 「组句空间 = 搜索器空间」：搜索器（py_composer，用于 mix_segmentor 判读法 +
+    # compose_filter 混打注入）之前只读 base 档词表，而引擎组句还会用 longtail/mined4
+    # ⇒ 引擎认识的词搜索器不认识，混打长句里跨字词（如「赶得上」）无法成词，回退单字后
+    # 被 grammar 的同音字罚分带偏（§4.86 用 debug 版 librime 验证）。
+    for fname, kind in (
+        ("egret_py_words_longtail.dict.yaml", "pinyin"),
+        ("egret_py_words_mined4.dict.yaml", "pinyin"),
+        ("egret_wubi_words_wb86_longtail.dict.yaml", "wubi"),
+        ("egret_wubi_words_wb86_mined4.dict.yaml", "wubi"),
+    ):
+        path = os.path.join(D, fname)
+        if not os.path.exists(path):
+            continue
+        for w, code, _ in rows(path):
+            c = code.replace(" ", "")
+            # 与 py_composer 的 MAX_CODE_LEN(16) 契约一致（scripts/check_compose_table.lua
+            # 会在 make lint 里断言最长码；超长的长句词条对组句也没用）
+            if len(c) <= 16:
+                add(w, c, kind)
 
     out.sort(key=lambda x: (x[1], -x[2]))
     tmp = args.out + ".tmp"

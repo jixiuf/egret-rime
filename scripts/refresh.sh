@@ -209,11 +209,13 @@ for i in "${!STAGES[@]}"; do
       # 长尾拼音词（§4.55）：base 档只收权重 >=451 的词，451 以下的长尾在纯拼音路径上
       # 「只能单字硬组」——本步给它们补拼音码。实测两套独立句子集各 +6 句，
       # 混流与黄金零回归；多读音展开反而更差，故 max-readings 保持默认 1。
+      # 阈值 2026-10 从 300 降到 200（§4.86）：300 切掉了大量常见 3 字短语
+      # （如「赶得上」=220），导致混打时它们无法成词、同音字被 grammar 带偏。
       "$PY" "$ROOT/scripts/gen_pinyin_words.py" \
         --src "$ROOT/dicts/egret_wubi_words_wangxiang_full.dict.yaml" \
-        --min-weight 300 --exclude "$ROOT/dicts/egret_py_words_base.dict.yaml" \
+        --min-weight 200 --exclude "$ROOT/dicts/egret_py_words_base.dict.yaml" \
         --out-name egret_py_words_longtail >>"$RUNLOG" 2>&1 \
-        && ok "长尾拼音词已生成（约 18 万条，可复现）" || warn "长尾拼音词生成失败"
+        && ok "长尾拼音词已生成（约 23 万条，可复现）" || warn "长尾拼音词生成失败"
       # 注意：gen_wubi_py_unified_dicts.py **不能在这里自动跑**，两个原因：
       #   ① 它需要 dicts/wangxiang_cn_dicts/base.small.dict.yaml（**拼音侧**源，本仓库没有）
       #      —— 五笔侧（本次关心的部分）其实能算，但整脚本会因此中断；

@@ -24,7 +24,7 @@ bash scripts/refresh.sh --loop 30   # 常驻：每 30 分钟增量刷新（语�
 | 长尾拼音词 | `dicts/egret_py_words_longtail.dict.yaml` | base 档的 451 阈值切掉的 451 以下长尾词，补上拼音码（17.8 万条）；两套独立句子集各 +8/+9 句（§4.55）|
 | 86 造词码词库 | `dicts/egret_wubi_words_wb86_*.dict.yaml` | 传统库（形码确定性层） |
 | **语言模型（必需）** | `data/gram/wanxiang-lts-zh-hans.gram` | **词级** gram（万象 LMDG，约 400MB）——引擎原生 octagram 直接用它；**不随仓库分发，需自行下载**（见 README）|
-| 搜索器码表 | `data/gram/compose_table.{tsv,bin}` | 统一码表（五笔+拼音 27 万条）；`.bin` 是运行时读的（契约测试 `scripts/check_compose_table.lua`）|
+| 搜索器码表 | `data/gram/compose_table.{tsv,bin}` | 统一码表（五笔+拼音 63.8 万条，含 longtail/mined4，§4.86）；`.bin` 是运行时读的（契约测试 `scripts/check_compose_table.lua`）|
 | Lua LM 表 | `data/gram/lm_rerank.{bin,meta}` | **只给搜索器内部打分用**（引擎侧已关 `lm_rerank`）|
 | 方案词库包装 | `egret_wubi_py.dict.yaml` / `egret_wubi.dict.yaml` | 由 `--tier` 切换档位 |
 
@@ -82,17 +82,17 @@ RIME_SHARED_DIR / RIME_FROST_DIR / RIME_WANXIANG_DIR / EGRET_GRAM_DIR。
 
 ## 验证基线
 
-**全链验收一条命令**：`make verify`（= 契约 + 黄金 43 + **五笔能力 5 组** + **输入延迟门**）。
+**全链验收一条命令**：`make verify`（= 契约 + 黄金 44 + **五笔能力 5 组** + **输入延迟门**）。
 后两者是 2026-10 新增的护栏，用来防"加词导致能力/延迟退化"（见 docs/PROGRESS.md §4.40）：
 - `make verify-wubi`：五笔打词（二字/三字/四字 × base/长尾）固定采样 + 阈值；
 - `make bench`：三串固定拼音的整串重放耗时，超基线 1.5× 失败（基线在脚本里）；
 - `make verify-bundle`：**交付包验收**（解包→装到空目录→部署→8 条探针；模拟目标机）。
 
-**黄金用例 43 条 + 4 条候选表结构断言全过**（`make test`，含契约测试）；整句(全拼)多来源评测 **160 句**：
+**黄金用例 44 条 + 4 条候选表结构断言全过**（`make test`，含契约测试）；整句(全拼)多来源评测 **160 句**：
 **73/160 (46%)**（万象词级 gram，2026-10-14 钉住 sha256 后实测 + 长尾拼音词 + 词组感知注音，§4.55/§4.56；`make eval` 可重测。
 §4.44 首次接入万象 gram 时是 66/160，旧的 Lua 字级重排只有 27%）。
 
-黄金用例要点（43 条 + 4 条结构断言，含下面这些 + 简码/全码/词组/混句/整句词库/成语/混流多读法）：
+黄金用例要点（44 条 + 4 条结构断言，含下面这些 + 简码/全码/词组/混句/整句词库/成语/混流多读法）：
 
 e→有 q→我 yi→就 yl→为 kl→另 de→胡 tffu→等 khlg→中国 xciy→经济
 kdyc→顺序 trwu→我们 trwuchifan→我们吃饭 jfwaguangfnrt→时代广场
@@ -103,7 +103,7 @@ ronghe→融合(不自动上屏) b,→了 ktn,→吃 ben→本 gdrnthtcsu→天�
 
 注意: 全新目录首跑(清用户词典 + 重建)可能出 wan→蛙嗯(万排第2)，这是陷阱#9 prism 非确定性；
 判 failure 前先与黄金环境(`data/rime-test`)交叉验证。**加用例前必须先跑一遍确认期望值**（曾凭想象写期望，害自己一次）。
-本机复现：`make test`（默认测 data/rime-test，**47/47 全过**，含契约测试）；
+本机复现：`make test`（默认测 data/rime-test，**48/48 全过**，含契约测试）；
 `make test-rebuild` 清 build+用户词典后重跑。
 jintiandetianqizenmeyang→今天的天气怎么样
 

@@ -10,7 +10,7 @@
 
 ```bash
 cd /export/ebook/egret-rime
-make test                                  # 黄金 43 条 + 4 条结构断言 + 契约测试（必须全过）
+make test                                  # 黄金 44 条 + 4 条结构断言 + 契约测试（必须全过）
 make lint                                  # 命名/路径/契约/运行时文件一致性
 bash scripts/probe.sh qktnqnr gdrnthtcsu ronghe   # 混流短码 / 整串五笔 / 自动上屏
 make eval                                  # 160 句整句评测（并行 6，当前 74/160 = 46%）
@@ -41,7 +41,7 @@ engine.segmentors
 - **引擎 LM = 万象词级 gram**（`wanxiang-lts-zh-hans.gram`，~400MB，原生 octagram 直接读）
 - **Lua 侧重排已关**（`dynamic_translator/lm_rerank: false`、`lm_compose: false`）；
   Lua 的 `lm_rerank.{bin,meta}` 只剩**搜索器自己打分**用
-- **搜索器** = `lua/py_composer.lua` + `data/gram/compose_table.bin`（27 万条统一码表：五笔+拼音）；
+- **搜索器** = `lua/py_composer.lua` + `data/gram/compose_table.bin`（63.8 万条统一码表：五笔+拼音，含 longtail/mined4，§4.86）；
   beam 状态**按输入前缀增量缓存**（§4.50）：每键 O(1 个位置)，判定不变（52 字母单例 60s→11.9s）
 - 命名规则：内容同时含五笔与拼音 → `egret_wubi_py_*`；只五笔 → `egret_wubi_*`；只拼音 → `egret_py_*`
 - **长句页尾留「字 + 词」（先字修正）**：`lua/tail_word_filter.lua`（§4.76）——首候选是
@@ -79,7 +79,7 @@ engine.segmentors
 3. ❌「把输入切成多段实现多读法」→ **结构上错**：rime 里**段=组字/上屏单位**，切段必碎句
 4. ❌「`charset_filter` 用来隐藏 CJK 扩展字」→ 它在本构建里一直是 **no-op**（只刷 ERROR）；
    真正管用的是**字表分层**（扩展区字不在默认 prism 里）
-5. ❌「20 条黄金用例」→ 现在 **43 条 + 4 条结构断言**
+5. ❌「20 条黄金用例」→ 现在 **44 条 + 4 条结构断言**
 6. ❌「权重带宽 451-5000 需要重标」→ 四次重标定全部破黄金；现有权重是**整体手工调好的**
 
 ## 4. 组件 / API 硬事实（踩坑换来的，都是源码或实验确认过的）
