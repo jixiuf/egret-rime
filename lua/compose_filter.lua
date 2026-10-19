@@ -134,6 +134,7 @@ end
 function M.func(input, env)
     local composed = nil
     local composed_all_wubi = false
+    local composed_monotone = true    -- 读法序列是否「形码前缀 + 拼音后缀」
     local inp = env.engine.context.input
     -- 判据：只有「形码片段 + 拼音音节并存的长输入」才让搜索器插手（两条路径都受它约束）。
     -- 此前只约束注入路径、放开共识重排：结果 `kkkk`（纯形码 4 码）被搜索器的「咒骂」
@@ -148,13 +149,24 @@ function M.func(input, env)
             -- 为何必须拦（§4.88）：`tgynlwtyif` = 重启+输入法 的简码序列，引擎首候选
             -- 正确（重启输入法 679 > 第一遍 346），但搜索器的字级 LM 偏爱「第一遍」并
             -- 把它**注入**到首位 ⇒ 输出「第一遍输入法」。它只会低估五笔同码词的差别。
+            -- 读法体检（§4.90）：
+            --   all_wubi   = 搜索器把整串读成形码 → 86库/引擎权威，不插手（§4.88）
+            --   monotone   = 读法序列是「形码前缀 + 拼音后缀」。真实混打就是「先打几个
+            --               五笔词再切拼音」；若出现「拼音后又回到形码」（wubi,pinyin,wubi），
+            --               多半是搜索器在钻字母表的歧义空子（nnxcyiwug → 已经|义务|一）。
             local ps = res[1].pieces
             if ps and #ps > 0 then
-                local all = true
+                local all, mono, seen_py = true, true, false
                 for _, p in ipairs(ps) do
-                    if p.kind ~= "wubi" then all = false end
+                    if p.kind == "pinyin" then
+                        seen_py = true
+                        all = false
+                    elseif p.kind == "wubi" then
+                        if seen_py then mono = false end
+                    end
                 end
                 composed_all_wubi = all
+                composed_monotone = mono
             end
         end
     end
@@ -162,7 +174,7 @@ function M.func(input, env)
     local cands = {}
     for cand in input:iter() do cands[#cands + 1] = cand end
 
-    if composed and not composed_all_wubi and #inp >= 4 and #cands > 0 then
+    if composed and not composed_all_wubi and composed_monotone and #inp >= 4 and #cands > 0 then
         local r = nil
         for i, cand in ipairs(cands) do
             if cand.text:sub(1, #composed) == composed then r = i; break end

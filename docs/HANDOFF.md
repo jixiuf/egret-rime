@@ -10,11 +10,11 @@
 
 ```bash
 cd /export/ebook/egret-rime
-make test                                  # 黄金 45 条 + 4 条结构断言 + 契约测试（必须全过）
+make test                                  # 黄金 46 条 + 4 条结构断言 + 契约测试（必须全过）
 make lint                                  # 命名/路径/契约/运行时文件一致性
 bash scripts/probe.sh qktnqnr gdrnthtcsu ronghe   # 混流短码 / 整串五笔 / 自动上屏
 make eval                                  # 160 句整句评测（并行 6，当前 74/160 = 46%）
-make eval-mixed                            # 混打整句评测（固定集 scripts/eval_sets/mixed.tsv，当前 164/640 = 26%，§4.87）
+make eval-mixed                            # 混打整句评测（固定集 scripts/eval_sets/mixed.tsv，当前 238/640 = 37%，§4.87）
 make deploy && make reload                 # 目标机部署（先 git pull --ff-only，§4.77）
 bash scripts/refresh.sh --only dict        # 重建词库产物（可复现，秒级）
 bash scripts/refresh.sh --loop 30          # 常驻增量刷新（语料在持续增长）
@@ -80,7 +80,7 @@ engine.segmentors
 3. ❌「把输入切成多段实现多读法」→ **结构上错**：rime 里**段=组字/上屏单位**，切段必碎句
 4. ❌「`charset_filter` 用来隐藏 CJK 扩展字」→ 它在本构建里一直是 **no-op**（只刷 ERROR）；
    真正管用的是**字表分层**（扩展区字不在默认 prism 里）
-5. ❌「20 条黄金用例」→ 现在 **45 条 + 4 条结构断言**
+5. ❌「20 条黄金用例」→ 现在 **46 条 + 4 条结构断言**
 6. ❌「权重带宽 451-5000 需要重标」→ 四次重标定全部破黄金；现有权重是**整体手工调好的**
 
 ## 4. 组件 / API 硬事实（踩坑换来的，都是源码或实验确认过的）
