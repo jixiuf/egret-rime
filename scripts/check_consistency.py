@@ -199,7 +199,9 @@ for p in glob.glob("scripts/**/*.sh", recursive=True) + glob.glob("scripts/*.sh"
 try:
     sys.path.insert(0, os.path.join(ROOT, "scripts"))
     from keyname_priority import caps as _kn_caps
-    _kcaps = _kn_caps(os.path.join(ROOT, "dicts"))
+    _kcaps = _kn_caps(os.path.join(ROOT, "dicts"),
+                         [os.path.join(ROOT, "dicts",
+                                       "egret_wubi_words_wb86_base.dict.yaml")])
     _trad_tables = ["egret_wubi_words_wb86_base", "egret_wubi_words_wb86_longtail",
                     "egret_wubi_words_wb86_mined4", "egret_wubi_sentence",
                     "egret_wubi_force_end"]

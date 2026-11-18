@@ -139,7 +139,7 @@ def main():
             continue
         # 键名字优先只对**传统库词**（86 造词码，纯 4 字母）生效；混合库词是逗号
         # token（如 串串 = "kk,hk kk,hk"），码要运行时由 algebra 派生，此处不匹配。
-        caps = keyname_caps(DICTS) if kind == "words_wb86" else None
+        caps = keyname_caps(DICTS, [SRC_WUBI_TRAD]) if kind == "words_wb86" else None
         for tier in tiers:
             minw = TIERS[tier]
             n = write_tier(kind, src, tier, minw, note, prefix, caps)

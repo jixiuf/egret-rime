@@ -36,6 +36,10 @@ KEYNAME_4 = {
 
 CHARS_NAME = "egret_wubi_chars.dict.yaml"    # 传统字表（git 跟踪的源）
 
+# 单字全码优先（§4.91）：只在「单字足够常用」且「词权与字权可比」时压词
+FULLCODE_MIN_CHAR = 400     # 单字权重下限（生僻字不抢同码词）
+FULLCODE_RATIO = 0.8       # 字权 / 同码词最高权 的比例下限
+
 
 def _rows(path):
     started = False
@@ -49,8 +53,16 @@ def _rows(path):
             yield p[0], p[1], int(p[2])
 
 
-def caps(dicts_dir):
-    """{4 码: 键名字权重 - 1}：同码词被压到它之下；字表缺失时返回空表（不改权）。"""
+def caps(dicts_dir, word_srcs=None):
+    """{4 码: 上限权重 - 1}：同码词被压到它之下；字表缺失时返回空表（不改权）。
+
+    两类规则：
+    1) 键名字四连击（无条件，§4.76）；
+    2) 单字全码优先（§4.91，需传 word_srcs）：4 字母输入既可能是某单字的**全码**，
+       也可能是某 2 字词的 2+2 派生码。用户报 `wfhg` → 会上(668) 压过 值(593)。
+       但 9002 个撞码里 8907 个是**生僻字**（权重 1）输给常用词 —— 那是对的。
+       故只在「单字足够常用」且「词权与字权可比」时才压词（实测仅 119 个码）。
+    """
     path = os.path.join(dicts_dir, CHARS_NAME)
     out = {}
     if not os.path.exists(path):
@@ -61,6 +73,29 @@ def caps(dicts_dir):
         # 这种键名字不参与优先，否则会把同码词压到 0、让词从档位里消失
         if code in KEYNAME_4 and text == KEYNAME_4[code] and weight > 1:
             out[code] = weight - 1
+
+    if word_srcs:
+        char_full = {}
+        for text, code, weight in _rows(path):
+            if len(text) == 1 and len(code) == 4 and code.isalpha() \
+                    and weight >= FULLCODE_MIN_CHAR:
+                if weight > char_full.get(code, 0):
+                    char_full[code] = weight
+        max_word = {}
+        for src in word_srcs:
+            if not src or not os.path.exists(src):
+                continue
+            for text, code, weight in _rows(src):
+                code = code.strip().lower()
+                if len(text) >= 2 and len(code) == 4 and code.isalpha():
+                    if weight > max_word.get(code, 0):
+                        max_word[code] = weight
+        for code, cw in char_full.items():
+            mw = max_word.get(code)
+            if mw and cw < mw and cw >= FULLCODE_RATIO * mw:
+                limit = cw - 1
+                if code not in out or limit < out[code]:
+                    out[code] = limit
     return out
 
 

@@ -478,7 +478,7 @@ columns:
 奥义	tmyq	527
 敖姨	gqvg	526
 遨游	gqiy	516
-澳元	itfq	595
+澳元	itfq	523
 奥运	tmfc	721
 鏖战	ynhk	503
 熬制	gqrm	588
@@ -624,7 +624,7 @@ columns:
 八神	wtpy	462
 巴生	cntg	451
 巴士	cnfg	747
-八十	wtfg	566
+八十	wtfg	495
 八世	wtan	499
 巴适	cntd	490
 巴氏	cnqa	452
@@ -707,7 +707,6 @@ columns:
 白茶	rraw	549
 百场	djfn	466
 百城	djfd	503
-摆成	rldn	457
 白痴	rrut	580
 白吃	rrkt	469
 摆出	rlbm	573
@@ -729,7 +728,7 @@ columns:
 白点	rrhk	511
 百点	djhk	461
 白丁	rrsg	484
-摆动	rlfc	576
+摆动	rlfc	481
 百度	djya	803
 拜读	rdyf	570
 摆渡	rliy	508
@@ -961,12 +960,11 @@ columns:
 柏悦	srnu	481
 白云	rrfc	598
 摆在	rldh	651
-败在	mtdh	501
 百赞	djtf	512
 败仗	mtwd	461
 摆着	rlud	568
 败者	mtft	479
-摆正	rlgh	537
+摆正	rlgh	457
 白纸	rrxq	553
 白芷	rrah	498
 柏芝	srap	468
@@ -1072,7 +1070,7 @@ columns:
 斑斓	gyyu	516
 伴郎	wuyv	531
 办了	lwbn	684
-搬了	rtbn	556
+搬了	rtbn	504
 办理	lwgj	780
 班里	gyjf	612
 板栗	srss	578
@@ -1898,7 +1896,7 @@ columns:
 奔波	dfih	587
 本部	sguk	628
 本不	sgdh	479
-本草	sgaj	527
+本草	sgaj	455
 本场	sgfn	672
 本朝	sgfj	491
 奔驰	dfcb	704
@@ -2034,7 +2032,7 @@ columns:
 本质	sgrf	723
 本职	sgbk	482
 笨重	tstg	535
-本种	sgtk	533
+本种	sgtk	461
 本周	sgmf	710
 本州	sgyt	516
 笨拙	tsrb	550
@@ -3161,7 +3159,7 @@ columns:
 不当	dhiv	698
 不到	dhgc	776
 步道	hiut	591
-补刀	puvn	526
+补刀	puvn	493
 不倒	dhwg	524
 布道	dmut	488
 补的	purq	565
@@ -3636,7 +3634,6 @@ columns:
 不愈	dhwg	461
 不愿	dhdr	673
 不远	dhfq	634
-部员	ukkm	459
 不悦	dhnu	520
 不约	dhxq	474
 不孕	dheb	570
@@ -4317,12 +4314,12 @@ columns:
 查看	sjrh	807
 察看	pwrh	509
 查克	sjdq	558
-插孔	rtbn	539
+插孔	rtbn	504
 插口	rtkk	551
 查扣	sjrk	504
 差了	udbn	687
 查了	sjbn	624
-插了	rtbn	519
+插了	rtbn	504
 茶类	awod	502
 查理	sjgj	614
 茶楼	awso	558
@@ -4427,7 +4424,6 @@ columns:
 拆装	rruf	490
 潺潺	inin	526
 禅城	pyfd	528
-馋虫	qnjh	466
 产出	utbm	662
 铲除	qubw	534
 蟾蜍	jqjw	508
@@ -4688,7 +4684,6 @@ columns:
 长滩	taic	468
 长条	tats	553
 唱跳	kjkh	453
-常听	ipkr	485
 畅通	jhce	632
 长途	tawt	628
 长腿	taev	587
@@ -4730,7 +4725,6 @@ columns:
 畅饮	jhqn	602
 常因	ipld	501
 长音	tauj	466
-常饮	ipqn	460
 常用	ipet	796
 常有	ipde	618
 畅游	jhiy	591
@@ -5526,7 +5520,7 @@ columns:
 吃撑	ktri	500
 赤城	fofd	462
 吃吃	ktkt	759
-迟迟	nyny	622
+迟迟	nyny	547
 吃出	ktbm	636
 吃穿	ktpw	509
 吃串	ktkk	457
@@ -5612,7 +5606,7 @@ columns:
 耻辱	bhdf	573
 赤色	foqc	484
 吃啥	ktkw	550
-吃上	kthg	655
+吃上	kthg	551
 池上	ibhg	486
 吃剩	kttu	483
 吃食	ktwy	541
@@ -5987,7 +5981,7 @@ columns:
 出街	bmtf	564
 出借	bmwa	488
 褚姐	puve	468
-储姐	wyve	468
+储姐	wyve	452
 楚姐	ssve	468
 出尽	bmny	472
 处境	thfu	619
@@ -6290,7 +6284,7 @@ columns:
 川普	ktuo	678
 传奇	wfds	735
 传祺	wfpy	591
-川崎	ktmd	556
+川崎	ktmd	502
 喘气	kmrn	481
 串起	kkfh	476
 穿起	pwfh	462
@@ -6331,8 +6325,8 @@ columns:
 喘息	kmth	534
 川西	ktsg	522
 传销	wfqi	653
-穿鞋	pwaf	526
-穿行	pwtf	551
+穿鞋	pwaf	510
+穿行	pwtf	454
 船型	tega	452
 川芎	ktax	493
 传讯	wfyn	465
@@ -6352,7 +6346,7 @@ columns:
 船只	tekw	633
 传至	wfgc	532
 传中	wfkh	591
-穿著	pwaf	612
+穿著	pwaf	510
 串珠	kkgr	456
 创办	wblw	689
 床板	yssr	452
@@ -6633,7 +6627,7 @@ columns:
 此刻	hxyn	618
 刺客	gmpt	604
 词库	ynyl	908
-此款	hxff	597
+此款	hxff	587
 次郎	uqyv	583
 辞了	tdbn	507
 此类	hxod	704
@@ -6717,7 +6711,6 @@ columns:
 此线	hxxg	505
 此项	hxad	619
 慈祥	uxpy	475
-此校	hxsu	490
 词性	ynnt	715
 雌性	hxnt	594
 词形	ynga	547
@@ -6849,7 +6842,7 @@ columns:
 凑活	udit	549
 凑近	udrp	458
 凑了	udbn	511
-凑齐	udyj	534
+凑齐	udyj	509
 凑钱	udqg	462
 凑巧	udag	478
 凑数	udov	521
@@ -7027,7 +7020,7 @@ columns:
 措施	rayt	833
 错失	qarw	556
 错事	qagk	463
-错题	qajg	607
+错题	qajg	546
 蹉跎	khkh	488
 错位	qawu	583
 错误	qayk	830
@@ -7191,7 +7184,7 @@ columns:
 大发	ddnt	517
 打翻	rsto	486
 打饭	rsqn	478
-大凡	ddmy	464
+大凡	ddmy	456
 大方	ddyy	676
 大房	ddyn	473
 打分	rswv	637
@@ -7804,7 +7797,6 @@ columns:
 代码	wadc	818
 代买	wanu	469
 怠慢	cknj	515
-玳瑁	gwgj	452
 傣妹	wdvf	535
 呆萌	ksaj	601
 戴蒙	faap	466
@@ -7957,7 +7949,7 @@ columns:
 单反	ujrc	672
 但凡	wjmy	615
 单方	ujyy	512
-单飞	ujnu	506
+单飞	ujnu	464
 但非	wjdj	485
 丹佛	mywx	537
 担负	rjqm	538
@@ -8029,7 +8021,7 @@ columns:
 单论	ujyw	517
 胆码	ejdc	482
 丹麦	mygt	687
-单买	ujnu	528
+单买	ujnu	464
 单卖	ujfn	473
 但没	wjim	626
 耽美	bpug	520
@@ -8408,7 +8400,7 @@ columns:
 捣烂	rqou	528
 导览	nfjt	508
 刀郎	vnyv	466
-到老	gcft	551
+到老	gcft	471
 到了	gcbn	894
 倒了	wgbn	611
 道理	utgj	755
@@ -9172,7 +9164,7 @@ columns:
 点个	hkwh	646
 点歌	hksk	529
 电工	jnaa	576
-典故	madt	611
+典故	madt	515
 电光	jniq	487
 点过	hkfp	591
 电焊	jnoj	455
@@ -9991,7 +9983,7 @@ columns:
 都是	ftjg	990
 斗士	uffg	557
 都使	ftwg	473
-兜售	qrwy	527
+兜售	qrwy	520
 都受	ftep	461
 都属	ftnt	513
 都说	ftyu	784
@@ -10007,7 +9999,6 @@ columns:
 都往	ftty	512
 都为	ftyl	630
 都未	ftfi	575
-窦唯	pwkw	530
 逗我	gktr	451
 都无	ftfq	589
 都先	fttf	474
@@ -10035,7 +10026,7 @@ columns:
 都有	ftde	905
 都由	ftmh	619
 豆油	gkim	540
-都与	ftgn	649
+都与	ftgn	632
 斗鱼	ufqg	565
 都远	ftfq	476
 都在	ftdh	851
@@ -10096,8 +10087,7 @@ columns:
 督导	hinf	577
 独到	qtgc	539
 独岛	qtqy	471
-堵得	fftj	562
-读得	yftj	541
+堵得	fftj	455
 毒的	gxrq	532
 杜德	sftf	502
 度电	yajn	492
@@ -10278,7 +10268,7 @@ columns:
 断电	onjn	592
 端点	umhk	552
 断点	onhk	492
-断掉	onrh	520
+断掉	onrh	474
 断定	onpg	556
 短短	tdtd	665
 段段	wdwd	554
@@ -10344,7 +10334,7 @@ columns:
 短效	tduq	483
 短信	tdwy	744
 短袖	tdpu	588
-短靴	tdaf	534
+短靴	tdaf	493
 短讯	tdyn	454
 断崖	onmd	474
 断言	onyy	563
@@ -10543,7 +10533,6 @@ columns:
 吨级	kgxe	481
 顿觉	gbip	464
 蹲坑	khfy	488
-炖了	ogbn	477
 盾牌	rfth	581
 炖品	ogkk	495
 炖肉	ogmw	530
@@ -10895,7 +10884,7 @@ columns:
 恶心	gony	701
 恶性	gont	615
 恶行	gotf	511
-额叶	ptkf	483
+额叶	ptkf	457
 恶业	goog	456
 恶意	gouj	741
 俄语	wtyg	633
@@ -11022,7 +11011,7 @@ columns:
 二两	fggm	549
 饵料	qnou	531
 而令	dmwy	493
-二流	fgiy	564
+二流	fgiy	517
 耳聋	bgdx	539
 二楼	fgso	719
 二路	fgkh	536
@@ -11397,7 +11386,6 @@ columns:
 犯病	qtug	457
 反驳	rccq	679
 帆布	mhdm	511
-反哺	rckg	505
 饭菜	qnae	667
 反差	rcud	601
 翻唱	tokj	634
@@ -11581,7 +11569,6 @@ columns:
 返台	rcck	496
 翻台	tock	489
 反弹	rcxu	738
-反贪	rcwy	500
 饭堂	qnip	553
 翻腾	toeu	480
 繁体	txws	607
@@ -11650,7 +11637,6 @@ columns:
 反之	rcpp	661
 泛指	itrx	570
 反制	rcrm	505
-反智	rctd	501
 繁重	txtg	528
 泛舟	itte	496
 藩主	aiyg	523
@@ -11858,7 +11844,6 @@ columns:
 防汛	byin	635
 方言	yyyy	485
 放眼	ythv	562
-放盐	ytfh	534
 放言	ytyy	462
 放养	ytud	520
 放羊	ytud	465
@@ -11906,7 +11891,6 @@ columns:
 房子	ynbb	775
 方子	yybb	573
 放纵	ytxw	590
-放走	ytfh	486
 房租	ynte	656
 肺癌	eguk	673
 诽谤	ydyu	561
@@ -12636,7 +12620,7 @@ columns:
 负分	qmwv	487
 夫妇	fwvv	692
 覆盖	stug	744
-福冈	pymq	581
+福冈	pymq	490
 赴港	fhia	520
 副高	gkym	505
 讣告	yhtf	456
@@ -12864,7 +12848,6 @@ columns:
 负向	qmtm	548
 附小	bwih	478
 拂晓	rxja	468
-复校	tjsu	461
 腹泻	etip	677
 阜新	wnus	473
 复兴	tjiw	670
@@ -13432,7 +13415,6 @@ columns:
 肛裂	eagq	487
 刚烈	mqgq	458
 杠铃	saqw	624
-纲领	xmwy	527
 港龙	iadx	465
 刚买	mqnu	631
 刚满	mqia	495
@@ -13612,7 +13594,7 @@ columns:
 高卢	ymhn	510
 高炉	ymoy	471
 搞乱	rytd	458
-高吗	ymkc	579
+高吗	ymkc	491
 告密	tfpn	483
 高密	ympn	461
 高棉	ymsr	495
@@ -13916,7 +13898,6 @@ columns:
 隔夜	bgyw	616
 个亿	whwn	607
 各异	tkna	586
-各一	tkgg	487
 葛姨	ajvg	486
 戈姨	agvg	486
 隔音	bguj	635
@@ -14560,7 +14541,6 @@ columns:
 谷地	wwfb	498
 故地	dtfb	459
 古典	dgma	723
-鼓点	fkhk	508
 固定	ldpg	738
 股东	emai	792
 古董	dgat	589
@@ -14779,7 +14759,6 @@ columns:
 挂满	rfia	492
 挂面	rfdm	510
 挂名	rfqk	499
-挂念	rfwy	496
 挂牌	rfth	705
 刮起	tdfh	499
 挂起	rffh	470
@@ -15476,7 +15455,7 @@ columns:
 郭某	ybaf	534
 果木	jsss	467
 国内	lgmw	816
-锅内	qkmw	606
+锅内	qkmw	537
 过年	fprh	688
 果农	jspe	519
 果盘	jste	565
@@ -15812,7 +15791,7 @@ columns:
 还上	gihg	512
 还少	giit	532
 海参	itcd	631
-海神	itpy	522
+海神	itpy	474
 海婶	itvp	521
 还剩	gitu	632
 还是	gijg	955
@@ -15965,7 +15944,7 @@ columns:
 韩军	fjpl	488
 汉克	icdq	488
 汉口	ickk	576
-喊了	kdbn	574
+喊了	kdbn	476
 含泪	wyih	541
 韩磊	fjdd	495
 寒冷	pfuw	653
@@ -16609,7 +16588,7 @@ columns:
 河西	issg	575
 荷西	awsg	510
 何夕	wsqt	465
-河虾	isjg	550
+河虾	isjg	491
 喝下	kjgh	541
 和弦	tkxy	632
 河鲜	isqg	510
@@ -16958,7 +16937,6 @@ columns:
 横的	sarq	457
 横店	sayh	544
 恒定	ngpg	563
-横渡	saiy	498
 恒丰	ngdh	526
 横幅	samh	582
 横贯	saxf	489
@@ -16970,14 +16948,12 @@ columns:
 亨利	ybtj	659
 衡量	tqjg	696
 横梁	saiv	543
-横流	saiy	475
 恒隆	ngbt	525
 横排	sard	510
 横盘	sate	603
 横批	sarx	508
 横屏	sanu	451
 恒强	ngxk	456
-横琴	sagg	550
 横扫	sarv	591
 衡嫂	tqvv	590
 横山	samm	523
@@ -17841,7 +17817,7 @@ columns:
 化学	wxip	758
 滑雪	imfv	646
 化验	wxcw	596
-花样	awsu	640
+花样	awsu	532
 华阳	wxbj	471
 华业	wxog	481
 花叶	awkf	479
@@ -18535,7 +18511,7 @@ columns:
 灰色	doqc	685
 晦涩	jtiv	566
 回山	lkmm	459
-会上	wfhg	668
+会上	wfhg	592
 徽商	tmum	492
 会商	wfum	477
 会伤	wfwt	457
@@ -18548,7 +18524,6 @@ columns:
 会试	wfya	609
 汇市	iaym	544
 会师	wfjg	536
-会士	wffg	510
 回事	lkgk	469
 回收	lknh	737
 回首	lkut	555
@@ -18623,7 +18598,7 @@ columns:
 辉夜	iqyw	462
 会议	wfyy	797
 回忆	lknn	738
-会以	wfny	650
+会以	wfny	534
 会因	wfld	630
 回音	lkuj	505
 会阴	wfbe	494
@@ -18728,7 +18703,6 @@ columns:
 混血	ijtl	591
 婚讯	vqyn	497
 婚宴	vqpj	671
-混业	ijog	485
 婚姻	vqvl	770
 混音	ijuj	605
 混用	ijet	528
@@ -18930,7 +18904,7 @@ columns:
 获赠	aqmu	557
 或者	akft	899
 活着	itud	673
-获知	aqtd	565
+获知	aqtd	479
 货值	wxwf	488
 火种	ootk	511
 活著	itaf	499
@@ -19244,7 +19218,7 @@ columns:
 击溃	fmik	531
 基拉	adru	478
 寄来	pdgo	493
-基佬	adwf	535
+基佬	adwf	475
 季老	tbft	479
 记牢	ynpr	460
 急了	qvbn	680
@@ -19391,7 +19365,7 @@ columns:
 肌肉	emmw	796
 鸡肉	cqmw	745
 计入	yfty	677
-记入	ynty	536
+记入	ynty	468
 挤入	ryty	466
 集散	wyae	460
 祭扫	wfrv	615
@@ -19841,7 +19815,7 @@ columns:
 架空	lkpw	561
 驾控	lkrp	469
 加快	lknn	740
-价款	wwff	582
+价款	wwff	556
 加宽	lkpa	485
 加辣	lkug	459
 加来	lkgo	553
@@ -20314,7 +20288,7 @@ columns:
 见识	mqyk	617
 监事	jtgk	588
 件事	wrgk	567
-简史	tukq	561
+简史	tukq	517
 检视	swpy	542
 剑士	wgfg	527
 坚实	jcpu	512
@@ -20492,7 +20466,6 @@ columns:
 江道	iaut	584
 讲道	yfut	494
 讲的	yfrq	548
-讲得	yftj	524
 降低	btwq	829
 讲点	yfhk	480
 降调	btym	457
@@ -21174,7 +21147,7 @@ columns:
 解法	qeif	548
 揭发	rjnt	533
 解放	qeyt	670
-街坊	tffy	578
+街坊	tffy	538
 借方	wayy	480
 接访	ruyy	451
 劫匪	fcad	543
@@ -21469,7 +21442,6 @@ columns:
 结转	xflf	578
 街庄	tfyf	517
 节奏	abdw	754
-接走	rufh	474
 杰作	sowt	601
 紧挨	jcrc	465
 近岸	rpmd	467
@@ -21485,7 +21457,6 @@ columns:
 金本	qqsg	549
 紧绷	jcxe	582
 金币	qqtm	632
-紧闭	jcuf	479
 金边	qqlp	528
 锦标	qrsf	611
 金标	qqsf	510
@@ -21660,7 +21631,6 @@ columns:
 进阶	fjbw	641
 金戒	qqaa	513
 紧接	jcru	473
-今届	wynm	465
 仅仅	wcwc	712
 紧紧	jcjc	545
 进京	fjyi	549
@@ -21851,7 +21821,7 @@ columns:
 金水	qqii	496
 浸水	ivii	469
 金顺	qqkd	460
-近似	rpwn	607
+近似	rpwn	498
 金斯	qqad	487
 金丝	qqxx	481
 劲松	casw	514
@@ -21933,7 +21903,7 @@ columns:
 金业	qqog	540
 津液	iviy	486
 金一	qqgg	577
-近亿	rpwn	573
+近亿	rpwn	498
 仅以	wcny	567
 金逸	qqqk	452
 金银	qqqv	631
@@ -22498,7 +22468,7 @@ columns:
 就离	yiyb	472
 就连	yilp	719
 九连	vtlp	452
-酒量	isjg	541
+酒量	isjg	491
 久留	qyqy	454
 九龙	vtdx	641
 酒楼	isso	614
@@ -22916,7 +22886,7 @@ columns:
 卷纸	udxq	454
 卷轴	udlm	589
 捐助	rkeg	581
-卷子	udbb	604
+卷子	udbb	572
 捐资	rkuq	512
 卷宗	udpf	484
 卷走	udfh	492
@@ -23046,7 +23016,6 @@ columns:
 均居	fqnd	464
 君君	vtvt	468
 均可	fqsk	711
-菌科	altu	510
 俊朗	wcyv	481
 菌类	alod	587
 军力	pllt	549
@@ -23077,8 +23046,8 @@ columns:
 均属	fqnt	562
 军统	plxy	491
 军团	pllf	676
-君王	vtgg	570
-郡王	vtgg	548
+君王	vtgg	484
+郡王	vtgg	484
 均为	fqyl	747
 均未	fqfi	623
 军委	pltv	520
@@ -24066,7 +24035,7 @@ columns:
 孔哥	bnsk	457
 控股	rpem	723
 空管	pwtp	520
-空行	pwtf	456
+空行	pwtf	454
 空号	pwkg	461
 恐吓	amkg	586
 空话	pwyt	520
@@ -24461,7 +24430,7 @@ columns:
 框里	sajf	475
 筐里	tajf	473
 狂魔	qtys	552
-框内	samw	471
+框内	samw	458
 狂怒	qtvc	478
 况且	ukeg	636
 矿区	dyaq	522
@@ -24619,7 +24588,7 @@ columns:
 拉来	rugo	495
 拉了	rubn	604
 拉力	rult	555
-拉里	rujf	544
+拉里	rujf	473
 拉链	ruql	590
 拉练	ruxa	453
 拉拢	rurd	554
@@ -24630,7 +24599,7 @@ columns:
 拉曼	rujl	514
 辣么	ugtc	577
 拉美	ruug	573
-辣妹	ugvf	513
+辣妹	ugvf	478
 拉门	ruuy	453
 拉蒙	ruap	503
 拉面	rudm	726
@@ -24639,7 +24608,6 @@ columns:
 拉你	ruwq	516
 拉皮	ruhc	566
 拉票	rusf	546
-拉起	rufh	552
 拉取	rubc	495
 拉去	rufc	491
 拉人	ruww	509
@@ -24682,11 +24650,9 @@ columns:
 拉在	rudh	472
 拉涨	ruix	460
 拉着	ruud	614
-拉直	rufh	495
 蜡烛	jaoj	671
 拉住	ruwy	520
 辣子	ugbb	556
-拉走	rufh	471
 来啊	gokb	577
 莱昂	agjq	578
 莱奥	agtm	478
@@ -24752,7 +24718,6 @@ columns:
 来京	goyi	503
 来救	gofi	479
 徕卡	tghh	569
-莱卡	aghh	511
 来开	goga	491
 来看	gorh	801
 莱克	agdq	564
@@ -24913,7 +24878,7 @@ columns:
 烂片	outh	599
 蓝屏	ajnu	574
 滥情	ijng	454
-篮球	tjgf	755
+篮球	tjgf	668
 蓝染	ajiv	465
 懒人	ngww	616
 懒散	ngae	551
@@ -25187,7 +25152,7 @@ columns:
 老庄	ftyf	465
 老子	ftbb	663
 劳资	apuq	535
-落子	aibb	480
+落子	aibb	459
 老总	ftuk	602
 劳作	apwt	548
 了吧	bnkc	807
@@ -26879,7 +26844,6 @@ columns:
 六层	uynf	498
 流产	iyut	650
 流畅	iyjh	724
-刘畅	yjjh	485
 六场	uyfn	478
 留长	qyta	462
 六朝	uyfj	485
@@ -27019,7 +26983,7 @@ columns:
 刘谦	yjyu	476
 刘强	yjxk	470
 六亲	uyus	460
-留情	qyng	551
+留情	qyng	513
 柳青	sqge	502
 刘庆	yjyd	473
 琉球	gygf	597
@@ -27040,7 +27004,6 @@ columns:
 流逝	iyrr	573
 六世	uyan	546
 刘氏	yjqa	540
-流食	iywy	452
 留守	qypf	634
 柳树	sqsc	517
 流水	iyii	632
@@ -27304,7 +27267,7 @@ columns:
 卢布	hndm	581
 鲁菜	qgae	575
 卤菜	hlae	526
-路程	khtk	627
+路程	khtk	562
 鹿城	ynfd	465
 路痴	khut	514
 陆川	bfkt	512
@@ -27320,7 +27283,6 @@ columns:
 路灯	khos	592
 陆地	bffb	694
 鲁迪	qgmp	487
-露点	fkhk	465
 路东	khai	484
 鲁东	qgai	472
 路段	khwd	710
@@ -27561,7 +27523,7 @@ columns:
 论语	ywyg	620
 论战	ywhk	524
 论者	ywft	513
-论证	ywyg	665
+论证	ywyg	648
 轮值	lwwf	504
 论著	ywaf	497
 轮转	lwlf	506
@@ -27744,7 +27706,7 @@ columns:
 落叶	aikf	612
 罗伊	lqwv	565
 洛伊	itwv	515
-落于	aigf	538
+落于	aigf	483
 罗源	lqid	451
 罗云	lqfc	478
 落在	aidh	646
@@ -27782,7 +27744,7 @@ columns:
 绿灯	xvos	552
 绿地	xvfb	648
 率低	yxwq	536
-旅店	ytyh	566
+旅店	ytyh	489
 律动	tvfc	531
 绿豆	xvgk	644
 律法	tvif	513
@@ -27855,7 +27817,7 @@ columns:
 铝制	qkrm	505
 滤纸	ihxq	465
 率众	yxww	478
-绿洲	xviy	562
+绿洲	xviy	481
 绿柱	xvsy	508
 驴子	cybb	470
 绿子	xvbb	454
@@ -28544,7 +28506,7 @@ columns:
 茅台	acck	637
 毛毯	tftf	510
 矛头	cbud	470
-猫王	qtgg	489
+猫王	qtgg	474
 毛细	tfxl	467
 冒险	jhbw	708
 毛线	tfxg	540
@@ -28864,7 +28826,6 @@ columns:
 没玩	imgf	493
 美味	ugkf	758
 每位	txwu	652
-没味	imkf	504
 霉味	ftkf	486
 眉尾	nhnt	475
 美文	ugyy	577
@@ -29248,7 +29209,6 @@ columns:
 面部	dmuk	710
 棉布	srdm	512
 面层	dmnf	467
-面茶	dmaw	471
 绵长	xrta	506
 面朝	dmfj	561
 免除	qkbw	590
@@ -29570,7 +29530,7 @@ columns:
 明末	jegs	544
 名模	qksa	506
 明目	jehh	553
-名目	qkhh	473
+名目	qkhh	452
 明年	jerh	695
 名女	qkvv	482
 名牌	qkth	658
@@ -29830,7 +29790,7 @@ columns:
 摸鱼	raqg	489
 魔域	ysfa	480
 抹在	rgdh	522
-魔杖	yssd	542
+魔杖	yssd	467
 魔爪	ysrh	465
 摸着	raud	586
 墨汁	lfif	476
@@ -29856,7 +29816,7 @@ columns:
 谋划	yaaj	591
 某家	afpe	576
 某件	afwr	531
-某款	afff	547
+某款	afff	507
 某类	afod	489
 牟利	crtj	543
 谋利	yatj	476
@@ -30264,7 +30224,6 @@ columns:
 奈尔	dfqi	483
 奶粉	veow	694
 耐寒	dmpf	501
-耐旱	dmjf	455
 奈何	dfws	577
 奶黄	veam	464
 耐火	dmoo	453
@@ -30548,7 +30507,7 @@ columns:
 闹的	uyrq	567
 脑洞	eyim	676
 闹翻	uyto	461
-脑干	eyfg	496
+脑干	eyfg	453
 脑梗	eysg	499
 闹鬼	uyrq	481
 闹过	uyfp	512
@@ -30858,7 +30817,7 @@ columns:
 你都	wqft	696
 你读	wqyf	556
 你对	wqcf	740
-你多	wqqq	512
+你多	wqqq	481
 尼尔	nxqi	605
 你发	wqnt	460
 逆反	ubrc	482
@@ -31098,7 +31057,7 @@ columns:
 年时	rhjf	658
 年始	rhvc	472
 年首	rhut	492
-念书	wynn	579
+念书	wynn	510
 年叔	rhhi	530
 年数	rhov	483
 廿四	aglh	474
@@ -31373,7 +31332,6 @@ columns:
 浓汤	ipin	608
 农田	pell	603
 弄完	gapf	453
-浓味	ipkf	468
 农委	petv	455
 浓雾	ipft	474
 浓香	iptj	551
@@ -31579,7 +31537,7 @@ columns:
 欧战	aqhk	515
 欧洲	aqiy	799
 怕被	nrpu	572
-爬虫	rhjh	670
+爬虫	rhjh	567
 爬出	rhbm	485
 爬到	rhgc	601
 帕蒂	mhau	480
@@ -32067,7 +32025,7 @@ columns:
 配置	sglf	808
 配制	sgrm	553
 培植	fusf	498
-配种	sgtk	512
+配种	sgtk	461
 配重	sgtg	465
 配资	sguq	572
 配租	sgte	461
@@ -32149,7 +32107,7 @@ columns:
 澎湃	ifir	644
 砰砰	dgdg	458
 彭浦	fkig	469
-捧起	rdfh	494
+捧起	rdfh	471
 碰巧	duag	570
 烹饪	ybqn	741
 硼砂	dedi	485
@@ -32185,7 +32143,7 @@ columns:
 皮蛋	hcnh	649
 皮的	hcrq	636
 批的	rxrq	501
-匹敌	aqtd	535
+匹敌	aqtd	479
 屁颠	nxfh	545
 皮冻	hcua	469
 批斗	rxuf	527
@@ -32222,7 +32180,7 @@ columns:
 皮了	hcbn	459
 疲累	uhlx	473
 霹雳	fnfd	563
-批量	rxjg	661
+批量	rxjg	570
 皮料	hcou	462
 毗邻	lxwy	600
 纰漏	xxin	497
@@ -32231,7 +32189,6 @@ columns:
 匹马	aqcn	476
 皮毛	hctf	573
 媲美	vtug	596
-皮面	hcdm	458
 屁民	nxna	487
 皮囊	hcgk	479
 皮内	hcmw	469
@@ -32646,7 +32603,7 @@ columns:
 坪山	fgmm	538
 平山	gumm	487
 屏山	numm	480
-评上	yghg	540
+评上	yghg	509
 评审	ygpj	671
 瓶身	uatm	545
 平婶	guvp	457
@@ -32820,7 +32777,6 @@ columns:
 普京	uoyi	657
 葡京	aqyi	457
 扑救	rhfi	572
-铺就	qgyi	474
 普军	uopl	463
 普卡	uohh	462
 铺开	qgga	540
@@ -32941,7 +32897,7 @@ columns:
 启德	yntf	534
 气得	rntj	534
 起得	fhtj	475
-启迪	ynmp	594
+启迪	ynmp	523
 其弟	adux	533
 栖地	ssfb	484
 其地	adfb	480
@@ -33209,7 +33165,6 @@ columns:
 七万	agdn	476
 期望	adyn	745
 齐王	yjgg	505
-棋王	sagg	458
 气味	rnkf	672
 其为	adyl	595
 七位	agwu	526
@@ -33518,7 +33473,6 @@ columns:
 前生	uetg	452
 前十	uefg	655
 前世	uean	576
-钱时	qgjf	538
 佥事	wggk	516
 遣使	khwg	510
 芡实	aqpu	506
@@ -33707,7 +33661,7 @@ columns:
 枪决	swun	510
 强军	xkpl	515
 枪口	swkk	525
-抢了	rwbn	607
+抢了	rwbn	548
 强了	xkbn	526
 强力	xklt	671
 强烈	xkgq	764
@@ -34005,7 +33959,7 @@ columns:
 琴声	ggfn	474
 寝室	pupg	653
 侵蚀	wvqn	579
-秦时	dwjf	485
+秦时	dwjf	462
 亲手	usrt	620
 禽兽	wyul	516
 亲属	usnt	633
@@ -34101,7 +34055,7 @@ columns:
 轻度	lcya	656
 清炖	igog	492
 请发	ygnt	490
-清肺	igeg	515
+清肺	igeg	502
 情分	ngwv	471
 清风	igmq	565
 庆丰	yddh	514
@@ -34219,7 +34173,7 @@ columns:
 氢气	rnrn	590
 清奇	igds	492
 清浅	igig	487
-轻巧	lcag	580
+轻巧	lcag	529
 轻轻	lclc	679
 青青	gege	532
 倾情	wxng	517
@@ -34250,7 +34204,6 @@ columns:
 庆生	ydtg	580
 轻生	lctg	515
 轻声	lcfn	511
-情圣	ngcf	460
 轻视	lcpy	579
 请示	ygfi	530
 情势	ngrv	511
@@ -35340,7 +35293,6 @@ columns:
 人名	wwqk	717
 任命	wtwg	655
 人命	wwwg	533
-认命	ywwg	476
 人呐	wwkm	494
 忍耐	vydm	579
 人脑	wwey	586
@@ -35456,7 +35408,7 @@ columns:
 忍着	vyud	556
 仁者	wfft	458
 认真	ywfh	768
-认证	ywyg	766
+认证	ywyg	648
 认知	ywtd	764
 任职	wtbk	667
 人质	wwrf	567
@@ -36233,7 +36185,7 @@ columns:
 三车	dglg	455
 三成	dgdn	570
 三尺	dgny	497
-三重	dgtg	598
+三重	dgtg	482
 三处	dgth	527
 三川	dgkt	465
 三次	dguq	714
@@ -36319,7 +36271,6 @@ columns:
 三进	dgfj	466
 三金	dgqq	461
 三井	dgfj	544
-三九	dgvt	494
 三局	dgnn	497
 三句	dgqk	480
 三居	dgnd	455
@@ -36374,7 +36325,6 @@ columns:
 三盘	dgte	502
 三胖	dgeu	451
 三批	dgrx	457
-三篇	dgty	518
 三片	dgth	511
 三品	dgkk	484
 三拼	dgru	462
@@ -36403,7 +36353,7 @@ columns:
 三山	dgmm	512
 三少	dgit	492
 散射	aetm	543
-三生	dgtg	509
+三生	dgtg	482
 三声	dgfn	482
 三圣	dgcf	456
 三是	dgjg	710
@@ -37133,7 +37083,7 @@ columns:
 上千	hgtf	579
 上墙	hgff	485
 上翘	hgat	483
-尚且	imeg	559
+尚且	imeg	473
 伤情	wtng	553
 商丘	umrg	531
 赏秋	ipto	471
@@ -37598,7 +37548,7 @@ columns:
 神功	pyal	527
 神宫	pypk	495
 申购	jhmq	699
-身故	tmdt	546
+身故	tmdt	467
 神谷	pyww	464
 深谷	ipww	458
 神官	pypn	457
@@ -38724,7 +38674,7 @@ columns:
 食完	wypf	511
 失望	rwyn	780
 驶往	ckty	491
-狮王	qtgg	489
+狮王	qtgg	474
 是为	jgyl	718
 视为	pyyl	700
 市委	ymtv	628
@@ -38802,7 +38752,7 @@ columns:
 实验	pucw	726
 试验	yacw	667
 食盐	wyfh	612
-誓言	rryy	578
+誓言	rryy	496
 十堰	fgfa	503
 时延	jfth	451
 式样	aasu	551
@@ -38925,7 +38875,7 @@ columns:
 式中	aakh	494
 市中	ymkh	494
 市州	ymyt	534
-失主	rwyg	574
+失主	rwyg	551
 事主	gkyg	543
 石柱	dgsy	535
 是猪	jgqt	488
@@ -39256,7 +39206,7 @@ columns:
 首席	utya	717
 手洗	rtit	513
 受洗	epit	468
-手下	rtgh	624
+手下	rtgh	583
 收下	nhgh	517
 首先	uttf	854
 受限	epbv	612
@@ -39587,7 +39537,7 @@ columns:
 书香	nntj	584
 属相	ntsh	535
 书写	nnpg	699
-舒心	wfny	590
+舒心	wfny	534
 书信	nnwy	550
 属性	ntnt	780
 数学	ovip	806
@@ -39599,7 +39549,6 @@ columns:
 输液	lwiy	564
 术业	syog	499
 数亿	ovwn	523
-鼠疫	vnum	504
 数以	ovny	498
 树荫	scab	459
 输赢	lwyn	566
@@ -39858,7 +39807,6 @@ columns:
 水杯	iisg	603
 水贝	iimh	550
 水泵	iidi	546
-水笔	iitt	454
 水边	iilp	506
 水表	iige	496
 水兵	iirg	517
@@ -40575,7 +40523,7 @@ columns:
 松垮	swfd	468
 送来	udgo	656
 送了	udbn	700
-松了	swbn	566
+松了	swbn	527
 怂了	wwbn	491
 送礼	udpy	621
 耸立	wwuu	466
@@ -40747,7 +40695,7 @@ columns:
 速配	gksg	491
 酥皮	sghc	620
 俗气	wwrn	534
-宿迁	pwtf	530
+宿迁	pwtf	454
 苏秦	aldw	468
 肃清	viig	511
 诉求	yrfi	667
@@ -40755,7 +40703,6 @@ columns:
 素人	gxww	552
 俗人	wwww	489
 速溶	gkip	556
-酥肉	sgmw	509
 素肉	gxmw	458
 酥软	sglq	541
 苏芮	alam	464
@@ -40890,7 +40837,7 @@ columns:
 酸味	sgkf	601
 蒜味	afkf	516
 算我	thtr	500
-蒜香	aftj	608
+蒜香	aftj	507
 酸性	sgnt	616
 酸雨	sgfg	475
 算在	thdh	501
@@ -40947,7 +40894,7 @@ columns:
 随身	bdtm	607
 随时	bdjf	742
 岁时	mqjf	708
-虽是	kjjg	583
+虽是	kjjg	566
 碎石	dydg	519
 随手	bdrt	638
 岁数	mqov	550
@@ -41519,7 +41466,7 @@ columns:
 太厚	dydj	565
 太湖	dyid	586
 泰皇	dwrg	453
-太会	dywf	475
+太会	dywf	452
 太极	dyse	628
 胎记	ecyn	501
 太急	dyqv	492
@@ -42264,7 +42211,6 @@ columns:
 体内	wsmw	712
 体能	wsce	665
 替你	fwwq	575
-蹄髈	khme	495
 体魄	wsrr	541
 提起	rjfh	677
 提前	rjue	796
@@ -42679,7 +42625,7 @@ columns:
 条腿	tsev	459
 跳脱	kheu	503
 眺望	hiyn	559
-调味	ymkf	696
+调味	ymkf	675
 条纹	tsxy	631
 条文	tsyy	564
 跳舞	khrl	669
@@ -43126,7 +43072,7 @@ columns:
 同态	mgdy	467
 通体	cews	512
 通天	cegd	508
-统统	xyxy	627
+统统	xyxy	521
 通通	cece	590
 童童	ujuj	509
 通透	cete	608
@@ -43443,7 +43389,7 @@ columns:
 吐气	kfrn	494
 突然	pwqd	792
 土壤	fffy	678
-兔肉	qkmw	538
+兔肉	qkmw	537
 突入	pwty	469
 途锐	wtqu	498
 图三	ltdg	473
@@ -43724,7 +43670,7 @@ columns:
 脱困	euls	515
 拖拉	rtru	529
 托拉	rtru	469
-拖了	rtbn	577
+拖了	rtbn	504
 脱了	eubn	546
 拖累	rtlx	610
 脱离	euyb	691
@@ -43775,7 +43721,7 @@ columns:
 脱鞋	euaf	542
 脱屑	euni	474
 拖行	rttf	479
-拖延	rtth	655
+拖延	rtth	546
 唾液	ktiy	579
 托业	rtog	490
 脱页	eudm	473
@@ -43862,7 +43808,7 @@ columns:
 外国	qhlg	735
 外海	qhit	516
 外行	qhtf	616
-外号	qhkg	593
+外号	qhkg	479
 外化	qhwx	457
 外环	qhgg	517
 外汇	qhia	714
@@ -43959,7 +43905,6 @@ columns:
 外族	qhyt	509
 玩啊	gfkb	540
 晚安	jqpv	670
-万安	dnpv	455
 玩吧	gfkc	520
 完败	pfmt	510
 玩伴	gfwu	519
@@ -45637,7 +45582,7 @@ columns:
 屋顶	ngsd	644
 武定	gapg	466
 乌冬	qntu	555
-舞动	rlfc	524
+舞动	rlfc	481
 吴东	kgai	479
 乌东	qnai	473
 武斗	gauf	487
@@ -46269,7 +46214,7 @@ columns:
 细了	xlbn	455
 西冷	sguw	512
 犀利	nitj	632
-洗礼	itpy	593
+洗礼	itpy	474
 戏里	cajf	553
 吸力	kelt	518
 系里	txjf	495
@@ -46456,7 +46401,7 @@ columns:
 喜迎	fkqb	509
 息影	thjy	452
 喜用	fket	468
-西游	sgiy	636
+西游	sgiy	509
 稀有	tqde	573
 西柚	sgsm	513
 吸油	keim	508
@@ -47318,7 +47263,7 @@ columns:
 响铃	ktqw	454
 香炉	tjoy	499
 详略	yult	455
-想买	shnu	714
+想买	shnu	703
 想卖	shfn	492
 香芒	tjay	483
 相貌	shee	610
@@ -47492,7 +47437,7 @@ columns:
 相拥	shre	509
 享有	ybde	677
 香油	tjim	623
-向右	tmdk	541
+向右	tmdk	464
 想有	shde	499
 镶有	qyde	455
 相遇	shjm	675
@@ -47891,7 +47836,7 @@ columns:
 小山	ihmm	561
 小勺	ihqy	574
 校舍	suwf	606
-笑声	ttfn	579
+笑声	ttfn	535
 小生	ihtg	537
 小声	ihfn	522
 小胜	ihet	515
@@ -48150,7 +48095,7 @@ columns:
 写就	pgyi	515
 谢绝	ytxq	584
 蟹壳	qefp	470
-鞋款	afff	558
+鞋款	afff	507
 谢啦	ytkr	489
 写了	pgbn	749
 谢了	ytbn	560
@@ -48513,7 +48458,7 @@ columns:
 馨香	fntj	460
 新鞋	usaf	464
 信心	wyny	734
-心心	nyny	596
+心心	nyny	547
 欣欣	rqrq	484
 新新	usus	477
 新型	usga	729
@@ -49507,7 +49452,7 @@ columns:
 训读	ykyf	451
 寻访	vfyy	521
 巡防	vpby	454
-讯飞	ynnu	525
+讯飞	ynnu	481
 巡抚	vprf	579
 驯服	ckeb	506
 寻根	vfsv	505
@@ -49623,7 +49568,6 @@ columns:
 压痕	dfuv	490
 押后	rlrg	458
 雅虎	ahha	647
-压坏	dffg	466
 丫鬟	uhde	495
 压货	dfwx	456
 亚基	goad	485
@@ -49714,7 +49658,7 @@ columns:
 牙龈	ahhw	620
 押韵	rluj	540
 亚运	gofc	500
-押运	rlfc	488
+押运	rlfc	481
 压在	dfdh	559
 压榨	dfsp	576
 鸭掌	lqip	544
@@ -51103,7 +51047,6 @@ columns:
 一股	ggem	687
 亿股	wnem	641
 已故	nndt	589
-遗骨	khme	485
 一贯	ggxf	624
 一罐	ggrm	568
 一关	ggud	490
@@ -51118,7 +51061,6 @@ columns:
 已过	nnfp	575
 一过	ggfp	515
 一哈	ggkw	479
-遗骸	khme	544
 乙亥	nnyn	466
 遗憾	khnd	721
 意涵	ujib	486
@@ -51509,7 +51451,7 @@ columns:
 一事	gggk	656
 意式	ujaa	626
 以使	nywg	608
-遗失	khrw	586
+遗失	khrw	486
 一试	ggya	575
 轶事	lrgk	574
 以示	nyfi	561
@@ -51726,7 +51668,7 @@ columns:
 意义	ujyq	811
 一一	gggg	575
 异议	nayy	563
-一亿	ggwn	555
+一亿	ggwn	534
 以一	nygg	525
 意译	ujyc	521
 亦以	yony	518
@@ -52227,7 +52169,6 @@ columns:
 硬壳	dgfp	546
 映客	jmpt	507
 迎客	qbpt	488
-营口	apkk	534
 硬块	dgfn	488
 盈亏	ecfn	580
 硬拉	dgru	587
@@ -52304,7 +52245,7 @@ columns:
 英王	amgg	488
 应为	yiyl	626
 英文	amyy	820
-硬卧	dgah	505
+硬卧	dgah	454
 鹦鹉	mmga	595
 硬物	dgtr	497
 赢下	yngh	559
@@ -52451,7 +52392,7 @@ columns:
 用具	ethw	578
 拥军	repl	454
 用卡	ethh	563
-永康	ynyv	528
+永康	ynyv	493
 泳裤	iypu	452
 用来	etgo	781
 涌来	icgo	468
@@ -53004,7 +52945,6 @@ columns:
 有为	deyl	549
 有味	dekf	542
 有违	defn	525
-油味	imkf	478
 又问	ccuk	572
 油温	imij	554
 尤文	dnyy	500
@@ -53264,7 +53204,6 @@ columns:
 余华	wtwx	578
 鱼滑	qgim	513
 雨花	fgaw	479
-玉环	gygg	511
 玉皇	gyrg	460
 与会	gnwf	622
 迂回	gflk	510
@@ -53707,7 +53646,7 @@ columns:
 院区	bpaq	526
 原曲	drma	523
 圆圈	lklu	593
-源泉	idri	542
+源泉	idri	485
 袁泉	fkri	472
 元人	fqww	651
 原任	drwt	493
@@ -53799,7 +53738,7 @@ columns:
 原油	drim	708
 原由	drmh	500
 源于	idgf	700
-缘于	xxgf	533
+缘于	xxgf	459
 愿与	drgn	520
 远远	fqfq	700
 元元	fqfq	661
@@ -54546,7 +54485,7 @@ columns:
 暂居	lrnd	471
 暂扣	lrrk	522
 赞了	tfbn	582
-攒了	rtbn	547
+攒了	rtbn	504
 咱俩	ktwg	534
 暂列	lrgq	482
 赞美	tfug	648
@@ -54645,7 +54584,6 @@ columns:
 躁狂	khqt	473
 早了	jhbn	569
 造了	tfbn	557
-糟了	ogbn	456
 藻类	aiod	531
 早恋	jhyo	594
 造林	tfss	528
@@ -54863,7 +54801,7 @@ columns:
 扎紧	rnjc	463
 炸开	otga	475
 乍看	thrh	504
-扎克	rndq	543
+扎克	rndq	494
 闸口	ulkk	528
 栅栏	smsu	534
 炸了	otbn	603
@@ -55160,7 +55098,6 @@ columns:
 张纯	xtxg	481
 张村	xtsf	472
 长大	tadd	698
-张达	xtdp	490
 张大	xtdd	489
 张岱	xtwa	502
 账单	mtuj	618
@@ -55582,7 +55519,7 @@ columns:
 照烧	jvoa	559
 照射	jvtm	604
 招生	rvtg	759
-肇事	yngk	621
+肇事	yngk	574
 招式	rvaa	596
 赵氏	fhqa	506
 昭示	jvfi	469
@@ -55601,7 +55538,7 @@ columns:
 兆瓦	iqgn	524
 爪哇	rhkf	521
 赵王	fhgg	503
-赵薇	fhat	650
+赵薇	fhat	618
 赵魏	fhtv	462
 赵文	fhyy	580
 找我	ratr	671
@@ -56381,7 +56318,6 @@ columns:
 正传	ghwf	544
 症状	ugud	806
 正装	ghuf	577
-整装	gkuf	469
 郑庄	udyf	466
 正字	ghpb	467
 正宗	ghpf	757
@@ -56646,7 +56582,7 @@ columns:
 直击	fhfm	590
 制剂	rmyj	579
 至极	gcse	573
-知己	tdnn	571
+知己	tdnn	537
 之机	ppsm	540
 只鸡	kwcq	529
 职级	bkxe	526
@@ -57321,7 +57257,7 @@ columns:
 中行	khtf	570
 中号	khkg	508
 仲好	wkvb	461
-中和	khtk	671
+中和	khtk	562
 中核	khsy	457
 中后	khrg	497
 忠厚	khdj	465
@@ -57333,7 +57269,7 @@ columns:
 钟会	qkwf	466
 中火	khoo	582
 终极	xtse	686
-中级	khxe	636
+中级	khxe	519
 重疾	tgut	552
 重击	tgfm	527
 中继	khxo	522
@@ -57845,7 +57781,6 @@ columns:
 驻防	cyby	496
 朱芳	riay	470
 煮沸	ftix	610
-猪肺	qteg	482
 珠峰	grmt	570
 主峰	ygmt	525
 诸佛	yfwx	466
@@ -58271,7 +58206,7 @@ columns:
 转念	lfwy	485
 转暖	lfje	534
 转派	lfir	458
-转盘	lfte	556
+转盘	lfte	528
 转起	lffh	527
 砖砌	dfda	477
 赚钱	muqg	750
@@ -58522,7 +58457,7 @@ columns:
 追捧	wnrd	650
 追平	wngu	562
 追求	wnfi	790
-追认	wnyw	467
+追认	wnyw	459
 赘肉	gqmw	576
 坠入	bwty	555
 追杀	wnqs	573
@@ -59058,7 +58993,7 @@ columns:
 祖辈	pydj	518
 组别	xekl	605
 足部	khuk	557
-足彩	khes	594
+足彩	khes	529
 租车	telg	647
 组成	xedn	756
 祖传	pywf	519
@@ -59729,8 +59664,8 @@ columns:
 车迷网	lomq	522
 撤侨时	rwjf	475
 沉没时	iijf	472
-称帝时	tujf	484
-乘凉时	tujf	471
+称帝时	tujf	459
+乘凉时	tujf	459
 成人网	dwmq	518
 成一时	dgjf	470
 持续到	rxgc	667
@@ -59756,7 +59691,7 @@ columns:
 垂危时	tqjf	478
 春哥传	dswf	502
 从设备	wytl	472
-大促时	dwjf	474
+大促时	dwjf	462
 大大大	dddd	550
 大导师	dnjg	454
 打滑时	rijf	462
@@ -60021,7 +59956,6 @@ columns:
 该权证	ysyg	453
 该缺口	yrkk	484
 该热点	yrhk	495
-该任命	ywwg	483
 该日钜	yjqa	470
 该入手	ytrt	456
 该商会	yuwf	470
@@ -60957,7 +60891,6 @@ columns:
 九点整	vhgk	515
 就都是	yfjg	465
 就搞了	yrbn	499
-就会使	ywwg	495
 就叫做	ykwd	579
 就进行	yftf	513
 九连跳	vlkh	502
@@ -61699,7 +61632,6 @@ columns:
 你又会	wcwf	511
 你优惠	wwgj	461
 你有了	wdbn	486
-你犹豫	wqcb	542
 你鱿鱼	wqqg	492
 你与你	wgwq	482
 你约到	wxgc	463
@@ -61743,7 +61675,7 @@ columns:
 弄得完	gtpf	494
 拍拍币	rrtm	515
 盘点机	thsm	455
-盘问时	tujf	492
+盘问时	tujf	459
 跑马机	kcsm	462
 配镜时	sqjf	477
 呸呸呸	kkkg	568
@@ -61848,7 +61780,7 @@ columns:
 三角架	dqlk	534
 三六豹	duee	486
 三轮帝	dlup	458
-三人时	dwjf	480
+三人时	dwjf	462
 散学礼	aipy	503
 色位数	qwov	505
 山东市	maym	453
@@ -62143,7 +62075,7 @@ columns:
 他启奏	wydw	496
 他掐指	wrrx	482
 他前段	wuwd	498
-他钱多	wqqq	489
+他钱多	wqqq	481
 他牵了	wdbn	474
 他牵手	wdrt	451
 他遣送	wkud	478
@@ -62166,7 +62098,6 @@ columns:
 他仍未	wwfi	486
 他揉搓	wrru	452
 他揉捏	wrrj	483
-他如墨	wvlf	452
 他锐利	wqtj	492
 他上任	whwt	484
 他伤透	wwte	477
@@ -62205,7 +62136,7 @@ columns:
 他跳的	wkrq	488
 他跳得	wktj	458
 他同来	wmgo	484
-他同住	wmwy	500
+他同住	wmwy	462
 他投的	wrrq	456
 他偷瞄	wwha	476
 他偷着	wwud	453
@@ -62407,7 +62338,6 @@ columns:
 我不干	tdfg	465
 我不管	tdtp	496
 我不跪	tdkh	458
-我不很	tdtv	479
 我不将	tduq	464
 我不叫	tdkn	487
 我不借	tdwa	464

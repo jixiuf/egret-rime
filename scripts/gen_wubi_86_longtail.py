@@ -94,7 +94,7 @@ def main():
         rows.append((w, code, max(1, int(wt * args.weight_scale))))
 
     # 键名字优先：同码词压到键名字之下（如 tttt 的 笔笔/竹笙 不能压住 禾，§4.76）
-    kcaps = keyname_caps(DICTS)
+    kcaps = keyname_caps(DICTS, [SRC_WB])
     capped = 0
     fixed = []
     for w, c, wt in rows:
