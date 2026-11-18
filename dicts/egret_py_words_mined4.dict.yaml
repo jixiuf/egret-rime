@@ -23,7 +23,9 @@ columns:
 劳动合同	lao dong he tong	625
 中共中央	zhong gong zhong yang	620
 神经网络	shen jing wang luo	617
+换句话说	huan ju hua shuo	612
 不可避免	bu ke bi mian	610
+哈哈大笑	ha ha da xiao	604
 伊斯兰教	yi si lan jiao	604
 民事法律	min shi fa lv	604
 竞争对手	jing zheng dui shou	603
@@ -41,14 +43,15 @@ columns:
 值得注意	zhi de zhu yi	588
 由此可见	you ci ke jian	586
 医疗机构	yi liao ji gou	584
+数据分析	shu ju fen xi	583
 基础设施	ji chu she shi	583
 中央政府	zhong yang zheng fu	580
 诉讼时效	su song shi xiao	579
-理所当然	li suo dang ran	578
 发生变化	fa sheng bian hua	577
 一切都是	yi qie dou shi	576
 量子力学	liang zi li xue	575
 损害赔偿	sun hai pei chang	575
+吓了一跳	xia le yi tiao	575
 辛亥革命	xin hai ge ming	575
 不管怎么	bu guan zen me	573
 大吃一惊	da chi yi jing	572
@@ -73,7 +76,6 @@ columns:
 发挥作用	fa hui zuo yong	560
 关键时刻	guan jian shi ke	560
 承担责任	cheng dan ze ren	558
-闭上眼睛	bi shang yan jing	558
 公安机关	gong an ji guan	558
 墨索里尼	mo suo li ni	557
 从根本上	cong gen ben shang	557
@@ -106,6 +108,7 @@ columns:
 应用程序	ying yong cheng xu	544
 在实践中	zai shi jian zhong	543
 充分利用	chong fen li yong	543
+固定资产	gu ding zi chan	543
 新闻报道	xin wen bao dao	543
 刑事责任	xing shi ze ren	543
 莫洛托夫	mo luo tuo fu	542
@@ -114,17 +117,13 @@ columns:
 军事行动	jun shi xing dong	541
 心理健康	xin li jian kang	541
 技术人员	ji shu ren yuan	541
-玛格丽特	ma ge li te	541
 在历史上	zai li shi shang	540
 大大小小	da da xiao xiao	540
-多长时间	duo zhang shi jian	539
 个人信息	ge ren xin xi	539
-意大利人	yi da li ren	538
 充分发挥	chong fen fa hui	538
 市场经济	shi chang jing ji	538
 得出结论	de chu jie lun	538
 学术研究	xue shu yan jiu	538
-现实主义	xian shi zhu yi	537
 社会关系	she hui guan xi	537
 中华民国	zhong hua min guo	536
 非常高兴	fei chang gao xing	536
@@ -140,7 +139,6 @@ columns:
 文化遗产	wen hua yi chan	530
 梅迪尔丽	mei di er li	529
 解决办法	jie jue ban fa	529
-亲密关系	qin mi guan xi	529
 帕特里克	pa te li ke	528
 解除合同	jie chu he tong	527
 解放战争	jie fang zhan zheng	527
@@ -150,7 +148,6 @@ columns:
 赫鲁晓夫	he lu xiao fu	526
 智能手机	zhi neng shou ji	526
 威尼斯人	wei ni si ren	525
-权利义务	quan li yi wu	525
 两者之间	liang zhe zhi jian	525
 完全相同	wan quan xiang tong	525
 革命党人	ge ming dang ren	525
@@ -175,6 +172,7 @@ columns:
 社会保险	she hui bao xian	520
 军事力量	jun shi li liang	520
 如前所述	ru qian suo shu	520
+电子邮件	dian zi you jian	519
 公共利益	gong gong li yi	519
 发展趋势	fa zhan qu shi	519
 表现形式	biao xian xing shi	518
@@ -206,6 +204,7 @@ columns:
 平静下来	ping jing xia lai	511
 主管部门	zhu guan bu men	511
 法定代理	fa ding dai li	511
+数据处理	shu ju chu li	511
 托尔斯泰	tuo er si tai	511
 适用法律	shi yong fa lv	510
 高度重视	gao du zhong shi	510
@@ -242,7 +241,6 @@ columns:
 表达方式	biao da fang shi	506
 建设工程	jian she gong cheng	506
 今天下午	jin tian xia wu	505
-葡萄牙人	pu tao ya ren	505
 富兰克林	fu lan ke lin	505
 一切众生	yi qie zhong sheng	505
 太平天国	tai ping tian guo	505
@@ -321,6 +319,7 @@ columns:
 迷迷糊糊	mi mi hu hu	495
 波多里诺	bo duo li nuo	495
 世说新语	shi shuo xin yu	494
+筋疲力尽	jin pi li jin	494
 威廉姆斯	wei lian mu si	494
 答应下来	da ying xia lai	494
 格雷厄姆	ge lei e mu	494
@@ -337,7 +336,6 @@ columns:
 气势汹汹	qi shi xiong xiong	492
 四库全书	si ku quan shu	492
 外交关系	wai jiao guan xi	492
-计算方法	ji suan fang fa	491
 生命危险	sheng ming wei xian	491
 阿尔伯特	a er bo te	491
 中年男子	zhong nian nan zi	490
@@ -371,7 +369,9 @@ columns:
 联合政府	lian he zheng fu	487
 巴伐利亚	ba fa li ya	486
 施加压力	shi jia ya li	486
+远远不够	yuan yuan bu gou	486
 整整齐齐	zheng zheng qi qi	486
+翰林学士	han lin xue shi	486
 法律依据	fa lv yi ju	486
 日复一日	ri fu yi ri	485
 医护人员	yi hu ren yuan	485
@@ -399,7 +399,6 @@ columns:
 自然资源	zi ran zi yuan	483
 公共服务	gong gong fu wu	483
 市场营销	shi chang ying xiao	482
-考古学家	kao gu xue jia	482
 金融风险	jin rong feng xian	482
 保持一致	bao chi yi zhi	482
 精疲力竭	jing pi li jie	482
@@ -455,6 +454,7 @@ columns:
 相互之间	xiang hu zhi jian	477
 跌跌撞撞	die die zhuang zhuang	477
 摇摇欲坠	yao yao yu zhui	477
+完全正确	wan quan zheng que	477
 一声不吭	yi sheng bu keng	476
 赔偿损失	pei chang sun shi	476
 经常出现	jing chang chu xian	476
@@ -478,7 +478,6 @@ columns:
 行政处罚	xing zheng chu fa	474
 马戛尔尼	ma jia er ni	474
 商业秘密	shang ye mi mi	474
-取得联系	qu de lian xi	474
 中国通史	zhong guo tong shi	474
 持续时间	chi xu shi jian	474
 摇身一变	yao shen yi bian	474
@@ -505,14 +504,13 @@ columns:
 朝鲜战争	chao xian zhan zheng	472
 充满活力	chong man huo li	472
 春秋时代	chun qiu shi dai	472
+历史悠久	li shi you jiu	472
 络绎不绝	luo yi bu jue	472
 调查报告	diao cha bao gao	472
 化学物质	hua xue wu zhi	472
 司徒雷登	si tu lei deng	472
 充分体现	chong fen ti xian	472
-坚持下去	jian chi xia qu	472
 大大提高	da da ti gao	472
-机会主义	ji hui zhu yi	472
 货真价实	huo zhen jia shi	472
 实际操作	shi ji cao zuo	472
 下回分解	xia hui fen jie	472
@@ -549,6 +547,7 @@ columns:
 武器装备	wu qi zhuang bei	470
 长江流域	chang jiang liu yu	470
 婚姻关系	hun yin guan xi	470
+体育中心	ti yu zhong xin	470
 罗慧宁道	luo hui ning dao	469
 海军上将	hai jun shang jiang	469
 各界人士	ge jie ren shi	469
@@ -569,7 +568,6 @@ columns:
 格里菲斯	ge li fei si	468
 思想体系	si xiang ti xi	468
 保守主义	bao shou zhu yi	468
-神职人员	shen zhi ren yuan	468
 一审判决	yi shen pan jue	468
 总理衙门	zong li ya men	468
 期货市场	qi huo shi chang	468
@@ -577,10 +575,10 @@ columns:
 一致意见	yi zhi yi jian	468
 公爵夫人	gong jue fu ren	468
 思考问题	si kao wen ti	468
-万平方米	wan ping fang mi	468
 政治经济	zheng zhi jing ji	468
 不惜一切	bu xi yi qie	468
 一段距离	yi duan ju li	468
+亲子关系	qin zi guan xi	468
 品牌形象	pin pai xing xiang	467
 损失惨重	sun shi can zhong	467
 抓紧时间	zhua jin shi jian	467
@@ -592,6 +590,7 @@ columns:
 卡捷琳娜	ka jie lin na	467
 关键作用	guan jian zuo yong	467
 教条主义	jiao tiao zhu yi	467
+脸色铁青	lian se tie qing	467
 万事万物	wan shi wan wu	467
 无论怎样	wu lun zen yang	467
 快速增长	kuai su zeng zhang	466
@@ -602,6 +601,7 @@ columns:
 具体分析	ju ti fen xi	466
 太皇太后	tai huang tai hou	466
 慌慌张张	huang huang zhang zhang	466
+跃跃欲试	yue yue yu shi	466
 比较复杂	bi jiao fu za	466
 判处死刑	pan chu si xing	466
 博士论文	bo shi lun wen	466
@@ -609,13 +609,13 @@ columns:
 不寒而栗	bu han er li	466
 想来想去	xiang lai xiang qu	466
 计划经济	ji hua jing ji	466
+种族主义	zhong zu zhu yi	466
 左轮手枪	zuo lun shou qiang	466
 教学活动	jiao xue huo dong	466
 十字路口	shi zi lu kou	466
 主要矛盾	zhu yao mao dun	466
 春秋时期	chun qiu shi qi	466
 签订合同	qian ding he tong	466
-实话实说	shi hua shi shuo	465
 财务状况	cai wu zhuang kuang	465
 价值观念	jia zhi guan nian	465
 生产成本	sheng chan cheng ben	465
@@ -630,7 +630,6 @@ columns:
 耶夫斯基	ye fu si ji	464
 联合王国	lian he wang guo	464
 哲学思想	zhe xue si xiang	464
-爱尔兰人	ai er lan ren	464
 工伤保险	gong shang bao xian	464
 金融资产	jin rong zi chan	464
 外部环境	wai bu huan jing	464
@@ -639,7 +638,6 @@ columns:
 组织部长	zu zhi bu zhang	464
 显现出来	xian xian chu lai	464
 税务机关	shui wu ji guan	464
-个人电脑	ge ren dian nao	464
 技术手段	ji shu shou duan	464
 书面形式	shu mian xing shi	464
 历史文献	li shi wen xian	464
@@ -662,7 +660,6 @@ columns:
 公司章程	gong si zhang cheng	463
 继续前进	ji xu qian jin	463
 登门拜访	deng men bai fang	462
-社会保障	she hui bao zhang	462
 含糊不清	han hu bu qing	462
 总的说来	zong de shuo lai	462
 房屋买卖	fang wu mai mai	462
@@ -685,6 +682,7 @@ columns:
 甲午战争	jia wu zhan zheng	461
 毫不在意	hao bu zai yi	461
 小亚细亚	xiao ya xi ya	461
+微乎其微	wei hu qi wei	461
 二十一年	er shi yi nian	461
 商业价值	shang ye jia zhi	461
 一字一句	yi zi yi ju	461
@@ -716,7 +714,6 @@ columns:
 自由贸易	zi you mao yi	459
 克罗夫特	ke luo fu te	459
 北京政府	bei jing zheng fu	459
-大学教授	da xue jiao shou	459
 民事诉讼	min shi su song	459
 在思想上	zai si xiang shang	459
 今文经学	jin wen jing xue	459
@@ -761,8 +758,10 @@ columns:
 紧密联系	jin mi lian xi	457
 无时无刻	wu shi wu ke	456
 闭目养神	bi mu yang shen	456
+洛克菲勒	luo ke fei lei	456
 非法经营	fei fa jing ying	456
 拒绝接受	ju jue jie shou	456
+人力资本	ren li zi ben	456
 人民政协	ren min zheng xie	456
 监管部门	jian guan bu men	456
 防御工事	fang yu gong shi	456
@@ -780,7 +779,6 @@ columns:
 数额较大	shu e jiao da	455
 政治委员	zheng zhi wei yuan	455
 波兰政府	bo lan zheng fu	455
-自我实现	zi wo shi xian	455
 百科全书	bai ke quan shu	455
 不可一世	bu ke yi shi	455
 民主主义	min zhu zhu yi	455
@@ -888,6 +886,7 @@ columns:
 官僚机构	guan liao ji gou	450
 无计可施	wu ji ke shi	450
 汇报工作	hui bao gong zuo	450
+降低成本	jiang di cheng ben	450
 镜花水月	jing hua shui yue	450
 失魂落魄	shi hun luo po	450
 迥然不同	jiong ran bu tong	450
@@ -911,12 +910,11 @@ columns:
 不管是谁	bu guan shi shui	449
 面红耳赤	mian hong er chi	449
 计算结果	ji suan jie guo	449
+振作起来	zhen zuo qi lai	449
 抗日救亡	kang ri jiu wang	449
 反过来说	fan guo lai shuo	448
 集体经济	ji ti jing ji	448
-台湾地区	tai wan di qu	448
 大打出手	da da chu shou	448
-高中毕业	gao zhong bi ye	448
 责任人员	ze ren ren yuan	448
 配置文件	pei zhi wen jian	448
 进步人士	jin bu ren shi	448
@@ -931,6 +929,7 @@ columns:
 技术水平	ji shu shui ping	448
 核心思想	he xin si xiang	448
 任何事物	ren he shi wu	448
+放声大哭	fang sheng da ku	448
 算命先生	suan ming xian sheng	448
 闪闪发亮	shan shan fa liang	448
 史蒂文森	shi di wen sen	447
@@ -1032,7 +1031,6 @@ columns:
 群众运动	qun zhong yun dong	443
 休息时间	xiu xi shi jian	443
 科幻小说	ke huan xiao shuo	443
-理解能力	li jie neng li	443
 恢复原状	hui fu yuan zhuang	443
 举证责任	ju zheng ze ren	443
 心里有数	xin li you shu	443
@@ -1062,7 +1060,6 @@ columns:
 一百五十	yi bai wu shi	442
 一百二十	yi bai er shi	442
 永远都是	yong yuan dou shi	442
-不但如此	bu dan ru ci	442
 国际象棋	guo ji xiang qi	442
 副总司令	fu zong si ling	442
 维持秩序	wei chi zhi xu	442
@@ -1108,7 +1105,6 @@ columns:
 环环相扣	huan huan xiang kou	440
 地理环境	di li huan jing	440
 实证主义	shi zheng zhu yi	440
-社会福利	she hui fu li	440
 千百年来	qian bai nian lai	439
 财务管理	cai wu guan li	439
 工程施工	gong cheng shi gong	439
@@ -1148,7 +1144,6 @@ columns:
 首当其冲	shou dang qi chong	437
 深刻理解	shen ke li jie	437
 民政部门	min zheng bu men	437
-环境保护	huan jing bao hu	437
 中央日报	zhong yang ri bao	437
 完好无损	wan hao wu sun	437
 分门别类	fen men bie lei	437
@@ -1176,7 +1171,6 @@ columns:
 当今世界	dang jin shi jie	436
 集成电路	ji cheng dian lu	436
 二十五日	er shi wu ri	436
-社会舆论	she hui yu lun	436
 问题所在	wen ti suo zai	436
 实地考察	shi di kao cha	436
 心狠手辣	xin hen shou la	436
@@ -1189,6 +1183,7 @@ columns:
 不讲道理	bu jiang dao li	436
 某种原因	mou zhong yuan yin	436
 巨大变化	ju da bian hua	436
+立法机构	li fa ji gou	436
 黄昏时分	huang hun shi fen	436
 师范学院	shi fan xue yuan	436
 社会风气	she hui feng qi	436
@@ -1200,10 +1195,10 @@ columns:
 正态分布	zheng tai fen bu	436
 百货公司	bai huo gong si	435
 历史数据	li shi shu ju	435
+数据传输	shu ju chuan shu	435
 二十七年	er shi qi nian	435
 波埃蒙多	bo ai meng duo	435
 可持续性	ke chi xu xing	435
-三十多岁	san shi duo sui	435
 武昌起义	wu chang qi yi	435
 相当程度	xiang dang cheng du	435
 西北地区	xi bei di qu	435
@@ -1298,7 +1293,6 @@ columns:
 二次革命	er ci ge ming	432
 桑贝贝道	sang bei bei dao	432
 集中体现	ji zhong ti xian	431
-四十多岁	si shi duo sui	431
 财务人员	cai wu ren yuan	431
 淮海战役	huai hai zhan yi	431
 变本加厉	bian ben jia li	431
@@ -1365,7 +1359,6 @@ columns:
 鼎盛时期	ding sheng shi qi	429
 昨天下午	zuo tian xia wu	429
 一字一顿	yi zi yi dun	429
-钢铁公司	gang tie gong si	429
 二十六日	er shi liu ri	429
 警察局长	jing cha ju zhang	429
 开怀大笑	kai huai da xiao	429
@@ -1393,6 +1386,7 @@ columns:
 广大群众	guang da qun zhong	428
 三天三夜	san tian san ye	428
 两国之间	liang guo zhi jian	428
+参考资料	can kao zi liao	428
 资源管理	zi yuan guan li	428
 数据挖掘	shu ju wa jue	428
 公职人员	gong zhi ren yuan	428
@@ -1447,6 +1441,7 @@ columns:
 法律援助	fa lv yuan zhu	426
 英美两国	ying mei liang guo	426
 工业园区	gong ye yuan qu	425
+周而复始	zhou er fu shi	425
 二十余年	er shi yu nian	425
 奇迹般地	qi ji ban di	425
 时间推移	shi jian tui yi	425
@@ -1473,6 +1468,7 @@ columns:
 国有土地	guo you tu di	424
 二三十年	er san shi nian	424
 理论依据	li lun yi ju	424
+管理费用	guan li fei yong	424
 财政部长	cai zheng bu zhang	424
 尼古拉斯	ni gu la si	424
 雨后春笋	yu hou chun sun	424
@@ -1531,7 +1527,6 @@ columns:
 数码相机	shu ma xiang ji	422
 生活用品	sheng huo yong pin	422
 上述情况	shang shu qing kuang	422
-绩效考核	ji xiao kao he	422
 五十万元	wu shi wan yuan	422
 十七路军	shi qi lu jun	422
 英雄人物	ying xiong ren wu	422
@@ -1627,7 +1622,6 @@ columns:
 投入使用	tou ru shi yong	419
 八万四千	ba wan si qian	419
 决策机构	jue ce ji gou	419
-医疗卫生	yi liao wei sheng	419
 教育领域	jiao yu ling yu	419
 心理素质	xin li su zhi	419
 欧几里得	ou ji li de	419
@@ -1636,9 +1630,9 @@ columns:
 股票投资	gu piao tou zi	419
 费尔南德	fei er nan de	419
 价值体系	jia zhi ti xi	419
-惊魂未定	jing hun wei ding	419
 满满当当	man man dang dang	419
 投资决策	tou zi jue ce	419
+保持平衡	bao chi ping heng	419
 成都平原	cheng du ping yuan	419
 罗马教皇	luo ma jiao huang	419
 过渡时期	guo du shi qi	419
@@ -1677,6 +1671,7 @@ columns:
 军事顾问	jun shi gu wen	418
 千差万别	qian cha wan bie	417
 一走了之	yi zou liao zhi	417
+家常便饭	jia chang bian fan	417
 男女之间	nan nv zhi jian	417
 积极支持	ji ji zhi chi	417
 捕风捉影	bu feng zhuo ying	417
@@ -1710,7 +1705,6 @@ columns:
 期末考试	qi mo kao shi	416
 总工程师	zong gong cheng shi	416
 建筑材料	jian zhu cai liao	416
-有声有色	you sheng you se	416
 严肃认真	yan su ren zhen	416
 背景音乐	bei jing yin yue	416
 区别对待	qu bie dui dai	416
@@ -1735,7 +1729,6 @@ columns:
 难以忘怀	nan yi wang huai	416
 活动场所	huo dong chang suo	416
 意大利语	yi da li yu	416
-鉴定结论	jian ding jie lun	416
 军事援助	jun shi yuan zhu	416
 年轻气盛	nian qing qi sheng	415
 走起路来	zou qi lu lai	415
@@ -1749,6 +1742,7 @@ columns:
 高楼大厦	gao lou da sha	415
 令人生畏	ling ren sheng wei	415
 民主运动	min zhu yun dong	415
+种族隔离	zhong zu ge li	415
 社会形态	she hui xing tai	415
 满足用户	man zu yong hu	415
 寻欢作乐	xun huan zuo le	415
@@ -1860,7 +1854,6 @@ columns:
 打打杀杀	da da sha sha	412
 满脸堆笑	man lian dui xiao	412
 议事日程	yi shi ri cheng	412
-总结经验	zong jie jing yan	412
 二十万元	er shi wan yuan	412
 深受感动	shen shou gan dong	412
 操作步骤	cao zuo bu zhou	412
@@ -1896,7 +1889,6 @@ columns:
 穷困潦倒	qiong kun liao dao	411
 历史使命	li shi shi ming	411
 中介机构	zhong jie ji gou	411
-鬼使神差	gui shi shen chai	411
 发生意外	fa sheng yi wai	411
 大小不一	da xiao bu yi	411
 唯一标准	wei yi biao zhun	411
@@ -1956,7 +1948,6 @@ columns:
 庐山会议	lu shan hui yi	409
 十几分钟	shi ji fen zhong	409
 狂轰滥炸	kuang hong lan zha	409
-一切正常	yi qie zheng chang	409
 世纪之交	shi ji zhi jiao	409
 年轻漂亮	nian qing piao liang	409
 宽宏大量	kuan hong da liang	409
@@ -1967,7 +1958,6 @@ columns:
 力量对比	li liang dui bi	409
 北方地区	bei fang di qu	409
 熟练掌握	shu lian zhang wo	409
-亚伯拉罕	ya bo la han	409
 军事管制	jun shi guan zhi	409
 民族意识	min zu yi shi	409
 教学模式	jiao xue mo shi	409
@@ -1987,6 +1977,7 @@ columns:
 大汗淋漓	da han lin li	408
 兵荒马乱	bing huang ma luan	408
 权力斗争	quan li dou zheng	408
+问卷调查	wen juan diao cha	408
 股票交易	gu piao jiao yi	408
 身份证明	shen fen zheng ming	408
 迅猛发展	xun meng fa zhan	408
@@ -2000,7 +1991,6 @@ columns:
 粮食供应	liang shi gong ying	408
 太平广记	tai ping guang ji	408
 语言学家	yu yan xue jia	408
-漆黑一片	qi hei yi pian	408
 欢呼雀跃	huan hu que yue	408
 十多分钟	shi duo fen zhong	408
 女服务员	nv fu wu yuan	408
@@ -2052,7 +2042,6 @@ columns:
 初级阶段	chu ji jie duan	407
 学术著作	xue shu zhu zuo	407
 技术革新	ji shu ge xin	407
-放心好了	fang xin hao le	407
 物价水平	wu jia shui ping	407
 劳动人事	lao dong ren shi	407
 四方面军	si fang mian jun	407
@@ -2077,7 +2066,6 @@ columns:
 工资水平	gong zi shui ping	406
 天人之际	tian ren zhi ji	406
 海德里希	hai de li xi	406
-环境因素	huan jing yin su	406
 举手投足	ju shou tou zu	406
 血流成河	xue liu cheng he	406
 水深火热	shui shen huo re	406
@@ -2104,6 +2092,7 @@ columns:
 民事案件	min shi an jian	406
 主营业务	zhu ying ye wu	406
 图像处理	tu xiang chu li	406
+销售费用	xiao shou fei yong	406
 晋冀鲁豫	jin ji lu yu	406
 宣布独立	xuan bu du li	406
 克里斯托	ke li si tuo	406
@@ -2155,9 +2144,7 @@ columns:
 表示满意	biao shi man yi	404
 纳米技术	na mi ji shu	404
 适应环境	shi ying huan jing	404
-越快越好	yue kuai yue hao	404
 千疮百孔	qian chuang bai kong	404
-坚持到底	jian chi dao di	404
 发生争执	fa sheng zheng zhi	404
 五代十国	wu dai shi guo	404
 多种不同	duo zhong bu tong	404
@@ -2195,6 +2182,7 @@ columns:
 地方官吏	di fang guan li	403
 售后服务	shou hou fu wu	403
 生动活泼	sheng dong huo po	403
+实用价值	shi yong jia zhi	403
 难以相信	nan yi xiang xin	403
 笨手笨脚	ben shou ben jiao	403
 办公大楼	ban gong da lou	403
@@ -2209,7 +2197,6 @@ columns:
 具体方法	ju ti fang fa	402
 达到高潮	da dao gao chao	402
 手机号码	shou ji hao ma	402
-争取时间	zheng qu shi jian	402
 女生宿舍	nv sheng su she	402
 充满热情	chong man re qing	402
 逃过一劫	tao guo yi jie	402
@@ -2345,7 +2332,6 @@ columns:
 表示歉意	biao shi qian yi	399
 独立国家	du li guo jia	399
 复杂多变	fu za duo bian	399
-招商引资	zhao shang yin zi	399
 财产权利	cai chan quan li	399
 人格尊严	ren ge zun yan	399
 展开讨论	zhan kai tao lun	399
@@ -2407,7 +2393,6 @@ columns:
 服务体系	fu wu ti xi	397
 放眼望去	fang yan wang qu	397
 无可争议	wu ke zheng yi	397
-阴差阳错	yin cha yang cuo	397
 使用暴力	shi yong bao li	397
 商业利益	shang ye li yi	397
 一张白纸	yi zhang bai zhi	397
@@ -2451,10 +2436,10 @@ columns:
 洋务运动	yang wu yun dong	396
 麻醉药品	ma zui yao pin	396
 毫无结果	hao wu jie guo	396
-标点符号	biao dian fu hao	396
 本质特征	ben zhi te zheng	396
 原始森林	yuan shi sen lin	396
 天寒地冻	tian han di dong	396
+情况紧急	qing kuang jin ji	396
 三百六十	san bai liu shi	396
 怨声载道	yuan sheng zai dao	396
 牵着鼻子	qian zhe bi zi	396
@@ -2512,7 +2497,6 @@ columns:
 客观事物	ke guan shi wu	394
 企业形象	qi ye xing xiang	394
 小玩意儿	xiao wan yi er	394
-有何不可	you he bu ke	394
 严刑拷打	yan xing kao da	394
 满口答应	man kou da ying	394
 全权负责	quan quan fu ze	394
@@ -2566,7 +2550,6 @@ columns:
 玻尔兹曼	bo er zi man	394
 基因突变	ji yin tu bian	394
 齐天大圣	qi tian da sheng	394
-布鲁克林	bu lu ke lin	394
 初始条件	chu shi tiao jian	394
 军事学院	jun shi xue yuan	394
 三五九旅	san wu jiu lv	394
@@ -2621,6 +2604,7 @@ columns:
 警卫人员	jing wei ren yuan	392
 外来文化	wai lai wen hua	392
 时代特征	shi dai te zheng	392
+缺乏经验	que fa jing yan	392
 不良后果	bu liang hou guo	392
 思想认识	si xiang ren shi	392
 怀疑论者	huai yi lun zhe	392
@@ -2684,7 +2668,6 @@ columns:
 人文学科	ren wen xue ke	391
 含糊其辞	han hu qi ci	391
 批量生产	pi liang sheng chan	391
-消费市场	xiao fei shi chang	390
 传奇人物	chuan qi ren wu	390
 关键时期	guan jian shi qi	390
 十一点半	shi yi dian ban	390
@@ -2773,6 +2756,7 @@ columns:
 外祖父母	wai zu fu mu	389
 一大家子	yi da jia zi	389
 十七世纪	shi qi shi ji	389
+自我管理	zi wo guan li	389
 有生力量	you sheng li liang	389
 共同完成	gong tong wan cheng	389
 革命队伍	ge ming dui wu	389
@@ -2934,7 +2918,6 @@ columns:
 设宴款待	she yan kuan dai	385
 稍有不慎	shao you bu shen	385
 追究责任	zhui jiu ze ren	385
-更胜一筹	geng sheng yi chou	385
 和和气气	he he qi qi	385
 基本建设	ji ben jian she	385
 悲从中来	bei cong zhong lai	385
@@ -2965,6 +2948,7 @@ columns:
 工商业者	gong shang ye zhe	384
 斯图亚特	si tu ya te	384
 吉尔伯特	ji er bo te	384
+心理因素	xin li yin su	384
 关中地区	guan zhong di qu	384
 令人感动	ling ren gan dong	384
 保存实力	bao cun shi li	384
@@ -2997,7 +2981,6 @@ columns:
 很不简单	hen bu jian dan	383
 技术细节	ji shu xi jie	383
 高度一致	gao du yi zhi	383
-天气晴朗	tian qi qing lang	383
 医院院长	yi yuan yuan zhang	383
 专制制度	zhuan zhi zhi du	383
 乒乓球队	ping pang qiu dui	383
@@ -3032,6 +3015,7 @@ columns:
 四中全会	si zhong quan hui	383
 档案资料	dang an zi liao	383
 萧玫红道	xiao mei hong dao	383
+言之有理	yan zhi you li	382
 衣锦还乡	yi jin huan xiang	382
 高头大马	gao tou da ma	382
 维持现状	wei chi xian zhuang	382
@@ -3077,6 +3061,7 @@ columns:
 归纳起来	gui na qi lai	382
 文艺创作	wen yi chuang zuo	382
 台湾海峡	tai wan hai xia	382
+课程标准	ke cheng biao zhun	382
 名誉教授	ming yu jiao shou	382
 越南战争	yue nan zhan zheng	382
 学生会长	xue sheng hui zhang	382
@@ -3161,6 +3146,7 @@ columns:
 财务报告	cai wu bao gao	380
 昏死过去	hun si guo qu	380
 多种类型	duo zhong lei xing	380
+毫无希望	hao wu xi wang	380
 参知政事	can zhi zheng shi	380
 绝对空间	jue dui kong jian	380
 父子关系	fu zi guan xi	380
@@ -3247,7 +3233,6 @@ columns:
 学术活动	xue shu huo dong	379
 学科建设	xue ke jian she	379
 一百九十	yi bai jiu shi	379
-联系实际	lian xi shi ji	379
 拾级而上	she ji er shang	379
 十六世纪	shi liu shi ji	379
 斯泰尔斯	si tai er si	379
@@ -3294,7 +3279,6 @@ columns:
 三十三岁	san shi san sui	378
 正月初一	zheng yue chu yi	378
 康斯坦丁	kang si tan ding	378
-职工代表	zhi gong dai biao	378
 犯罪集团	fan zui ji tuan	378
 农民负担	nong min fu dan	378
 前后矛盾	qian hou mao dun	377
@@ -3315,7 +3299,6 @@ columns:
 经营思想	jing ying si xiang	377
 表明态度	biao ming tai du	377
 回旋余地	hui xuan yu di	377
-埃里克森	ai li ke sen	377
 教学方式	jiao xue fang shi	377
 素质教育	su zhi jiao yu	377
 聚类分析	ju lei fen xi	377
@@ -3357,7 +3340,6 @@ columns:
 并不矛盾	bing bu mao dun	376
 政府首脑	zheng fu shou nao	376
 公共交通	gong gong jiao tong	376
-苏格兰人	su ge lan ren	376
 法国巴黎	fa guo ba li	376
 太多太多	tai duo tai duo	376
 熟视无睹	shu shi wu du	376
@@ -3454,8 +3436,8 @@ columns:
 认识一下	ren shi yi xia	374
 搜集情报	sou ji qing bao	374
 金融业务	jin rong ye wu	374
-长话短说	chang hua duan shuo	374
 死者家属	si zhe jia shu	374
+中学毕业	zhong xue bi ye	374
 服务行业	fu wu hang ye	374
 不断丰富	bu duan feng fu	374
 司法部长	si fa bu zhang	374
@@ -3483,6 +3465,7 @@ columns:
 摔了一跤	shuai le yi jiao	373
 外交人员	wai jiao ren yuan	373
 排列组合	pai lie zu he	373
+险象环生	xian xiang huan sheng	373
 男女双方	nan nv shuang fang	373
 性格内向	xing ge nei xiang	373
 电信业务	dian xin ye wu	373
@@ -3498,14 +3481,12 @@ columns:
 中华全国	zhong hua quan guo	373
 川端康成	chuan duan kang cheng	373
 会计核算	kuai ji he suan	373
-皮质激素	pi zhi ji su	373
 产业工人	chan ye gong ren	373
 宝树大师	bao shu da shi	373
 不听使唤	bu ting shi huan	373
 等候多时	deng hou duo shi	373
 战死沙场	zhan si sha chang	373
 成何体统	cheng he ti tong	373
-乘人之危	cheng ren zhi wei	373
 过人之处	guo ren zhi chu	373
 工程进度	gong cheng jin du	373
 大吵大闹	da chao da nao	373
@@ -3521,7 +3502,7 @@ columns:
 结构主义	jie gou zhu yi	373
 大肆宣扬	da si xuan yang	373
 科技领域	ke ji ling yu	373
-恶性肿瘤	e xing zhong liu	373
+费尔南多	fei er nan duo	373
 信息中心	xin xi zhong xin	373
 军事设施	jun shi she shi	373
 边界条件	bian jie tiao jian	373
@@ -3551,7 +3532,6 @@ columns:
 政治危机	zheng zhi wei ji	372
 手工艺品	shou gong yi pin	372
 私人生活	si ren sheng huo	372
-形式多样	xing shi duo yang	372
 边疆地区	bian jiang di qu	372
 俄狄浦斯	e di pu si	372
 全然不知	quan ran bu zhi	372
@@ -3615,7 +3595,6 @@ columns:
 浑水摸鱼	hun shui mo yu	371
 氏族社会	shi zu she hui	371
 五七干校	wu qi gan xiao	371
-深入调查	shen ru diao cha	371
 科学实验	ke xue shi yan	371
 行政责任	xing zheng ze ren	371
 反应速度	fan ying su du	371
@@ -3689,7 +3668,6 @@ columns:
 生理反应	sheng li fan ying	369
 见识一下	jian shi yi xia	369
 金发碧眼	jin fa bi yan	369
-眼见为实	yan jian wei shi	369
 铃声响起	ling sheng xiang qi	369
 比较满意	bi jiao man yi	369
 残酷无情	can ku wu qing	369
@@ -3801,6 +3779,7 @@ columns:
 内阁大臣	nei ge da chen	367
 好说歹说	hao shuo dai shuo	367
 说上几句	shuo shang ji ju	367
+机会难得	ji hui nan de	367
 中亚地区	zhong ya di qu	367
 依法治国	yi fa zhi guo	367
 一百万元	yi bai wan yuan	367
@@ -3970,10 +3949,8 @@ columns:
 每人每天	mei ren mei tian	364
 所在位置	suo zai wei zhi	364
 腐败无能	fu bai wu neng	364
-有色人种	you se ren zhong	364
 改造社会	gai zao she hui	364
 失去知觉	shi qu zhi jue	364
-化学成分	hua xue cheng fen	364
 财政部门	cai zheng bu men	364
 约翰斯顿	yue han si dun	364
 高度赞扬	gao du zan yang	364
@@ -3990,6 +3967,7 @@ columns:
 大众传播	da zhong chuan bo	363
 引起轰动	yin qi hong dong	363
 思维习惯	si wei xi guan	363
+事业有成	shi ye you cheng	363
 认知科学	ren zhi ke xue	363
 盛怒之下	sheng nu zhi xia	363
 年轻貌美	nian qing mao mei	363
@@ -4114,7 +4092,6 @@ columns:
 身体语言	shen ti yu yan	361
 精神振奋	jing shen zhen fen	361
 倒地不起	dao di bu qi	361
-时光流逝	shi guang liu shi	361
 银行职员	yin hang zhi yuan	361
 塞万提斯	sai wan ti si	361
 大陆法系	da lu fa xi	361
@@ -4132,6 +4109,7 @@ columns:
 热爱祖国	re ai zu guo	361
 斯多葛派	si duo ge pai	361
 枢机主教	shu ji zhu jiao	361
+国际局势	guo ji ju shi	361
 从严治党	cong yan zhi dang	361
 领导成员	ling dao cheng yuan	361
 亚非会议	ya fei hui yi	361
@@ -4142,6 +4120,7 @@ columns:
 牛顿定律	niu dun ding lv	361
 温克尔曼	wen ke er man	361
 拿在手上	na zai shou shang	360
+直来直去	zhi lai zhi qu	360
 终身大事	zhong shen da shi	360
 略知一二	lve zhi yi er	360
 将功补过	jiang gong bu guo	360
@@ -4292,6 +4271,7 @@ columns:
 演化过程	yan hua guo cheng	358
 收归国有	shou gui guo you	358
 自由支配	zi you zhi pei	358
+说法不一	shuo fa bu yi	358
 总负责人	zong fu ze ren	358
 第十六章	di shi liu zhang	358
 刑事判决	xing shi pan jue	358
@@ -4336,7 +4316,6 @@ columns:
 商品交换	shang pin jiao huan	357
 战略转移	zhan lve zhuan yi	357
 惊恐万分	jing kong wan fen	357
-真对不起	zhen dui bu qi	357
 伦敦大学	lun dun da xue	357
 以诚待人	yi cheng dai ren	357
 齐头并进	qi tou bing jin	357
@@ -4444,6 +4423,7 @@ columns:
 主谓结构	zhu wei jie gou	356
 北京日报	bei jing ri bao	356
 扩张主义	kuo zhang zhu yi	356
+如虎添翼	ru hu tian yi	355
 有何面目	you he mian mu	355
 后患无穷	hou huan wu qiong	355
 放高利贷	fang gao li dai	355
@@ -4550,9 +4530,11 @@ columns:
 不善言辞	bu shan yan ci	354
 操作规程	cao zuo gui cheng	354
 灯红酒绿	deng hong jiu lv	354
+社会分工	she hui fen gong	354
 值得纪念	zhi de ji nian	354
 数据交换	shu ju jiao huan	354
 经营场所	jing ying chang suo	354
+公共设施	gong gong she shi	354
 第六十四	di liu shi si	354
 拒不执行	ju bu zhi xing	354
 改变方向	gai bian fang xiang	354
@@ -4708,7 +4690,7 @@ columns:
 三百多年	san bai duo nian	352
 分析表明	fen xi biao ming	352
 一拖再拖	yi tuo zai tuo	352
-偶像崇拜	ou xiang chong bai	352
+档案管理	dang an guan li	352
 后果严重	hou guo yan zhong	352
 热爱生活	re ai sheng huo	352
 古已有之	gu yi you zhi	352
@@ -4929,7 +4911,6 @@ columns:
 孩提时代	hai ti shi dai	349
 语法错误	yu fa cuo wu	349
 根本变化	gen ben bian hua	349
-剩余价值	sheng yu jia zhi	349
 军事政变	jun shi zheng bian	349
 机密文件	ji mi wen jian	349
 文艺思想	wen yi si xiang	349
@@ -5042,6 +5023,7 @@ columns:
 悬崖勒马	xuan ya le ma	346
 青云直上	qing yun zhi shang	346
 上级指示	shang ji zhi shi	346
+不胜感激	bu sheng gan ji	346
 日常用品	ri chang yong pin	346
 喜剧演员	xi ju yan yuan	346
 克拉伦斯	ke la lun si	346
@@ -5143,6 +5125,7 @@ columns:
 迅速行动	xun su xing dong	345
 人事关系	ren shi guan xi	345
 应邀出席	ying yao chu xi	345
+最新消息	zui xin xiao xi	345
 错误观点	cuo wu guan dian	345
 洋洋自得	yang yang zi de	345
 满怀激情	man huai ji qing	345
@@ -5192,7 +5175,6 @@ columns:
 国民会议	guo min hui yi	345
 新学伪经	xin xue wei jing	345
 单位成本	dan wei cheng ben	345
-指明方向	zhi ming fang xiang	344
 物理学界	wu li xue jie	344
 效果显著	xiao guo xian zhu	344
 个性特征	ge xing te zheng	344
@@ -5254,6 +5236,7 @@ columns:
 产生误解	chan sheng wu jie	343
 露出破绽	lu chu po zhan	343
 小组会议	xiao zu hui yi	343
+态度强硬	tai du qiang ying	343
 临床经验	lin chuang jing yan	343
 举行会谈	ju xing hui tan	343
 三千多年	san qian duo nian	343
@@ -5395,6 +5378,7 @@ columns:
 敌对势力	di dui shi li	341
 历史主义	li shi zhu yi	341
 各级党委	ge ji dang wei	341
+动力系统	dong li xi tong	341
 业务收入	ye wu shou ru	341
 民主德国	min zhu de guo	341
 岁月流逝	sui yue liu shi	341
@@ -5481,6 +5465,7 @@ columns:
 澎湖列岛	peng hu lie dao	340
 泰康人寿	tai kang ren shou	340
 欧美各国	ou mei ge guo	339
+混世魔王	hun shi mo wang	339
 新几内亚	xin ji nei ya	339
 目标群体	mu biao qun ti	339
 徒步旅行	tu bu lv xing	339
@@ -5494,7 +5479,6 @@ columns:
 痛苦万分	tong ku wan fen	339
 囤积居奇	tun ji ju qi	339
 巨额利润	ju e li run	339
-红红火火	hong hong huo huo	339
 事态严重	shi tai yan zhong	339
 不良贷款	bu liang dai kuan	339
 严惩不贷	yan cheng bu dai	339
@@ -5513,6 +5497,7 @@ columns:
 其他费用	qi ta fei yong	339
 停止使用	ting zhi shi yong	339
 长期趋势	chang qi qu shi	339
+三十一岁	san shi yi sui	339
 美元汇率	mei yuan hui lv	339
 台湾同胞	tai wan tong bao	339
 公共财产	gong gong cai chan	339
@@ -5553,6 +5538,7 @@ columns:
 本科毕业	ben ke bi ye	338
 商品流通	shang pin liu tong	338
 联络感情	lian luo gan qing	338
+作息时间	zuo xi shi jian	338
 山河破碎	shan he po sui	338
 旗开得胜	qi kai de sheng	338
 精神领袖	jing shen ling xiu	338
@@ -5700,6 +5686,7 @@ columns:
 富有经验	fu you jing yan	337
 专科医生	zhuan ke yi sheng	337
 一眼看穿	yi yan kan chuan	337
+码头工人	ma tou gong ren	337
 海德公园	hai de gong yuan	337
 美好未来	mei hao wei lai	337
 彻底清除	che di qing chu	337
@@ -5717,7 +5704,6 @@ columns:
 公务人员	gong wu ren yuan	337
 石油化工	shi you hua gong	337
 道德哲学	dao de zhe xue	337
-回顾历史	hui gu li shi	337
 如前所说	ru qian suo shuo	337
 文化冲突	wen hua chong tu	337
 比较发达	bi jiao fa da	337
@@ -5816,6 +5802,7 @@ columns:
 正反两面	zheng fan liang mian	335
 决策依据	jue ce yi ju	335
 自有办法	zi you ban fa	335
+奴隶劳动	nu li lao dong	335
 末日审判	mo ri shen pan	335
 二十五分	er shi wu fen	335
 竞争能力	jing zheng neng li	335
@@ -5823,7 +5810,6 @@ columns:
 两大阵营	liang da zhen ying	335
 二十余里	er shi yu li	335
 禁欲主义	jin yu zhu yi	335
-诉诸武力	su zhu wu li	335
 盘山公路	pan shan gong lu	335
 警卫部队	jing wei bu dui	335
 在群众中	zai qun zhong zhong	335
@@ -5847,6 +5833,7 @@ columns:
 马林科夫	ma lin ke fu	335
 塔尔巴哈	ta er ba ha	335
 无线网络	wu xian wang luo	335
+尿路感染	niao lu gan ran	335
 枯燥无味	ku zao wu wei	334
 轻松自在	qing song zi zai	334
 每到一地	mei dao yi di	334
@@ -5952,6 +5939,7 @@ columns:
 墨西哥湾	mo xi ge wan	333
 计算技术	ji suan ji shu	333
 实用工具	shi yong gong ju	333
+个人观点	ge ren guan dian	333
 战功卓著	zhan gong zhuo zhu	333
 由近及远	you jin ji yuan	333
 人口比例	ren kou bi li	333
@@ -6276,10 +6264,10 @@ columns:
 刻苦钻研	ke ku zuan yan	329
 英勇斗争	ying yong dou zheng	329
 阿兹特克	a zi te ke	329
-体育比赛	ti yu bi sai	329
 薪火相传	xin huo xiang chuan	329
 分工负责	fen gong fu ze	329
 江苏省委	jiang su sheng wei	329
+网络分析	wang luo fen xi	329
 维护和平	wei hu he ping	329
 墨西哥人	mo xi ge ren	329
 关系恶化	guan xi e hua	329
@@ -6308,6 +6296,7 @@ columns:
 庆典活动	qing dian huo dong	329
 应征入伍	ying zheng ru wu	329
 重新部署	chong xin bu shu	329
+无线电波	wu xian dian bo	329
 朴次茅斯	pu ci mao si	329
 超越自我	chao yue zi wo	328
 后继有人	hou ji you ren	328
@@ -6428,7 +6417,6 @@ columns:
 思想品德	si xiang pin de	327
 知识经济	zhi shi jing ji	327
 渡江战役	du jiang zhan yi	327
-回忆往事	hui yi wang shi	327
 大声吼叫	da sheng hou jiao	327
 访问期间	fang wen qi jian	327
 彼得大帝	bi de da di	327
@@ -6451,6 +6439,7 @@ columns:
 伊塞克湖	yi sai ke hu	327
 美好愿望	mei hao yuan wang	326
 寒冬腊月	han dong la yue	326
+一语不发	yi yu bu fa	326
 痛哭失声	tong ku shi sheng	326
 利国利民	li guo li min	326
 几十公里	ji shi gong li	326
@@ -6469,6 +6458,7 @@ columns:
 挥霍无度	hui huo wu du	326
 针线活儿	zhen xian huo er	326
 四十八岁	si shi ba sui	326
+污染环境	wu ran huan jing	326
 自由思想	zi you si xiang	326
 力量强大	li liang qiang da	326
 分配机制	fen pei ji zhi	326
@@ -6479,7 +6469,6 @@ columns:
 难以容忍	nan yi rong ren	326
 魅力十足	mei li shi zu	326
 努力提高	nu li ti gao	326
-商业资本	shang ye zi ben	326
 四十一岁	si shi yi sui	326
 资格考试	zi ge kao shi	326
 以身相许	yi shen xiang xu	326
@@ -6632,6 +6621,7 @@ columns:
 深受鼓舞	shen shou gu wu	324
 忠厚老实	zhong hou lao shi	324
 精心制作	jing xin zhi zuo	324
+敬业精神	jing ye jing shen	324
 文物部门	wen wu bu men	324
 三峡地区	san xia di qu	324
 青春年华	qing chun nian hua	324
@@ -6648,7 +6638,6 @@ columns:
 马里兰州	ma li lan zhou	324
 目标语言	mu biao yu yan	324
 盲目崇拜	mang mu chong bai	324
-团队精神	tuan dui jing shen	324
 台湾大学	tai wan da xue	324
 深沟高垒	shen gou gao lei	324
 翻译人员	fan yi ren yuan	324
@@ -6681,6 +6670,7 @@ columns:
 陈老先生	chen lao xian sheng	324
 中立政策	zhong li zheng ce	324
 腰椎间盘	yao zhui jian pan	324
+惊鸿一瞥	jing hong yi pie	324
 机能主义	ji neng zhu yi	324
 费尔米娜	fei er mi na	324
 阿泰斯特	a tai si te	324
@@ -6693,6 +6683,7 @@ columns:
 抢占市场	qiang zhan shi chang	323
 专题报告	zhuan ti bao gao	323
 身在其中	shen zai qi zhong	323
+何苦来哉	he ku lai zai	323
 吞了下去	tun le xia qu	323
 虾兵蟹将	xia bing xie jiang	323
 大大缩短	da da suo duan	323
@@ -6702,7 +6693,6 @@ columns:
 秉笔直书	bing bi zhi shu	323
 所在城市	suo zai cheng shi	323
 冬暖夏凉	dong nuan xia liang	323
-海拔高度	hai ba gao du	323
 六十多年	liu shi duo nian	323
 华夏民族	hua xia min zu	323
 根本宗旨	gen ben zong zhi	323
@@ -6803,6 +6793,7 @@ columns:
 昨天早上	zuo tian zao shang	321
 自理能力	zi li neng li	321
 书本知识	shu ben zhi shi	321
+紧急任务	jin ji ren wu	321
 恍若隔世	huang ruo ge shi	321
 取得成效	qu de cheng xiao	321
 双喜临门	shuang xi lin men	321
@@ -6822,6 +6813,7 @@ columns:
 财政预算	cai zheng yu suan	321
 重新得到	chong xin de dao	321
 培养目标	pei yang mu biao	321
+农民阶级	nong min jie ji	321
 艺术修养	yi shu xiu yang	321
 综合利用	zong he li yong	321
 开山老祖	kai shan lao zu	321
@@ -6866,6 +6858,7 @@ columns:
 工人工资	gong ren gong zi	320
 咕咚咕咚	gu dong gu dong	320
 昨天上午	zuo tian shang wu	320
+腐化堕落	fu hua duo luo	320
 下地干活	xia di gan huo	320
 心胸开阔	xin xiong kai kuo	320
 交易中心	jiao yi zhong xin	320
@@ -6908,7 +6901,6 @@ columns:
 终端产品	zhong duan chan pin	320
 占山为王	zhan shan wei wang	320
 生活待遇	sheng huo dai yu	320
-孤掌难鸣	gu zhang nan ming	320
 公开审理	gong kai shen li	320
 拒绝执行	ju jue zhi xing	320
 局部地区	ju bu di qu	320
@@ -7148,7 +7140,6 @@ columns:
 改换门庭	gai huan men ting	317
 春风化雨	chun feng hua yu	317
 十一点多	shi yi dian duo	317
-银行借款	yin hang jie kuan	317
 百货大楼	bai huo da lou	317
 地方党委	di fang dang wei	317
 工艺水平	gong yi shui ping	317
@@ -7193,6 +7184,7 @@ columns:
 路上行人	lu shang xing ren	317
 葡萄牙语	pu tao ya yu	317
 能源行业	neng yuan hang ye	317
+价格低廉	jia ge di lian	317
 生活水准	sheng huo shui zhun	317
 福利事业	fu li shi ye	317
 重新排列	chong xin pai lie	317
@@ -7257,7 +7249,6 @@ columns:
 连为一体	lian wei yi ti	316
 基本路线	ji ben lu xian	316
 偶发事件	ou fa shi jian	316
-波多黎各	bo duo li ge	316
 操作手册	cao zuo shou ce	316
 修修补补	xiu xiu bu bu	316
 游街示众	you jie shi zhong	316
@@ -7503,7 +7494,9 @@ columns:
 平安保险	ping an bao xian	312
 过街老鼠	guo jie lao shu	312
 血流如注	xue liu ru zhu	312
+山高水长	shan gao shui chang	312
 放虎归山	fang hu gui shan	312
+弥天大谎	mi tian da huang	312
 处世之道	chu shi zhi dao	312
 请示汇报	qing shi hui bao	312
 答不答应	da bu da ying	312
@@ -7521,24 +7514,22 @@ columns:
 手机短信	shou ji duan xin	312
 情感世界	qing gan shi jie	312
 卫生条件	wei sheng tiao jian	312
+有伤风化	you shang feng hua	312
 走漏消息	zou lou xiao xi	312
 经济往来	jing ji wang lai	312
 努力完成	nu li wan cheng	312
 大体一致	da ti yi zhi	312
-虚度光阴	xu du guang yin	312
 无所不谈	wu suo bu tan	312
 时光倒流	shi guang dao liu	312
 长远目标	chang yuan mu biao	312
 零零星星	ling ling xing xing	312
 独具匠心	du ju jiang xin	312
-节省成本	jie sheng cheng ben	312
 商标注册	shang biao zhu ce	312
 宣传材料	xuan chuan cai liao	312
 态度暧昧	tai du ai mei	312
 发电机组	fa dian ji zu	312
 类似之处	lei si zhi chu	312
 新郎新娘	xin lang xin niang	312
-学习曲线	xue xi qu xian	312
 财务经理	cai wu jing li	312
 回归方程	hui gui fang cheng	312
 被征服者	bei zheng fu zhe	312
@@ -7596,6 +7587,7 @@ columns:
 大力推广	da li tui guang	311
 牙牙学语	ya ya xue yu	311
 肃杀之气	su sha zhi qi	311
+纵横天下	zong heng tian xia	311
 万夫莫开	wan fu mo kai	311
 自助餐厅	zi zhu can ting	311
 毫无知觉	hao wu zhi jue	311
@@ -7640,7 +7632,6 @@ columns:
 质量保证	zhi liang bao zheng	311
 要死要活	yao si yao huo	311
 不咸不淡	bu xian bu dan	311
-互相监督	hu xiang jian du	311
 人际沟通	ren ji gou tong	311
 分组讨论	fen zu tao lun	311
 千万美元	qian wan mei yuan	311
@@ -7850,12 +7841,12 @@ columns:
 两耳不闻	liang er bu wen	308
 土谢图汗	tu xie tu han	308
 万分危急	wan fen wei ji	308
+正合我意	zheng he wo yi	308
 赋闲在家	fu xian zai jia	308
 利益驱动	li yi qu dong	308
 男女朋友	nan nv peng you	308
 一人得道	yi ren de dao	308
 走回头路	zou hui tou lu	308
-喜忧参半	xi you can ban	308
 以一当十	yi yi dang shi	308
 避人耳目	bi ren er mu	308
 房地产商	fang di chan shang	308
@@ -7969,6 +7960,7 @@ columns:
 懊悔不已	ao hui bu yi	307
 有话好说	you hua hao shuo	307
 矿泉水瓶	kuang quan shui ping	307
+初战告捷	chu zhan gao jie	307
 隐忍不发	yin ren bu fa	307
 幼稚可笑	you zhi ke xiao	307
 把酒言欢	ba jiu yan huan	307
@@ -7980,7 +7972,6 @@ columns:
 统一规划	tong yi gui hua	307
 虚晃一枪	xu huang yi qiang	307
 基层单位	ji ceng dan wei	307
-过敏反应	guo min fan ying	307
 违纪行为	wei ji xing wei	307
 飞驰而去	fei chi er qu	307
 强烈反应	qiang lie fan ying	307
@@ -8102,7 +8093,6 @@ columns:
 妒火中烧	du huo zhong shao	305
 得理不饶	de li bu rao	305
 原始积累	yuan shi ji lei	305
-有何感想	you he gan xiang	305
 谁是谁非	shui shi shui fei	305
 日出日落	ri chu ri luo	305
 好事多磨	hao shi duo mo	305
@@ -8117,7 +8107,6 @@ columns:
 听取汇报	ting qu hui bao	305
 没有话说	mei you hua shuo	305
 外事活动	wai shi huo dong	305
-斗转星移	dou zhuan xing yi	305
 飞行速度	fei xing su du	305
 惊喜交加	jing xi jiao jia	305
 杂技演员	za ji yan yuan	305
@@ -8228,6 +8217,7 @@ columns:
 郎才女貌	lang cai nv mao	304
 大吵一架	da chao yi jia	304
 今年春节	jin nian chun jie	304
+分身乏术	fen shen fa shu	304
 现出原形	xian chu yuan xing	304
 列席会议	lie xi hui yi	304
 讨回公道	tao hui gong dao	304
@@ -8297,7 +8287,6 @@ columns:
 飞行技术	fei xing ji shu	304
 数据系统	shu ju xi tong	304
 非常灵活	fei chang ling huo	304
-居民收入	ju min shou ru	304
 效用函数	xiao yong han shu	304
 险恶用心	xian e yong xin	304
 马克西米	ma ke xi mi	304
@@ -8378,6 +8367,7 @@ columns:
 无花果树	wu hua guo shu	302
 社会现状	she hui xian zhuang	302
 悠闲自得	you xian zi de	302
+有何不妥	you he bu tuo	302
 招聘启事	zhao pin qi shi	302
 无亲无故	wu qin wu gu	302
 情感生活	qing gan sheng huo	302
@@ -8499,6 +8489,7 @@ columns:
 十里洋场	shi li yang chang	301
 财务顾问	cai wu gu wen	301
 经济腾飞	jing ji teng fei	301
+用意何在	yong yi he zai	301
 出国访问	chu guo fang wen	301
 国企改革	guo qi gai ge	301
 田野工作	tian ye gong zuo	301
