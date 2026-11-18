@@ -73,7 +73,8 @@ else
   fi
   echo "==> 合并短句语料"
   cat "$CLEAN"/*.txt > "$CORPUS"
-  echo "$FP" > "$FP_FILE"
+  # 指纹**成功后才写**（见文末）。此前写在这里：一次构建失败（如磁盘满）会把
+  # 「语料未变化」永久缓存，之后重跑全跳过——2026-11-18 真实踩到。
 fi
 
 echo "==> 字符 2-6gram 计数（threads=$THREADS, min-count=${MINCOUNTS}）"
@@ -89,6 +90,8 @@ nice -n 15 "$BUILDER" \
   $RESTART 2>&1 | tail -20
 
 if [ -s "$OUT/$LANGUAGE.gram" ]; then
+  # 成功后才落指纹（配合上面的跳过判断：失败不再被当作「已完成」）
+  [ -n "${FP:-}" ] && echo "$FP" > "$FP_FILE"
   echo "==> 产出: $OUT/$LANGUAGE.gram ($(du -h "$OUT/$LANGUAGE.gram" | cut -f1))"
   echo "    启用: egret.common.yaml 的 grammar/language: ${LANGUAGE}（并确保 .gram 在用户目录 build/）"
 else

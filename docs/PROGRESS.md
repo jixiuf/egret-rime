@@ -47,7 +47,11 @@ make test                           # 黄金用例（20 条），确认引擎仍
 | 任务 | 启动方式 | 日志 | 结果落点 |
 |---|---|---|---|
 | gram 全量训练 | `MINCOUNTS=50:30:15:8:4 bash scripts/corpus/gram.sh` | `log/gram.log` | `data/gram/zh-hans-egret.gram` |
-| **用户更新电子书后的全量重跑**（2026-11-18 起） | `bash scripts/refresh.sh --from extract --jobs 3`（PID 254426；`--list` 可看进度） | `/tmp/refresh_corpus.out` + `log/refresh-*.log` | `data/corpus/{extract,clean,freq}` → `dicts/` → `data/gram/` |
+| **用户更新电子书后的全量重跑**（2026-11-18 起） | extract/clean/freq/dict 已完成并提交（888c30a）；**char-gram 重训中**：`bash scripts/corpus/gram.sh`（PID 342182） | `/tmp/gram_rebuild.out` | `data/gram/{zh-hans-egret.gram,.2_6gram.tsv}` → lm_rerank |
+
+> ⚠️ 2026-11-18 磁盘写满（2.0T 用满）导致 gram 阶段中断。已修 `scripts/corpus/gram.sh`
+> 的一个真 bug：**语料指纹原先写在构建之前**，一次失败就会把"语料未变化"永久缓存，
+> 重跑全跳过（实测踩到：char-gram 还是 9月28 的旧版）。现在改为**成功后才写指纹**。
 
 > 一键刷新可代替逐个阶段：`bash scripts/refresh.sh`（增量，可反复重跑）。
 > 下载器写 `.part` 再改名——**抽取器只见完整文件**，避免半成品污染增量索引。
