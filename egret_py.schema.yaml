@@ -47,7 +47,7 @@ translator:
   user_dict: egret_py.user.dict
   enable_completion: false
   enable_sentence: true
-  max_sentences: 100           # librime 内部 clamp 到 [1,100]，写更大没用
+  max_sentences: 10           # librime 内部 clamp 到 [1,100]，写更大没用
   max_homophones: 7
   initial_quality: 1
   # 不加 grammar：实测全拼路径带 gram 反而更差（13~16% 对 24%），见
