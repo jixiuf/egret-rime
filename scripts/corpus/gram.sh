@@ -32,7 +32,7 @@ SAMPLE=""
 RESTART=""
 # 默认阈值经实测调优: 平阈值 30 得到 ~59MB/1000 万条 n-gram,
 # 与 237MB 版本效果持平(句子还原 16/100)，见 docs/PROGRESS.md
-MINCOUNTS="${MINCOUNTS:-30:30:30:30:30}"
+MINCOUNTS="${MINCOUNTS:-50:30:15:8:4}"
 
 while [ $# -gt 0 ]; do
   case "$1" in
