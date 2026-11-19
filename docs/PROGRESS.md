@@ -61,34 +61,23 @@ make test                           # 黄金用例（20 条），确认引擎仍
 > 下载器写 `.part` 再改名——**抽取器只见完整文件**，避免半成品污染增量索引。
 > 注意：**清洗/词频/gram 必须用 `third-party/venv/bin/python`**（系统 python 无 C++ OpenCC / jieba）。
 
-## 3.5 char-gram 重训：改用 50% 行采样重试（PID 548433，进行中）
+## 3.5 char-gram 重训：已完成（2026-11-19，用 50% 采样 + 阈值过滤绕过磁盘/内存限制）
 
-> 全量 76G 语料的 partitions 会破 1TB，2T 盘装不下。改为**按行取每源前 50%**
-> （≈35.6G，保留来源配比），直接调 builder（`--min-count 50:30:15:8:4`，
-> 新 work-dir `data/corpus/ngram/work50`，输出先落 `out50/`，成功后再搬 `data/gram/`）。
-> 首次尝试用 `head -c` 按字节截断 → 切坏 UTF-8（builder 报 invalid utf-8），已改按行。
+全量 76G 语料的 partitions 破 1TB、且 build_grammar 会 OOM，本机装不下。最终方案：
 
+1. **按行取每源前 50%**（≈35.6G，保留 epub/jsonl/markdown/parquet 配比）；
+   注：首次用 `head -c` 按字节截断会切坏 UTF-8（builder 报 invalid utf-8），必须按行。
+2. 直接用 builder（`--min-count 50:30:15:8:4`、新 work-dir）计数：
+   `[aggregate] 512 shards, 974.94 GiB` → 保留 **5.46 亿**条 n-gram。
+3. 5.46 亿条喂 `build_grammar` 会 OOM（61G 内存）⇒ **先按 count≥100 过滤**
+   （3520 万条，与旧表同量级）再喂：`awk -F'\t' '$2+0>=100' ... | build_grammar zh-hans-egret`。
+4. 产出：`data/gram/zh-hans-egret.gram` 227MB（sha256 1bc2ffd5…，旧版备份
+   `zh-hans-egret.gram.old-20260928`）；`2_6gram.tsv` 567MB；`lm_rerank` 重出。
 
-用户更新电子书后想重训 char-gram。**结论：本机不可行**，已放弃（不影响输入法功能）。
+**收益**：自训 char-gram 的语料从旧版 10.7 亿字 → **124.6 亿字**（11×），
+`lm_rerank` 覆盖的上下文证据大幅增加。
 
-实测三轮（每轮都跑到磁盘 98% 被迫中止）：
-
-| 轮次 | 处理 | partitions 峰值 | 结果 |
-|---|---|---|---|
-| 1 | 默认 min-count 30:30:30:30:30 | 683G | 磁盘满，失败 |
-| 2 | 同上，删 partitions+short_all 腾到 936G | 839G | 磁盘满，中止 |
-| 3 | 改回调优 50:30:15:8:4，再删 extract 腾到 1.1T | 1002G+（语料只读了一半）| 磁盘满，中止 |
-
-**根因不是参数**：构建器把**全部唯一 2-6gram** 落到计数分片（`--shards 512`），
-76G 语料的 partitions 会突破 **1TB**。2T 盘上电子书 564G + clean 160G + short_all 76G
-已占 800G，放不下 1TB 临时区。
-
-**影响面（很小）**：char-gram 只喂 ① 搜索器字级 LM `lm_rerank` ② A/B 评测用的自训 gram。
-**引擎长句打分用万象 gram，不受影响**；词库/码表/黄金均已是最新（§4.91）。
-要真重训：换一台临时盘 ≥1.2TB 的机器，或先把电子书挪走。
-
-**代价记录**：按用户授权删了 `data/corpus/{ngram/partitions, ngram/short_all.txt, extract}`
-（均可重建；extract 要重跑 extract 阶段才能回来）。
+**验证**：黄金 52/52 · verify-wubi 五组不变 · bench 1.28× · 混打整句 238/640 (37%)。
 
 ## 4. 已完成（均带验证）
 
