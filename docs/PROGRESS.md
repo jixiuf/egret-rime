@@ -47,7 +47,7 @@ make test                           # 黄金用例（20 条），确认引擎仍
 | 任务 | 启动方式 | 日志 | 结果落点 |
 |---|---|---|---|
 | gram 全量训练 | `MINCOUNTS=50:30:15:8:4 bash scripts/corpus/gram.sh` | `log/gram.log` | `data/gram/zh-hans-egret.gram` |
-| **用户更新电子书后的全量重跑**（2026-11-18 起） | extract/clean/freq/dict 已完成并提交（888c30a）；**char-gram 重训中**：`bash scripts/corpus/gram.sh`（PID 342182 → 构建器 346211；partitions 从零重建，约 343G） | `/tmp/gram_rebuild.out` | `data/gram/{zh-hans-egret.gram,.2_6gram.tsv}` → lm_rerank |
+| **用户更新电子书后的全量重跑**（2026-11-18 起） | extract/clean/freq/dict 已完成并提交（888c30a）；**char-gram 重训中**：`bash scripts/corpus/gram.sh`（PID 491136；已按用户授权删除失败残留的 partitions(683G)+short_all(72G)，腾出 936G 后重启） | `/tmp/gram_rebuild.out` | `data/gram/{zh-hans-egret.gram,.2_6gram.tsv}` → lm_rerank |
 
 > ⚠️ 2026-11-18 磁盘写满（2.0T 用满）导致 gram 阶段中断。已修 `scripts/corpus/gram.sh`
 > 的一个真 bug：**语料指纹原先写在构建之前**，一次失败就会把"语料未变化"永久缓存，
