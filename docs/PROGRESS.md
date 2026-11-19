@@ -61,7 +61,13 @@ make test                           # 黄金用例（20 条），确认引擎仍
 > 下载器写 `.part` 再改名——**抽取器只见完整文件**，避免半成品污染增量索引。
 > 注意：**清洗/词频/gram 必须用 `third-party/venv/bin/python`**（系统 python 无 C++ OpenCC / jieba）。
 
-## 3.5 char-gram 重训：本机磁盘放不下（2026-11-19 结论）
+## 3.5 char-gram 重训：改用 50% 行采样重试（PID 548433，进行中）
+
+> 全量 76G 语料的 partitions 会破 1TB，2T 盘装不下。改为**按行取每源前 50%**
+> （≈35.6G，保留来源配比），直接调 builder（`--min-count 50:30:15:8:4`，
+> 新 work-dir `data/corpus/ngram/work50`，输出先落 `out50/`，成功后再搬 `data/gram/`）。
+> 首次尝试用 `head -c` 按字节截断 → 切坏 UTF-8（builder 报 invalid utf-8），已改按行。
+
 
 用户更新电子书后想重训 char-gram。**结论：本机不可行**，已放弃（不影响输入法功能）。
 
