@@ -49,6 +49,12 @@ make test                           # 黄金用例（20 条），确认引擎仍
 | gram 全量训练 | `MINCOUNTS=50:30:15:8:4 bash scripts/corpus/gram.sh` | `log/gram.log` | `data/gram/zh-hans-egret.gram` |
 | **用户更新电子书后的全量重跑**（2026-11-18 起） | extract/clean/freq/dict 已完成并提交（888c30a）；**char-gram 重训中**：`bash scripts/corpus/gram.sh`（PID 491136；已按用户授权删除失败残留的 partitions(683G)+short_all(72G)，腾出 936G 后重启） | `/tmp/gram_rebuild.out` | `data/gram/{zh-hans-egret.gram,.2_6gram.tsv}` → lm_rerank |
 
+> ⚠️ **char-gram 重训在本机不可行（2026-11-19 实测）**：76G 语料的全量计数分片
+> （partitions）峰值 ~850G+，而 2T 盘上电子书 564G + clean 160G + extract 148G +
+> short_all 76G 已占 ~950G，腾到 861G 仍不够（需 ~926G）。连试三次都在 98% 处被杀。
+> 影响面：char-gram 只喂搜索器字级 LM（lm_rerank）与 A/B 评测；**引擎长句用万象 gram，
+> 不受影响**，词库/码表/黄金都已是最新。要重训需先腾出 ~150G（如删 extract）或换机。
+>
 > ⚠️ 2026-11-18 磁盘写满（2.0T 用满）导致 gram 阶段中断。已修 `scripts/corpus/gram.sh`
 > 的一个真 bug：**语料指纹原先写在构建之前**，一次失败就会把"语料未变化"永久缓存，
 > 重跑全跳过（实测踩到：char-gram 还是 9月28 的旧版）。现在改为**成功后才写指纹**。
