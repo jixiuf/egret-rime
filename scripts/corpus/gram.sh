@@ -77,6 +77,7 @@ else
   # 「语料未变化」永久缓存，之后重跑全跳过——2026-11-18 真实踩到。
 fi
 
+GRAM_MARK="$(mktemp)"
 echo "==> 字符 2-6gram 计数（threads=$THREADS, min-count=${MINCOUNTS}）"
 nice -n 15 "$BUILDER" \
   --corpus "$CORPUS" \
@@ -89,12 +90,15 @@ nice -n 15 "$BUILDER" \
   --build-grammar "$BUILD_GRAMMAR" \
   $RESTART 2>&1 | tail -20
 
-if [ -s "$OUT/$LANGUAGE.gram" ]; then
+# 成功判定必须看「这次构建**新产出了** .gram」：只判 `-s` 会让旧文件把失败伪装成成功
+# （2026-11-18 真实踩到：构建报 No space，脚本却打印「产出 xxx.gram」）。
+if [ -s "$OUT/$LANGUAGE.gram" ] && [ "$OUT/$LANGUAGE.gram" -nt "$GRAM_MARK" ]; then
   # 成功后才落指纹（配合上面的跳过判断：失败不再被当作「已完成」）
   [ -n "${FP:-}" ] && echo "$FP" > "$FP_FILE"
   echo "==> 产出: $OUT/$LANGUAGE.gram ($(du -h "$OUT/$LANGUAGE.gram" | cut -f1))"
   echo "    启用: egret.common.yaml 的 grammar/language: ${LANGUAGE}（并确保 .gram 在用户目录 build/）"
 else
-  echo "==> 失败：未生成 $OUT/$LANGUAGE.gram"
+  echo "==> 失败：未生成新的 $OUT/$LANGUAGE.gram（可能是磁盘满/构建器报错）"
+  rm -f "$GRAM_MARK"
   exit 1
 fi
