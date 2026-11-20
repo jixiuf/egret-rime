@@ -120,6 +120,41 @@ def make_mapper(freq, band, unknown_band):
     return map_weight
 
 
+def make_mix_mapper(counts, alpha, lo=100, hi=1000):
+    """统一语料标准 + 形状可调：w = lo + (hi-lo)·(α·log_norm + (1-α)·linear_norm)。
+
+    α=1 → 纯 log（压缩，混打最好、纯拼音略降）；α=0 → 纯线性（差距最大）。
+    两项**都来自语料**（不掺知频），满足「既然统一就统一标准」。
+    """
+    if not counts:
+        return lambda w, old: old
+    mx = max(counts.values()) or 1
+    lmx = math.log(1 + mx)
+    for k in ("A",):
+        pass
+    cache = {}
+
+    def one(c):
+        v = cache.get(c)
+        if v is None:
+            ln = math.log(1 + c) / lmx
+            li = c / mx
+            v = max(1, int(round(lo + (hi - lo) * (alpha * ln + (1 - alpha) * li))))
+            cache[c] = v
+        return v
+
+    def map_weight(word, old):
+        c = counts.get(word)
+        return one(c) if c is not None else max(1, int(round(lo * 0.5)))
+
+    return map_weight
+
+
+def count_from_lognorm(v):
+    """lm_rerank 的 1gram 值 = log(1+c)*1000 ⇒ 反推 c。"""
+    return math.exp(v / 1000.0) - 1
+
+
 def reweight_file(path, map_weight, dry_run=False, stats=None):
     lines = open(path, encoding="utf-8").read().split("\n")
     started = False
@@ -189,7 +224,9 @@ def main():
     ap.add_argument("--unknown-band", default="100,300",
                     help="语料未命中词（长尾）的权重区间")
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--scale", choices=["band", "log1000"], default="band",
+    ap.add_argument("--alpha", type=float, default=0.5,
+                    help="mix 模式：α=1 纯 log（压缩）/ α=0 纯线性；两项都来自语料")
+    ap.add_argument("--scale", choices=["band", "log1000", "mix"], default="band",
                     help="band=归一到 0-1000（旧）；log1000=log(1+count)*1000"
                          "（与 LM 同尺度，推荐）")
     ap.add_argument("--char-scale", type=float, default=1.0,
@@ -219,6 +256,9 @@ def main():
     if args.scale == "log1000":
         mapper = make_log_mapper(counts)
         print("映射: log(1+count)*1000（与 LM 表同尺度）")
+    elif args.scale == "mix":
+        mapper = make_mix_mapper(counts, args.alpha)
+        print(f"映射: 统一语料标准 α={args.alpha}（log↔线性混合，100~1000）")
     else:
         mapper = make_mapper(freq, band, uband)
 
@@ -245,7 +285,9 @@ def main():
             k, _, v = line.rstrip("\n").partition("\t")
             if len(k) == 1 and v.isdigit():
                 lm[k] = int(v)
-        print(f"\n字表 log 重标定（shift={args.char_shift}，unigram {len(lm)} 字）")
+        _vmax = max(lm.values()) or 1
+        _cmax = max(count_from_lognorm(v) for v in lm.values()) or 1.0
+        print(f"\n字表重标定（scale={args.scale} shift={args.char_shift} α={args.alpha}，unigram {len(lm)} 字）")
         # 传统库五笔字表也必须一起重标：否则词权升到 log 尺度(0~16000)、字权仍是
         # 知频(0~1000) ⇒ 词全面压字（tffu「等 780」输给「徒增 log 值」）——§4.92
         for path in (CHAR_DICTS + [os.path.join(OUT, "egret_wubi_py_chars.dict.yaml"),
@@ -264,7 +306,14 @@ def main():
                 if len(q) >= 3 and q[2].isdigit() and len(q[0]) == 1:
                     u = lm.get(q[0])
                     if u:
-                        q[2] = str(max(0, u - args.char_shift))
+                        if args.scale == "mix":
+                            ln = u / _vmax
+                            li = count_from_lognorm(u) / _cmax
+                            q[2] = str(max(1, int(round(
+                                100 + 900 * (args.alpha * ln
+                                             + (1 - args.alpha) * li)))))
+                        else:
+                            q[2] = str(max(0, u - args.char_shift))
                         n += 1
                 out.append("\t".join(q))
             if not args.dry_run:

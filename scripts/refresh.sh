@@ -45,7 +45,7 @@ mkdir -p "$LOG"
 #     要重做必须整链重标定 + 用 make test 标定，见 docs/PROGRESS.md
 # CHAR_SHIFT    配合 log1000 的字表下移量（log*1000 尺度）
 TIER="${TIER:-base}"
-REWEIGHT="${REWEIGHT:-log1000}"   # §4.92 联合标定后默认开（词/字/码表同 log 尺度；黄金 52/52）
+REWEIGHT="${REWEIGHT:-log1000}"   # §4.92 采用 log1000（α=mix 可做扫描，见 reweight --scale mix --alpha）
 CHAR_SHIFT="${CHAR_SHIFT:-0}"
 LM_TOPK_2="${LM_TOPK_2:-600000}"
 LM_TOPK_3="${LM_TOPK_3:-600000}"
@@ -147,9 +147,12 @@ for i in "${!STAGES[@]}"; do
       git -C "$ROOT" checkout -- dicts/ 2>/dev/null || true   # 从干净词库出发，保证可复现
       if [ "$REWEIGHT" != "off" ] && [ -s "$ROOT/data/corpus/freq/recount_full.txt" ]; then
         local extra=""
-        [ "$REWEIGHT" = "log1000" ] && extra="--char-from-lm $ROOT/data/gram/lm_rerank.tsv --char-shift $CHAR_SHIFT"
+        case "$REWEIGHT" in
+          log1000|mix) extra="--char-from-lm $ROOT/data/gram/lm_rerank.tsv --char-shift $CHAR_SHIFT" ;;
+        esac
         "$PY" "$ROOT/scripts/reweight_from_corpus.py" \
-          --freq "$ROOT/data/corpus/freq/recount_full.txt" --scale "$REWEIGHT" $extra \
+          --freq "$ROOT/data/corpus/freq/recount_full.txt" --scale "$REWEIGHT" \
+          --alpha "${ALPHA:-0.5}" $extra \
           >>"$RUNLOG" 2>&1 && ok "词权重已按语料回归（${REWEIGHT}）" || warn "权重回归失败"
       else
         ok "权重回归: 关闭（保持仓库内词库原值；实测 log1000 会破黄金用例）"
