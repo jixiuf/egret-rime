@@ -27,8 +27,6 @@ sort: by_weight
 曖	jept	1
 噯	kep	1
 噯	kept	1
-僾	wep	1
-僾	wept	1
 嬡	vep	1
 嬡	vept	1
 敳	mgkt	1
@@ -100,8 +98,6 @@ sort: by_weight
 䶣	hbm	1
 䶣	hbmu	1
 嵦	mmgu	1
-欬	ynt	1
-欬	yntw	1
 焥	opq	1
 焥	opqb	1
 磑	dmg	1
@@ -236,7 +232,6 @@ sort: by_weight
 闇	uujd	1
 鵪	djn	1
 鵪	djno	1
-荌	apv	1
 侒	wpv	1
 侒	wpvg	1
 晻	jdj	1
@@ -272,8 +267,6 @@ sort: by_weight
 罯	luj	1
 堓	fmd	1
 堓	fmdf	1
-貋	eej	1
-貋	eejf	1
 雸	faf	1
 雸	faff	1
 鶕	ujw	1
@@ -518,8 +511,6 @@ sort: by_weight
 䥝	qynx	1
 墽	fry	1
 墽	fryt	1
-泑	ixl	1
-泑	ixln	1
 澚	itm	1
 澚	itmn	1
 熝	oyn	1
@@ -627,16 +618,12 @@ sort: by_weight
 𪃨	xxmo	1
 𪓴	fqt	1
 𪓾	bmy	1
-峇	mwg	1
-峇	mwgk	1
 抜	rdc	1
 抜	rdcy	1
 罷	lce	1
 罷	lcex	1
 覇	saf	1
 覇	safe	1
-茇	adc	1
-茇	adcu	1
 丷	uyt	1
 犮	dcu	1
 壩	ffa	1
@@ -645,8 +632,6 @@ sort: by_weight
 軷	ldcy	1
 弝	xcn	1
 鈀	qcn	1
-叐	tdc	1
-叐	tdcu	1
 癹	wmc	1
 癹	wmcu	1
 玐	gwy	1
@@ -674,7 +659,6 @@ sort: by_weight
 釟	qwy	1
 颰	mtj	1
 颰	mtjc	1
-㞎	ncv	1
 䎬	dil	1
 䎬	dilc	1
 䩗	afe	1
@@ -792,10 +776,10 @@ sort: by_weight
 粺	ortf	1
 挀	rre	1
 挀	rrey	1
+絔	xdj	1
+絔	xdjg	1
 韛	nhk	1
 韛	nhke	1
-薭	atr	1
-薭	atrf	1
 贁	mmt	1
 贁	mmty	1
 猈	qtr	1
@@ -867,13 +851,10 @@ sort: by_weight
 辦	ulu	1
 辦	uluh	1
 闆	ukk	1
-粄	orc	1
-粄	orcy	1
 舨	ter	1
 舨	terc	1
 頒	wvd	1
 絆	xuf	1
-蝂	jthc	1
 岅	mrcy	1
 螌	tem	1
 螌	temj	1
@@ -883,8 +864,6 @@ sort: by_weight
 姅	vufh	1
 鉡	quf	1
 鉡	qufh	1
-瓪	gny	1
-瓪	gnyc	1
 怑	nuf	1
 褩	tem	1
 辬	uyu	1
@@ -988,8 +967,6 @@ sort: by_weight
 謗	yupy	1
 綁	xdt	1
 綁	xdtb	1
-幇	fff	1
-幇	fffh	1
 牓	thg	1
 牓	thgy	1
 鎊	qup	1
@@ -1084,7 +1061,6 @@ sort: by_weight
 寶	pgr	1
 飽	wyv	1
 飽	wyvn	1
-寳	pgq	1
 鮑	qoq	1
 鮑	qoqn	1
 髱	deq	1
@@ -1099,13 +1075,10 @@ sort: by_weight
 鉋	qqn	1
 媬	vwk	1
 媬	vwks	1
-寚	pgr	1
 緥	xwk	1
 緥	xwks	1
 骲	meq	1
 骲	meqn	1
-菢	arq	1
-菢	arqn	1
 靌	fpg	1
 靌	fpgm	1
 袌	yqn	1
@@ -1259,8 +1232,6 @@ sort: by_weight
 貝	mhny	1
 輩	djd	1
 輩	djdl	1
-揹	rux	1
-揹	ruxe	1
 盃	gil	1
 憊	wat	1
 憊	watn	1
@@ -1300,8 +1271,6 @@ sort: by_weight
 郥	mbh	1
 鉳	qux	1
 鉳	quxn	1
-藣	alc	1
-藣	alcx	1
 愂	fpb	1
 昁	jgm	1
 㶔	ill	1
@@ -1311,13 +1280,10 @@ sort: by_weight
 㻗	djd	1
 䰽	qog	1
 䰽	qogh	1
-杮	sgm	1
 柸	sgi	1
 柸	sgig	1
 棑	sdj	1
 棑	sdjd	1
-痺	urt	1
-痺	urtf	1
 箄	trt	1
 諀	yrt	1
 諀	yrtf	1
@@ -1437,7 +1403,6 @@ sort: by_weight
 𪂃	wvg	1
 渀	idf	1
 渀	idfa	1
-泍	isgg	1
 奙	cdj	1
 奙	cdjn	1
 楍	skk	1
@@ -1452,9 +1417,6 @@ sort: by_weight
 撪	rcdl	1
 桳	scd	1
 桳	scdf	1
-喯	kdf	1
-喯	kdfa	1
-夲	dfj	1
 炃	wvo	1
 炃	wvou	1
 蟦	jfa	1
@@ -1622,7 +1584,6 @@ sort: by_weight
 幣	umih	1
 閉	uft	1
 躄	nkuh	1
-禆	pyr	1
 斃	umi	1
 箆	tmw	1
 箆	tmwx	1
@@ -1748,7 +1709,6 @@ sort: by_weight
 鷝	jafo	1
 鰏	qog	1
 鰏	qogl	1
-朼	sxn	1
 螕	jtl	1
 螕	jtlx	1
 貱	mhc	1
@@ -2108,10 +2068,7 @@ sort: by_weight
 邊	thp	1
 邊	thpp	1
 辺	vpv	1
-変	yot	1
-変	yotu	1
 編	xyna	1
-釆	toi	1
 辯	uyu	1
 貶	mtp	1
 貶	mtpy	1
@@ -2121,7 +2078,6 @@ sort: by_weight
 峅	mcah	1
 辧	uvu	1
 辧	uvuh	1
-窆	pwt	1
 辮	uxi	1
 缏	xwgq	1
 甂	ynm	1
@@ -2133,7 +2089,6 @@ sort: by_weight
 艑	teya	1
 鯿	qoy	1
 鯿	qoya	1
-汳	irc	1
 獱	qtp	1
 獱	qtpm	1
 藊	atya	1
@@ -2292,8 +2247,6 @@ sort: by_weight
 𪓍	nah	1
 𪖯	thl	1
 𪖯	thla	1
-飚	mqo	1
-飚	mqoo	1
 標	ssf	1
 標	ssfi	1
 灬	oyy	1
@@ -2614,15 +2567,11 @@ sort: by_weight
 併	wua	1
 併	wuah	1
 幷	tft	1
-鞞	afr	1
-鞞	afrf	1
 冫	uyg	1
 竝	uug	1
 昞	jgm	1
-掤	ree	1
 鈵	qgm	1
 仌	wwu	1
-倂	wtf	1
 抦	rgm	1
 抦	rgmw	1
 餠	wyv	1
@@ -2633,8 +2582,6 @@ sort: by_weight
 棅	stg	1
 棅	stgi	1
 靐	flf	1
-鉼	qua	1
-鉼	quah	1
 垪	fua	1
 垪	fuah	1
 傡	wuu	1
@@ -2738,12 +2685,8 @@ sort: by_weight
 蘗	anks	1
 缽	rms	1
 缽	rmsg	1
-髆	meg	1
-髆	megf	1
 鉢	qsg	1
 鉢	qsgg	1
-馎	qng	1
-馎	qngf	1
 駮	cuq	1
 駮	cuqy	1
 鉑	qrg	1
@@ -2829,11 +2772,7 @@ sort: by_weight
 䗚	jgef	1
 噃	kto	1
 噃	ktol	1
-壆	wfq	1
-壆	wfqf	1
 彴	tqy	1
-擗	rnk	1
-擗	rnku	1
 檘	snk	1
 檘	snku	1
 殕	gqu	1
@@ -2841,8 +2780,6 @@ sort: by_weight
 發	wxmc	1
 皪	rxr	1
 皪	rxrs	1
-礡	dag	1
-礡	dagf	1
 穛	twy	1
 穛	twyo	1
 糪	nkuo	1
@@ -3069,11 +3006,8 @@ sort: by_weight
 𪙍	hbgf	1
 𪚷	hct	1
 𪚷	hctn	1
-歩	hit	1
-歩	hitr	1
 補	pug	1
 補	pugy	1
-咘	kdmh	1
 佈	wdm	1
 佈	wdmh	1
 廍	yuk	1
@@ -3081,8 +3015,6 @@ sort: by_weight
 钸	qdmh	1
 庯	yge	1
 庯	ygey	1
-吥	kgi	1
-吥	kgiy	1
 誧	yge	1
 誧	ygey	1
 捗	rhi	1
@@ -3095,8 +3027,6 @@ sort: by_weight
 郶	ukk	1
 郶	ukkc	1
 踄	khh	1
-荹	ahi	1
-荹	ahir	1
 峬	mge	1
 峬	mgey	1
 歨	hhu	1
@@ -3270,8 +3200,6 @@ sort: by_weight
 寀	pesu	1
 綵	xes	1
 綵	xesy	1
-婇	ves	1
-婇	vesy	1
 埰	fes	1
 埰	fesy	1
 啋	kes	1
@@ -3333,8 +3261,6 @@ sort: by_weight
 𪇭	awf	1
 𪇭	awfo	1
 參	ccc	1
-喰	kwy	1
-喰	kwye	1
 殘	gqa	1
 殘	gqaa	1
 慘	ncc	1
@@ -3358,8 +3284,6 @@ sort: by_weight
 傪	wcc	1
 儏	whq	1
 儏	whqo	1
-慙	lrn	1
-慙	lrnu	1
 蠺	gdg	1
 蝅	gdg	1
 黲	lfo	1
@@ -3505,8 +3429,6 @@ sort: by_weight
 獊	qtw	1
 鶬	wyv	1
 鶬	wyvo	1
-欌	sad	1
-欌	sadt	1
 濸	iaw	1
 鑶	qad	1
 鑶	qadt	1
@@ -3546,8 +3468,6 @@ sort: by_weight
 𩕹	awy	1
 𩝞	wyv	1
 𩝞	wyvk	1
-艸	btb	1
-艸	btbh	1
 曺	gmj	1
 懆	nkk	1
 懆	nkks	1
@@ -3630,7 +3550,6 @@ sort: by_weight
 憡	ntg	1
 憡	ntgi	1
 厠	dmjk	1
-箣	tgm	1
 拺	rgm	1
 拺	rgmi	1
 筴	tdw	1
@@ -3643,8 +3562,6 @@ sort: by_weight
 荝	amjj	1
 萴	amj	1
 萴	amjj	1
-粣	omm	1
-粣	ommg	1
 筞	tps	1
 筞	tpsu	1
 蓛	agm	1
@@ -3653,8 +3570,6 @@ sort: by_weight
 䇲	tgu	1
 㥽	ngm	1
 㥽	ngmy	1
-夨	gny	1
-夨	gnyi	1
 㨲	rap	1
 㨲	raps	1
 㩍	rtgi	1
@@ -3772,7 +3687,6 @@ sort: by_weight
 硳	dfo	1
 猠	qtm	1
 挿	rtgh	1
-詧	wyf	1
 揷	rtf	1
 揷	rtfv	1
 詫	ypt	1
@@ -3797,8 +3711,6 @@ sort: by_weight
 疀	vlgh	1
 鍤	qtf	1
 鍤	qtfv	1
-銟	qmm	1
-銟	qmmh	1
 㢉	ytt	1
 㤞	npt	1
 㤞	npta	1
@@ -3815,8 +3727,6 @@ sort: by_weight
 査	segf	1
 芆	acy	1
 芆	acyu	1
-鉏	qeg	1
-鉏	qegg	1
 鎈	qud	1
 鎈	quda	1
 㛳	upmv	1
@@ -4088,8 +3998,6 @@ sort: by_weight
 繟	xkk	1
 繟	xkkf	1
 攙	rqk	1
-欃	sqk	1
-欃	sqky	1
 滻	iut	1
 煘	odg	1
 煘	odgt	1
@@ -4097,10 +4005,6 @@ sort: by_weight
 嚵	kqky	1
 艬	teq	1
 艬	teqy	1
-獑	qtl	1
-獑	qtlr	1
-幨	mhq	1
-幨	mhqy	1
 酁	qkx	1
 酁	qkxb	1
 鋓	qtj	1
@@ -4155,9 +4059,6 @@ sort: by_weight
 漸	ilrh	1
 緂	xoo	1
 緂	xooy	1
-繵	xyl	1
-繵	xylg	1
-苂	aou	1
 螹	jlr	1
 螹	jlrh	1
 蟐	jip	1
@@ -4395,7 +4296,6 @@ sort: by_weight
 镸	dgh	1
 镸	dghy	1
 仩	whg	1
-仧	hwu	1
 鱨	qoi	1
 鱨	qoij	1
 膓	etj	1
@@ -4539,7 +4439,6 @@ sort: by_weight
 欩	vkqw	1
 巐	mym	1
 巐	myma	1
-牊	thg	1
 鼂	jgm	1
 鼂	jgmv	1
 㷅	bco	1
@@ -4641,8 +4540,6 @@ sort: by_weight
 硩	rrd	1
 勶	tyc	1
 勶	tycl	1
-瞮	hyc	1
-瞮	hyct	1
 硨	dlh	1
 唓	klh	1
 莗	alj	1
@@ -4751,8 +4648,6 @@ sort: by_weight
 綝	xssy	1
 鍖	qad	1
 鍖	qadn	1
-硶	dmw	1
-硶	dmwn	1
 曟	jjj	1
 曟	jjje	1
 諶	yad	1
@@ -4813,7 +4708,6 @@ sort: by_weight
 齔	hwwx	1
 贂	mcc	1
 贂	mcce	1
-䐜	efhw	1
 䜟	yfa	1
 𠋆	wus	1
 𠋆	wusy	1
@@ -4835,7 +4729,6 @@ sort: by_weight
 稱	tem	1
 稱	temf	1
 穪	tgw	1
-肜	eet	1
 跈	khw	1
 跈	khwe	1
 㕴	kpm	1
@@ -4937,8 +4830,6 @@ sort: by_weight
 蟶	jbkg	1
 撐	rip	1
 撐	ript	1
-僜	wwg	1
-僜	wwgu	1
 懲	tmg	1
 懲	tmgn	1
 娍	vdn	1
@@ -5003,8 +4894,6 @@ sort: by_weight
 荿	adnt	1
 鯎	qod	1
 鯎	qodt	1
-阷	bgh	1
-阷	bghg	1
 靗	gei	1
 靗	geiq	1
 饓	wyv	1
@@ -5186,18 +5075,12 @@ sort: by_weight
 𩯎	ded	1
 𩯎	dedl	1
 𪁋	dnno	1
-呎	kny	1
-呎	knyy	1
-勅	gki	1
-勅	gkil	1
 遲	nir	1
 遲	nirp	1
 恥	bny	1
 喫	kdh	1
 喫	kdhd	1
 齒	hww	1
-黐	twi	1
-黐	twic	1
 癡	uxt	1
 歯	hob	1
 歯	hobj	1
@@ -5242,8 +5125,6 @@ sort: by_weight
 袲	yqqe	1
 胵	egc	1
 鉹	qqq	1
-瘈	udh	1
-瘈	udhd	1
 噄	kdh	1
 噄	kdhi	1
 裭	puh	1
@@ -5300,7 +5181,6 @@ sort: by_weight
 蚇	jnyy	1
 鷘	gki	1
 鷘	gkio	1
-粚	otb	1
 誺	ysw	1
 誺	ysww	1
 𠡠	gol	1
@@ -5853,10 +5733,7 @@ sort: by_weight
 檮	sfn	1
 檮	sfnf	1
 牰	trm	1
-詶	yyt	1
 跾	wht	1
-醔	tos	1
-醔	tosg	1
 鮘	qow	1
 鮘	qowa	1
 㛶	vmd	1
@@ -5978,13 +5855,10 @@ sort: by_weight
 廚	yfkf	1
 礎	dss	1
 礎	dssh	1
-岀	mmj	1
-処	tmv	1
 儲	wyf	1
 豖	eyi	1
 齣	hww	1
 齣	hwwk	1
-閦	uww	1
 雛	qbt	1
 雛	qbty	1
 櫥	syf	1
@@ -6271,14 +6145,10 @@ sort: by_weight
 𨣅	sgj	1
 𨣅	sgjc	1
 傳	wgj	1
-巛	vnn	1
-巛	vnnn	1
 舡	tea	1
 舡	teag	1
 舩	tew	1
 舩	tewc	1
-荈	aqa	1
-荈	aqah	1
 釧	qkh	1
 歂	mdm	1
 歂	mdmw	1
@@ -6291,7 +6161,6 @@ sort: by_weight
 僢	weph	1
 賗	mkk	1
 賗	mkkh	1
-踳	khd	1
 輲	lmd	1
 輲	lmdj	1
 鶨	xew	1
@@ -6378,8 +6247,6 @@ sort: by_weight
 喠	ktgf	1
 囪	tlr	1
 囪	tlry	1
-朣	euj	1
-朣	eujf	1
 㡖	mht	1
 㡖	mhtf	1
 㼽	dqq	1
@@ -6434,8 +6301,6 @@ sort: by_weight
 搥	rwnp	1
 鎚	qwn	1
 鎚	qwnp	1
-箠	ttg	1
-箠	ttgf	1
 腄	etg	1
 菙	atg	1
 菙	atgf	1
@@ -6508,7 +6373,6 @@ sort: by_weight
 杶	sgb	1
 浱	idf	1
 浱	idfe	1
-櫄	stg	1
 湻	iyj	1
 醕	sgy	1
 鶞	rfh	1
@@ -6530,8 +6394,6 @@ sort: by_weight
 暙	jdw	1
 暙	jdwj	1
 萶	adwj	1
-睶	hdw	1
-睶	hdwj	1
 陙	bdf	1
 陙	bdfe	1
 賰	mdw	1
@@ -6613,7 +6475,6 @@ sort: by_weight
 𪂹	dwjo	1
 辶	pyn	1
 辶	pyny	1
-辵	ehu	1
 娕	vgk	1
 娕	vgki	1
 娖	vkh	1
@@ -6640,7 +6501,6 @@ sort: by_weight
 㚟	qkxd	1
 㲋	qkx	1
 㲋	qkxx	1
-吷	knw	1
 哾	kuk	1
 哾	kukq	1
 婥	vhj	1
@@ -6720,8 +6580,6 @@ sort: by_weight
 薋	auqm	1
 佌	whx	1
 佌	whxn	1
-甆	uxx	1
-甆	uxxn	1
 辤	epc	1
 辤	epcu	1
 鴜	hxw	1
@@ -6935,7 +6793,6 @@ sort: by_weight
 叢	oguc	1
 孮	bpf	1
 孮	bpfi	1
-怱	qry	1
 婃	vpf	1
 婃	vpfi	1
 瑽	gtw	1
@@ -6991,20 +6848,14 @@ sort: by_weight
 憁	ntl	1
 憁	ntln	1
 匇	qqi	1
-徔	tap	1
-徔	tapy	1
 愡	nqr	1
 愡	nqrn	1
-楤	sqr	1
-楤	sqrn	1
 潈	itl	1
 潈	itle	1
 潨	itl	1
 潨	itli	1
 碂	dpf	1
 碂	dpfi	1
-総	xwc	1
-総	xwcn	1
 總	xtl	1
 錝	qpf	1
 錝	qpfi	1
@@ -7157,10 +7008,8 @@ sort: by_weight
 憱	nyin	1
 瘯	uyt	1
 瘯	uytd	1
-瘄	uajd	1
 鼀	fwm	1
 鼀	fwmv	1
-趗	fhk	1
 媨	vus	1
 媨	vusg	1
 脨	egk	1
@@ -7176,7 +7025,6 @@ sort: by_weight
 皻	hae	1
 皻	haec	1
 趨	fhq	1
-踿	kht	1
 錯	qaj	1
 麆	ynj	1
 㗤	dhi	1
@@ -7319,7 +7167,6 @@ sort: by_weight
 𨼉	bnen	1
 粋	ovfh	1
 伜	wvf	1
-倅	wyw	1
 綷	xyw	1
 綷	xywf	1
 焠	oyw	1
@@ -7471,7 +7318,6 @@ sort: by_weight
 拵	rdhb	1
 膥	gsd	1
 膥	gsdw	1
-踆	khc	1
 刌	fjh	1
 澊	ius	1
 澊	iusf	1
@@ -7588,8 +7434,6 @@ sort: by_weight
 噠	kfu	1
 噠	kfup	1
 龘	ueg	1
-呾	kjg	1
-呾	kjgg	1
 汏	idy	1
 龖	ueg	1
 燵	ofu	1
@@ -7735,8 +7579,6 @@ sort: by_weight
 𩺗	qoak	1
 帶	aqp	1
 帶	aqph	1
-甙	aaf	1
-甙	aafd	1
 帯	gkg	1
 貸	wam	1
 貸	wamu	1
@@ -7864,20 +7706,16 @@ sort: by_weight
 啗	kqv	1
 啗	kqvg	1
 単	ijf	1
-蜑	thp	1
-蜑	thpj	1
 膽	eqd	1
 膽	eqdy	1
 誕	yth	1
 誕	ythp	1
 噉	knb	1
 噉	knbt	1
-襌	puk	1
 勯	ylk	1
 勯	ylkl	1
 玬	gmy	1
 褝	pui	1
-柦	sjgg	1
 躭	tmd	1
 紞	xpq	1
 紞	xpqn	1
@@ -7885,7 +7723,6 @@ sort: by_weight
 窞	pwqv	1
 鄲	kkj	1
 鄲	kkjb	1
-禫	pys	1
 髧	dep	1
 髧	depq	1
 撢	rsj	1
@@ -8124,7 +7961,6 @@ sort: by_weight
 𪒾	lfod	1
 當	ipk	1
 當	ipkl	1
-氹	nii	1
 檔	sip	1
 檔	sipl	1
 蟷	jip	1
@@ -8175,8 +8011,6 @@ sort: by_weight
 闣	uipl	1
 婸	vjg	1
 婸	vjgr	1
-瓽	ipk	1
-瓽	ipkn	1
 趤	fhp	1
 艡	tei	1
 艡	teil	1
@@ -8267,8 +8101,6 @@ sort: by_weight
 導	uthf	1
 島	wvg	1
 島	wvgm	1
-稲	teh	1
-稲	tehj	1
 盜	iqw	1
 盜	iqwl	1
 陦	bdt	1
@@ -8382,8 +8214,6 @@ sort: by_weight
 𩭟	dehj	1
 𩵕	qov	1
 𩵕	qovy	1
-徳	tfl	1
-徳	tfln	1
 悳	fhn	1
 惪	fhn	1
 淂	ijg	1
@@ -8496,14 +8326,10 @@ sort: by_weight
 𪒘	lfo	1
 𪔏	fku	1
 𪔏	fkuj	1
-啲	krq	1
-啲	krqy	1
 頔	mdm	1
 頔	mdmy	1
 遞	rha	1
 遞	rhap	1
-旳	jqy	1
-旳	jqyy	1
 敵	umd	1
 敵	umdt	1
 廸	mpd	1
@@ -8521,7 +8347,6 @@ sort: by_weight
 諦	yup	1
 諦	yuph	1
 牴	trqy	1
-苖	amf	1
 逓	rfm	1
 逓	rfmp	1
 觝	qeq	1
@@ -8605,7 +8430,6 @@ sort: by_weight
 怟	nqa	1
 怟	nqay	1
 嚁	knw	1
-菧	ayq	1
 祶	pyu	1
 藡	aum	1
 藡	aump	1
@@ -8627,16 +8451,12 @@ sort: by_weight
 䏑	qmw	1
 䣌	yqa	1
 䣌	yqab	1
-䯼	deq	1
-䯼	deqo	1
 儥	wfl	1
 儥	wflm	1
-哋	kfb	1
 啇	umd	1
 啇	umdf	1
 埅	byf	1
 埅	byff	1
-墆	faq	1
 岻	mqa	1
 岻	mqay	1
 嵽	maq	1
@@ -8850,8 +8670,6 @@ sort: by_weight
 點	lfok	1
 電	fjn	1
 電	fjnb	1
-槙	sfh	1
-槙	sfhw	1
 墊	fuf	1
 墊	fuff	1
 顛	fhw	1
@@ -9046,7 +8864,6 @@ sort: by_weight
 藋	anwy	1
 鼦	vnu	1
 鼦	vnuk	1
-奝	dmf	1
 刟	vkj	1
 刟	vkjh	1
 魡	qoq	1
@@ -9408,8 +9225,6 @@ sort: by_weight
 椗	spgh	1
 奵	vsh	1
 錠	qpgh	1
-帄	mhs	1
-帄	mhsh	1
 濎	ihn	1
 鼑	hhn	1
 鼑	hhnn	1
@@ -9432,7 +9247,6 @@ sort: by_weight
 𤐣	ohn	1
 𤐣	ohnn	1
 㝎	ppu	1
-掟	rpg	1
 甼	lsj	1
 艼	asj	1
 㐉	snb	1
@@ -9491,8 +9305,6 @@ sort: by_weight
 東	gjii	1
 動	tgj	1
 動	tgjl	1
-苳	atu	1
-苳	atuu	1
 凍	ugj	1
 凍	ugji	1
 鮗	qot	1
@@ -9560,8 +9372,6 @@ sort: by_weight
 勭	ujfl	1
 燑	ouj	1
 燑	oujf	1
-狪	qtm	1
-狪	qtmk	1
 衕	tmg	1
 㐑	tun	1
 㐑	tunb	1
@@ -9647,8 +9457,6 @@ sort: by_weight
 𪔦	fku	1
 𪔦	fkuk	1
 𪔳	btg	1
-荳	agk	1
-荳	agku	1
 闘	ugk	1
 鬥	hgg	1
 鬪	hgg	1
@@ -9658,8 +9466,6 @@ sort: by_weight
 脰	egk	1
 脰	egku	1
 竇	pwf	1
-枓	suf	1
-饾	qng	1
 鬭	hgg	1
 鬭	hggr	1
 吺	kmc	1
@@ -9814,8 +9620,6 @@ sort: by_weight
 賭	mftj	1
 妬	vdg	1
 篤	tcu	1
-覩	ftj	1
-覩	ftjq	1
 闍	uft	1
 牘	thg	1
 鍍	qya	1
@@ -9823,8 +9627,6 @@ sort: by_weight
 涜	ifp	1
 涜	ifpq	1
 蠧	fpd	1
-秺	tpt	1
-秺	tpta	1
 騳	ccy	1
 讟	yfl	1
 讟	yfly	1
@@ -9844,7 +9646,6 @@ sort: by_weight
 鑟	qflm	1
 荰	asf	1
 荰	asff	1
-琽	gft	1
 裻	hic	1
 裻	hice	1
 櫝	sfl	1
@@ -9883,12 +9684,9 @@ sort: by_weight
 噣	klq	1
 噣	klqj	1
 塗	iwt	1
-斁	lfu	1
 晵	ynt	1
 暏	jft	1
 暏	jftj	1
-睪	lfu	1
-睪	lfuf	1
 鍺	qft	1
 鍺	qftj	1
 㞘	ney	1
@@ -10069,6 +9867,8 @@ sort: by_weight
 鍴	qmdj	1
 褍	pum	1
 葮	awd	1
+腶	ewd	1
+腶	ewdc	1
 偳	wmd	1
 偳	wmdj	1
 毈	qyt	1
@@ -10115,7 +9915,6 @@ sort: by_weight
 對	ogu	1
 隊	bue	1
 隊	buey	1
-対	yfy	1
 頧	wnnm	1
 兌	wkq	1
 兌	wkqb	1
@@ -10422,8 +10221,6 @@ sort: by_weight
 䤪	qmsy	1
 𡶲	mes	1
 𡶲	mesy	1
-媠	vda	1
-媠	vdae	1
 崜	mtg	1
 杝	sbn	1
 柂	stb	1
@@ -10573,7 +10370,6 @@ sort: by_weight
 餓	wyv	1
 頞	pvd	1
 頞	pvdm	1
-譌	yet	1
 峩	mtr	1
 諤	ykk	1
 諤	ykkn	1
@@ -10622,8 +10418,6 @@ sort: by_weight
 堊	ghgf	1
 鶚	kkfo	1
 卾	kkfb	1
-鑩	qgk	1
-鑩	qgkk	1
 吪	kwx	1
 吪	kwxn	1
 砐	dey	1
@@ -10649,8 +10443,6 @@ sort: by_weight
 偔	wkkn	1
 騀	ctr	1
 騀	ctrt	1
-軶	lyn	1
-軶	lynn	1
 妿	lkv	1
 齃	thl	1
 齃	thln	1
@@ -10916,7 +10708,6 @@ sort: by_weight
 𪙯	ydhb	1
 誒	yct	1
 誒	yctd	1
-奀	gid	1
 煾	oldn	1
 峎	mve	1
 峎	mveu	1
@@ -11069,8 +10860,6 @@ sort: by_weight
 𪐰	ylfo	1
 𪕔	vnu	1
 𪕔	vnub	1
-発	wfq	1
-発	wfqb	1
 髮	ded	1
 髮	dedc	1
 髪	ded	1
@@ -11103,8 +10892,6 @@ sort: by_weight
 佱	wfhf	1
 傠	wyf	1
 傠	wyfy	1
-姂	vtp	1
-姂	vtpy	1
 醱	sgw	1
 醱	sgwc	1
 藅	aly	1
@@ -11168,8 +10955,6 @@ sort: by_weight
 範	tlbb	1
 煩	odm	1
 煩	odmy	1
-繙	xto	1
-繙	xtol	1
 販	mrcy	1
 旛	ytt	1
 汎	imy	1
@@ -11182,8 +10967,6 @@ sort: by_weight
 笵	tibb	1
 飜	tol	1
 飜	tolh	1
-柉	stp	1
-柉	stpy	1
 杋	smy	1
 礬	sqq	1
 礬	sqqd	1
@@ -11394,9 +11177,6 @@ sort: by_weight
 𪖇	vnul	1
 訪	yyn	1
 紡	xyn	1
-倣	wyt	1
-髣	dey	1
-髣	deyb	1
 匚	agn	1
 淓	iay	1
 汸	iyn	1
@@ -11652,7 +11432,6 @@ sort: by_weight
 糞	ola	1
 墳	ffa	1
 墳	ffam	1
-枌	swv	1
 濆	ifa	1
 濆	ifam	1
 朆	uljr	1
@@ -11870,8 +11649,6 @@ sort: by_weight
 篈	tff	1
 灃	idh	1
 灃	idhu	1
-凬	mgj	1
-凬	mgjd	1
 飌	akk	1
 飌	akkj	1
 焨	oje	1
@@ -11883,7 +11660,6 @@ sort: by_weight
 摓	rtdp	1
 檒	ssm	1
 檒	ssmj	1
-溄	imt	1
 碸	dmt	1
 蘴	adh	1
 蘴	adhu	1
@@ -11996,13 +11772,10 @@ sort: by_weight
 覅	svqr	1
 𧟰	qrs	1
 𧟰	qrsv	1
-仏	wcy	1
 坲	fxj	1
 坲	fxjh	1
 梻	swx	1
 梻	swxj	1
-仸	wtd	1
-仸	wtdy	1
 𧥚	dgk	1
 𧥚	dgke	1
 𧼴	fhm	1
@@ -12049,14 +11822,9 @@ sort: by_weight
 冨	pgkl	1
 輔	lge	1
 輔	lgey	1
-褔	pug	1
-褔	pugl	1
-伕	wfw	1
 賦	mga	1
 賦	mgah	1
 阝	bnh	1
-乀	yyl	1
-乀	yyll	1
 撫	rrl	1
 撫	rrlo	1
 栿	swd	1
@@ -12065,23 +11833,14 @@ sort: by_weight
 髴	dexj	1
 鍑	qtj	1
 鍑	qtjt	1
-俛	wqk	1
-俛	wqkq	1
 縛	xge	1
 縛	xgef	1
-旉	geh	1
-旉	gehy	1
 俌	wge	1
-鳆	qgtt	1
-蝜	jqm	1
-蝜	jqmy	1
 麩	sww	1
 麩	swww	1
 綍	xfp	1
 綍	xfpb	1
 畉	lfw	1
-郙	geh	1
-郙	gehb	1
 烰	oeb	1
 烰	oebg	1
 袝	puw	1
@@ -12092,8 +11851,6 @@ sort: by_weight
 尃	geh	1
 尃	gehf	1
 鈇	qfw	1
-襆	puo	1
-襆	puoy	1
 蜅	jge	1
 蜅	jgey	1
 枎	sfw	1
@@ -12115,14 +11872,11 @@ sort: by_weight
 葍	agkl	1
 坿	fwf	1
 坿	fwfy	1
-澓	itt	1
-澓	ittt	1
 釡	wqf	1
 鮒	qow	1
 鮒	qowf	1
 紱	xdc	1
 紱	xdcy	1
-虙	han	1
 踾	khg	1
 踾	khgl	1
 鵩	ebco	1
@@ -12154,8 +11908,6 @@ sort: by_weight
 紨	xwfy	1
 椱	stj	1
 椱	stjt	1
-椨	syw	1
-椨	sywf	1
 蚹	jwf	1
 蚹	jwfy	1
 鮲	qow	1
@@ -12185,7 +11937,6 @@ sort: by_weight
 秿	tgey	1
 鳺	fww	1
 鳺	fwwo	1
-妋	vfw	1
 緮	xtj	1
 緮	xtjt	1
 鰒	qot	1
@@ -12204,8 +11955,6 @@ sort: by_weight
 蚥	jwqy	1
 麬	sww	1
 麬	swwc	1
-禣	pyg	1
-禣	pygf	1
 綒	xeb	1
 綒	xebg	1
 訃	yhy	1
@@ -12242,8 +11991,6 @@ sort: by_weight
 乶	gehn	1
 翇	ndc	1
 翇	ndcu	1
-糐	oge	1
-糐	ogef	1
 㭪	sge	1
 㭪	sgey	1
 㟊	meb	1
@@ -12258,8 +12005,6 @@ sort: by_weight
 䱐	qoeb	1
 𤙭	trg	1
 𤙭	trgy	1
-呒	kfq	69
-呒	kfqn	69
 帗	mhd	1
 帗	mhdc	1
 彿	txj	1
@@ -12272,8 +12017,6 @@ sort: by_weight
 璷	gge	1
 纀	xwo	1
 纀	xwoy	1
-胕	ewf	1
-胕	ewfy	1
 蓲	aak	1
 蓲	aakk	1
 豧	ege	1
@@ -12719,7 +12462,6 @@ sort: by_weight
 郂	yntb	1
 瓂	gaf	1
 瓂	gafl	1
-乢	mnn	1
 賌	ynt	1
 豥	eyn	1
 豥	eynw	1
@@ -12814,8 +12556,6 @@ sort: by_weight
 𣹟	iamy	1
 佄	waf	1
 佄	wafg	1
-咁	kaf	1
-咁	kafg	1
 澸	idg	1
 澸	idgn	1
 篢	tam	1
@@ -12934,7 +12674,6 @@ sort: by_weight
 岡	mumk	1
 綱	xmu	1
 綱	xmum	1
-釭	qag	1
 崗	mmu	1
 崗	mmum	1
 堈	fmum	1
@@ -13003,22 +12742,16 @@ sort: by_weight
 𧧭	yta	1
 𧧭	ytah	1
 𨟼	sgy	1
-髙	yjf	1
 皐	rif	1
 皐	rifj	1
-吿	rhk	1
 臯	thif	1
 檺	syp	1
 檺	sype	1
-羙	ugo	1
-羙	ugou	1
 槀	ymks	1
 稾	ymkt	1
 誥	ytf	1
 藳	aym	1
 藳	aymt	1
-櫜	gkh	1
-櫜	gkhs	1
 峼	mtf	1
 鋯	qtf	1
 餻	wyv	1
@@ -13035,8 +12768,6 @@ sort: by_weight
 勂	tfk	1
 禞	pyy	1
 禞	pyyk	1
-橰	sth	1
-橰	sthf	1
 菒	ajs	1
 菒	ajsu	1
 稁	ypt	1
@@ -13127,7 +12858,6 @@ sort: by_weight
 韐	nhk	1
 嗰	kwl	1
 箇	tld	1
-臵	gcfk	1
 謌	ysk	1
 閣	utk	1
 閣	utkd	1
@@ -13139,15 +12869,14 @@ sort: by_weight
 閤	uwgk	1
 鎶	qsk	1
 鎶	qskk	1
-戓	akd	1
 彁	xsk	1
 彁	xskk	1
 佮	wwg	1
 擱	rut	1
+犵	qtt	1
+犵	qttn	1
 鞷	gkm	1
 鞷	gkmf	1
-獦	qta	1
-獦	qtan	1
 轕	laj	1
 轕	lajn	1
 諽	yaf	1
@@ -13192,8 +12921,6 @@ sort: by_weight
 佫	wtk	1
 吤	kwj	1
 吤	kwjh	1
-嘅	kvc	1
-嘅	kvcq	1
 扢	rtn	1
 笴	tsk	1
 笴	tskf	1
@@ -13387,8 +13114,6 @@ sort: by_weight
 𩒝	jxd	1
 𩓓	hxd	1
 𩓓	hxdm	1
-畊	lfj	1
-畊	lfjh	1
 賡	yvw	1
 賡	yvwm	1
 羮	ugo	1
@@ -13402,8 +13127,6 @@ sort: by_weight
 挭	rgjq	1
 峺	mgj	1
 峺	mgjq	1
-縆	xng	1
-縆	xngg	1
 綆	xgj	1
 綆	xgjq	1
 郠	gjq	1
@@ -13496,7 +13219,6 @@ sort: by_weight
 怾	nkwy	1
 宮	pkt	1
 宮	pktk	1
-栱	saw	1
 貢	amu	1
 厷	dcu	1
 廾	agt	1
@@ -13534,8 +13256,6 @@ sort: by_weight
 䲲	wcwo	1
 㫒	jaj	1
 㓋	uaw	1
-䂵	dam	1
-䂵	damy	1
 龷	agh	1
 龷	aghg	1
 㔶	auj	1
@@ -13549,9 +13269,7 @@ sort: by_weight
 嗊	kam	1
 嗊	kamy	1
 慐	amn	1
-澒	iad	1
 熕	oam	1
-糿	xvn	1
 紅	xag	1
 銾	qai	1
 銾	qaiy	1
@@ -13677,7 +13395,6 @@ sort: by_weight
 耈	ftxk	1
 撀	fnm	1
 撀	fnmr	1
-耉	ftt	1
 訽	yqk	1
 訽	yqkg	1
 玽	gqk	1
@@ -13703,8 +13420,6 @@ sort: by_weight
 傋	wfj	1
 區	akk	1
 區	akkk	1
-呴	kqk	1
-呴	kqkg	1
 啂	keb	1
 痀	uqk	1
 痀	uqkd	1
@@ -13799,8 +13514,6 @@ sort: by_weight
 蠱	jjj	1
 蠱	jjjl	1
 夃	eci	1
-盬	ahn	1
-盬	ahnl	1
 鴣	dwv	1
 鴣	dwvo	1
 淈	inb	1
@@ -13813,7 +13526,6 @@ sort: by_weight
 鮕	qodg	1
 傦	wme	1
 傦	wmeg	1
-泒	irc	1
 鈷	qdg	1
 棝	sld	1
 棝	sldg	1
@@ -13861,15 +13573,11 @@ sort: by_weight
 祻	pyld	1
 嫴	vdu	1
 嫴	vduh	1
-嗗	kme	1
-嗗	kmeg	1
 巭	alf	1
 巬	amf	1
 巬	amfw	1
 怘	dnu	1
 抇	rjg	1
-榾	sme	1
-榾	smeg	1
 櫎	sya	1
 櫎	syaw	1
 焸	jjo	1
@@ -14026,7 +13734,6 @@ sort: by_weight
 𪕷	fpg	1
 𪕷	fpgn	1
 掛	rffh	1
-叧	kvb	1
 啩	kff	1
 啩	kffh	1
 騧	cmn	1
@@ -14122,8 +13829,6 @@ sort: by_weight
 𩻎	qocw	1
 𪇜	apd	1
 𪇜	apdo	1
-叏	nhc	1
-叏	nhcu	1
 恠	ndh	1
 恠	ndhf	1
 柺	skl	1
@@ -14178,8 +13883,6 @@ sort: by_weight
 觀	akkq	1
 館	wyv	1
 館	wyvn	1
-観	rwy	1
-観	rwyq	1
 慣	nxf	1
 慣	nxfm	1
 瘝	uli	1
@@ -14211,8 +13914,6 @@ sort: by_weight
 泴	ilf	1
 鰥	qol	1
 鰥	qoli	1
-礶	dak	1
-礶	daky	1
 輨	lpn	1
 鱞	qol	1
 鱞	qole	1
@@ -14343,7 +14044,6 @@ sort: by_weight
 𩖒	drim	1
 𪈸	iak	1
 𪈸	iako	1
-広	yci	1
 撗	ram	1
 撗	ramw	1
 僙	wam	1
@@ -14374,8 +14074,6 @@ sort: by_weight
 輄	liqn	1
 㫛	jkq	1
 㫛	jkqn	1
-挄	riq	1
-挄	riqn	1
 硄	diq	1
 硄	diqn	1
 㤮	qtg	1
@@ -14449,8 +14147,6 @@ sort: by_weight
 璝	gkh	1
 璝	gkhm	1
 檜	swgj	1
-騩	crq	1
-騩	crqc	1
 鱖	qod	1
 鱖	qodw	1
 湀	iwg	1
@@ -14505,8 +14201,6 @@ sort: by_weight
 襘	puwj	1
 猤	qtw	1
 猤	qtwd	1
-庪	yrf	1
-庪	yrfc	1
 槶	sla	1
 槶	slag	1
 劌	hdg	1
@@ -14535,8 +14229,6 @@ sort: by_weight
 趹	khnw	1
 鐀	qkh	1
 鐀	qkhm	1
-鑎	qak	1
-鑎	qakm	1
 雟	btw	1
 雟	btwk	1
 㔳	awy	1
@@ -14793,17 +14485,10 @@ sort: by_weight
 國	lakg	1
 鍋	qmn	1
 鍋	qmnk	1
-菓	ajs	1
-菓	ajsu	1
-囯	lgd	1
 圀	lwy	1
 圀	lwyv	1
-啯	klg	1
-啯	klgy	1
 堝	fmn	1
 堝	fmnk	1
-墎	fyb	1
-墎	fybb	1
 濄	imn	1
 濄	imnp	1
 膕	ela	1
@@ -14847,7 +14532,6 @@ sort: by_weight
 咶	ktdg	1
 喐	kde	1
 喐	kdeb	1
-囗	lhng	1
 懖	qtd	1
 懖	qtdn	1
 摑	rla	1
@@ -14855,8 +14539,6 @@ sort: by_weight
 楇	smnk	1
 渦	imn	1
 渦	imnk	1
-猓	qtj	1
-猓	qtjs	1
 矌	hya	1
 矌	hyaw	1
 腂	ejs	1
@@ -15405,8 +15087,6 @@ sort: by_weight
 𩹼	fjwo	1
 𩾝	wvg	1
 垳	ftf	1
-斻	ytm	1
-斻	ytmn	1
 迒	ymp	1
 迒	ympv	1
 絎	xtf	1
@@ -15427,11 +15107,8 @@ sort: by_weight
 妔	vymn	1
 忼	nym	1
 忼	nymn	1
-裄	put	1
 邟	ymb	1
 邟	ymbh	1
-䀪	htf	1
-䀪	htfh	1
 䘕	tym	1
 䟘	khy	1
 䣈	kck	1
@@ -15487,10 +15164,6 @@ sort: by_weight
 恏	vbn	1
 澔	irt	1
 澔	irtk	1
-晧	jtf	1
-晧	jtfk	1
-滈	iym	1
-滈	iymk	1
 秏	ttfn	1
 悎	ntf	1
 悎	ntfk	1
@@ -15685,9 +15358,6 @@ sort: by_weight
 靏	fpw	1
 靏	fpwo	1
 渮	ias	1
-嗃	kym	1
-嗃	kymk	1
-礉	dry	1
 頜	wgk	1
 蠚	adk	1
 蠚	adkj	1
@@ -15720,8 +15390,6 @@ sort: by_weight
 惒	tknu	1
 鸖	fwy	1
 鸖	fwyo	1
-毼	jqw	1
-毼	jqwn	1
 袔	pus	1
 袔	pusk	1
 貈	eet	1
@@ -15752,8 +15420,6 @@ sort: by_weight
 喛	kef	1
 喛	kefc	1
 嚇	kfo	1
-朅	fcj	1
-朅	fcjn	1
 釛	qln	1
 閡	uyn	1
 閡	uynw	1
@@ -15989,8 +15655,6 @@ sort: by_weight
 𩻤	qolo	1
 佷	wve	1
 詪	yvey	1
-拫	rve	1
-拫	rvey	1
 鞎	afv	1
 鞎	afve	1
 㯊	sgh	1
@@ -16065,13 +15729,10 @@ sort: by_weight
 浤	ipd	1
 紘	xdc	1
 紘	xdcy	1
-汯	idc	1
-汯	idcy	1
 闀	uaw	1
 闀	uawn	1
 綋	xpd	1
 綋	xpdc	1
-鍧	qqy	1
 闂	uud	1
 闂	uudb	1
 焢	opw	1
@@ -16313,7 +15974,6 @@ sort: by_weight
 𪈘	alp	1
 𪈘	alpo	1
 後	txt	1
-犼	qtb	1
 鮜	qor	1
 鮜	qork	1
 矦	qdt	1
@@ -16463,9 +16123,6 @@ sort: by_weight
 虍	hav	1
 綔	dfn	1
 綔	dfni	1
-膴	erl	1
-膴	erlo	1
-曶	qrj	1
 鰗	qod	1
 鰗	qode	1
 嘑	kha	1
@@ -16475,8 +16132,6 @@ sort: by_weight
 泘	ituh	1
 槴	syn	1
 槴	sync	1
-虖	hat	1
-虖	hath	1
 頀	uja	1
 頀	ujac	1
 粐	oyn	1
@@ -16509,8 +16164,6 @@ sort: by_weight
 汻	itf	1
 幠	mhr	1
 幠	mhro	1
-螜	fpg	1
-螜	fpgj	1
 鱯	qoa	1
 鱯	qoac	1
 鶘	dew	1
@@ -16553,8 +16206,6 @@ sort: by_weight
 蔛	aqe	1
 蔛	aqef	1
 匢	aqr	1
-虝	ham	1
-虝	hamr	1
 鍸	qde	1
 鍸	qdeg	1
 帍	ynm	1
@@ -16978,8 +16629,6 @@ sort: by_weight
 澅	ivfg	1
 䱻	qom	1
 䱻	qome	1
-摦	rdf	1
-摦	rdfy	1
 䛡	yqa	1
 䛡	yqak	1
 䅿	tag	1
@@ -17110,8 +16759,6 @@ sort: by_weight
 蘹	anye	1
 耲	diy	1
 耲	diye	1
-蘾	afy	1
-蘾	afye	1
 佪	wlk	1
 佪	wlkg	1
 㜳	vyl	1
@@ -17165,10 +16812,6 @@ sort: by_weight
 雈	gjgy	1
 奐	qmw	1
 奐	qmwd	1
-槵	skk	1
-槵	skkn	1
-阛	ulg	1
-阛	ulge	1
 瘓	uqm	1
 瘓	uqmd	1
 渙	iqm	1
@@ -17382,18 +17025,12 @@ sort: by_weight
 𪍺	swwe	1
 黃	agm	1
 黃	agmw	1
-皝	rgi	1
-皝	rgiq	1
-晄	jiq	1
-晄	jiqn	1
 謊	yay	1
 謊	yayq	1
 熿	oam	1
 愰	nji	1
 愰	njiq	1
 熀	oji	1
-巟	ynq	1
-巟	ynqb	1
 怳	nkq	1
 怳	nkqn	1
 鍠	qrg	1
@@ -17449,8 +17086,6 @@ sort: by_weight
 鰉	qorg	1
 皩	rgj	1
 皩	rgjq	1
-䀮	hyn	1
-䀮	hynq	1
 㞷	bhgf	1
 𡧽	pyn	1
 𡧽	pynq	1
@@ -17605,8 +17240,6 @@ sort: by_weight
 燴	owgj	1
 薈	awg	1
 薈	awgj	1
-缋	xkh	1
-缋	xkhm	1
 穢	thd	1
 豗	gqe	1
 豗	gqei	1
@@ -17652,7 +17285,6 @@ sort: by_weight
 幑	tmt	1
 燬	ova	1
 燬	ovac	1
-嘒	kdh	1
 薉	ahd	1
 薉	ahdt	1
 頮	iad	1
@@ -18121,8 +17753,6 @@ sort: by_weight
 嚿	kaw	1
 嚿	kawv	1
 吙	koy	1
-臛	efw	1
-臛	efwy	1
 蒦	awy	1
 咟	kdj	1
 咟	kdjg	1
@@ -18183,8 +17813,6 @@ sort: by_weight
 窢	pwag	1
 篧	tpw	1
 鍃	qqr	1
-雘	mya	1
-雘	myac	1
 韄	afa	1
 韄	afac	1
 㗲	kvfg	1
@@ -18337,7 +17965,6 @@ sort: by_weight
 繋	lmci	1
 劑	yvu	1
 劑	yvuj	1
-丌	gjk	1
 鶏	efw	1
 鶏	efwo	1
 鷄	exd	1
@@ -18346,8 +17973,6 @@ sort: by_weight
 飢	wyvm	1
 磯	dxx	1
 磯	dxxt	1
-禨	pyx	1
-禨	pyxt	1
 茍	gjg	1
 錤	qad	1
 錤	qadw	1
@@ -18386,8 +18011,6 @@ sort: by_weight
 旡	aqv	1
 犱	qtv	1
 犱	qtvy	1
-濈	ikb	1
-濈	ikbt	1
 鰶	qow	1
 鰶	qowi	1
 卽	rxb	1
@@ -18432,6 +18055,7 @@ sort: by_weight
 踖	khaj	1
 鐖	qxx	1
 鐖	qxxt	1
+泲	itn	1
 簊	tad	1
 簊	tadf	1
 穊	tvc	1
@@ -18444,7 +18068,6 @@ sort: by_weight
 漃	iph	1
 漃	iphc	1
 覬	mgkq	1
-僟	wxx	1
 嵆	tdn	1
 嵆	tdnm	1
 卙	adwf	1
@@ -18488,8 +18111,6 @@ sort: by_weight
 焏	bkc	1
 焏	bkco	1
 韲	yvu	1
-銡	qfk	1
-銡	qfkg	1
 艥	tek	1
 艥	tekt	1
 刏	rnj	1
@@ -18513,8 +18134,6 @@ sort: by_weight
 鵋	nnw	1
 鵋	nnwo	1
 懻	nux	1
-刉	tnj	1
-刉	tnjh	1
 葪	aqe	1
 葪	aqej	1
 誋	ynny	1
@@ -18559,8 +18178,6 @@ sort: by_weight
 躸	tmd	1
 霵	fkb	1
 霵	fkbt	1
-蝍	jvc	1
-蝍	jvcb	1
 鱭	qoy	1
 鱭	qoyf	1
 蟣	jxxt	1
@@ -18593,8 +18210,6 @@ sort: by_weight
 嚌	kyvf	1
 㙫	fwy	1
 㙫	fwys	1
-㠱	nad	1
-㠱	nadw	1
 㸄	oyj	1
 㸄	oyjg	1
 㻑	gtb	1
@@ -18650,7 +18265,6 @@ sort: by_weight
 詰	yfkg	1
 趞	fha	1
 跡	khy	1
-踑	kha	1
 蹟	khg	1
 蹟	khgm	1
 鞊	aff	1
@@ -19310,8 +18924,6 @@ sort: by_weight
 郟	dwwb	1
 鵊	dww	1
 鵊	dwwo	1
-㗎	klk	1
-㗎	klks	1
 㹢	qtl	1
 㹢	qtlk	1
 䕒	afk	1
@@ -19471,15 +19083,12 @@ sort: by_weight
 鍵	qvfp	1
 堅	ahn	1
 堅	ahnf	1
-検	swgw	1
 監	ahn	1
 監	ahnl	1
 檢	swgw	1
 縑	xuv	1
 縑	xuvo	1
 劍	wgk	1
-硷	dwg	1
-硷	dwgi	1
 艦	tea	1
 艦	teal	1
 鑑	qah	1
@@ -19487,11 +19096,8 @@ sort: by_weight
 踐	kha	1
 姦	vvv	1
 姦	vvvf	1
-幵	ftf	1
 鑒	ahn	1
 鑒	ahnq	1
-瑊	gdg	1
-瑊	gdgt	1
 賤	maa	1
 賤	maat	1
 彅	xue	1
@@ -19524,8 +19130,6 @@ sort: by_weight
 儉	wwgw	1
 鑳	qpf	1
 鑳	qpfh	1
-洊	idh	1
-洊	idhb	1
 箋	taa	1
 箋	taar	1
 劔	wgk	1
@@ -19541,8 +19145,6 @@ sort: by_weight
 澗	iujg	1
 餞	wyv	1
 餞	wyva	1
-剱	wgk	1
-剱	wgky	1
 繭	amh	1
 繭	amhj	1
 鍳	ahn	1
@@ -19571,8 +19173,6 @@ sort: by_weight
 蕑	auef	1
 瞷	huj	1
 瞷	hujg	1
-囏	akf	1
-囏	akfk	1
 徤	tvfp	1
 葌	avv	1
 葌	avvv	1
@@ -19639,8 +19239,6 @@ sort: by_weight
 鬋	deu	1
 轞	lah	1
 轞	lahl	1
-菺	ayn	1
-菺	ayne	1
 鑬	qah	1
 鑬	qahq	1
 礛	dah	1
@@ -19699,8 +19297,6 @@ sort: by_weight
 㳨	ivgq	1
 𣘖	swv	1
 𣘖	swvs	1
-傔	wuv	1
-傔	wuvo	1
 僣	wfw	1
 僣	wfwj	1
 帴	mha	1
@@ -19722,8 +19318,6 @@ sort: by_weight
 籈	tsfn	1
 纖	xww	1
 聻	ilrb	1
-蔪	alr	1
-蔪	alrj	1
 覸	ujh	1
 覸	ujhq	1
 譖	yaq	1
@@ -19732,7 +19326,6 @@ sort: by_weight
 譛	yfwj	1
 譼	ahn	1
 譼	ahny	1
-釰	qvy	1
 鋄	qgo	1
 鋄	qgoc	1
 鎫	qtm	1
@@ -20062,11 +19655,9 @@ sort: by_weight
 漿	nhdi	1
 蔣	anh	1
 蔣	anhf	1
-橿	sgl	1
 薑	agl	1
 奨	uef	1
 奨	uefd	1
-醤	uef	1
 殭	gqg	1
 殭	gqgg	1
 奬	nhd	1
@@ -20109,7 +19700,6 @@ sort: by_weight
 嵹	mxkj	1
 摾	rxk	1
 摾	rxkj	1
-疅	lgl	1
 糡	ouj	1
 糡	oujq	1
 謽	xkjy	1
@@ -20245,8 +19835,6 @@ sort: by_weight
 嶕	mwyo	1
 鱎	qot	1
 鱎	qotk	1
-撹	rip	1
-撹	ripq	1
 挍	ruq	1
 挍	ruqy	1
 嘂	kkn	1
@@ -20272,7 +19860,6 @@ sort: by_weight
 臫	thn	1
 儌	wry	1
 儌	wryt	1
-嘦	kws	1
 煍	oto	1
 鷮	tdko	1
 灚	iwf	1
@@ -20309,7 +19896,6 @@ sort: by_weight
 徺	tff	1
 燞	wyq	1
 燞	wyqo	1
-敽	tdkc	1
 虠	uqh	1
 虠	uqhm	1
 譑	ytd	1
@@ -20326,8 +19912,6 @@ sort: by_weight
 剼	ccc	1
 剼	cccj	1
 喬	tdkk	1
-嘐	knw	1
-嘐	knwe	1
 憢	nff	1
 憢	nffq	1
 摎	rnw	1
@@ -20351,8 +19935,6 @@ sort: by_weight
 㚣	vvf	1
 㠐	mtd	1
 㠐	mtdk	1
-㤭	ntd	1
-㤭	ntdj	1
 㩰	rak	1
 㩰	raks	1
 㬭	jel	1
@@ -20559,8 +20141,6 @@ sort: by_weight
 蝔	jxxr	1
 潔	idh	1
 潔	idhi	1
-毑	xgu	1
-毑	xgub	1
 傑	wqa	1
 傑	wqas	1
 掲	rjq	1
@@ -20574,8 +20154,6 @@ sort: by_weight
 卩	bnh	1
 喼	kqv	1
 喼	kqvn	1
-岕	mwj	1
-岕	mwjj	1
 鎅	qlw	1
 鎅	qlwj	1
 誡	yaa	1
@@ -20593,8 +20171,6 @@ sort: by_weight
 卪	byi	1
 滐	iqa	1
 滐	iqas	1
-痎	uyn	1
-痎	uynw	1
 刦	fcj	1
 刦	fcjh	1
 稭	txx	1
@@ -20698,16 +20274,12 @@ sort: by_weight
 㓗	udh	1
 嵑	mjq	1
 嵑	mjqn	1
-嶰	mqe	1
-嶰	mqeh	1
 嶱	maj	1
 嶱	majn	1
 搩	rqa	1
 搩	rqas	1
 擳	rtv	1
 杢	saf	1
-楬	sjq	1
-楬	sjqn	1
 洯	dhv	1
 洯	dhvi	1
 狤	qtf	1
@@ -21022,7 +20594,6 @@ sort: by_weight
 釒	qtyg	1
 蓳	aak	1
 覲	akgq	1
-劤	rln	1
 饉	wyv	1
 黅	amw	1
 黅	amwn	1
@@ -21035,8 +20606,6 @@ sort: by_weight
 荕	aelb	1
 璡	gwy	1
 璡	gwyp	1
-賮	vhg	1
-賮	vhgm	1
 堻	ivff	1
 嫤	vak	1
 嫤	vakg	1
@@ -21247,9 +20816,6 @@ sort: by_weight
 荊	agaj	1
 鯨	qoy	1
 鯨	qoyi	1
-亰	yji	1
-稉	tgj	1
-稉	tgjq	1
 曔	jaq	1
 曔	jaqt	1
 剄	gva	1
@@ -21322,8 +20888,7 @@ sort: by_weight
 擏	raq	1
 擏	raqt	1
 殌	gqg	1
-殑	gqd	1
-殑	gqdq	1
+澋	ijyi	1
 粇	oym	1
 粇	oymn	1
 綡	xyi	1
@@ -21441,12 +21006,11 @@ sort: by_weight
 𪇒	ogeo	1
 煚	jan	1
 煚	jano	1
+烱	omw	1
+烱	omwk	1
 冂	mhn	1
-褧	boy	1
-褧	boye	1
 駉	cmk	1
 駉	cmkg	1
-逈	tmkp	1
 熲	xod	1
 冋	mkd	1
 綗	xmw	1
@@ -21528,7 +21092,6 @@ sort: by_weight
 廐	yrxq	1
 慦	fiy	1
 慦	fiyn	1
-乣	xnn	1
 鷲	yid	1
 鷲	yido	1
 牞	trl	1
@@ -21719,10 +21282,6 @@ sort: by_weight
 劇	haej	1
 舉	wfg	1
 舉	wfgh	1
-倶	whg	1
-倶	whgw	1
-鵙	mwv	1
-鵙	mwvo	1
 挙	iwr	1
 挙	iwrj	1
 窶	pwk	1
@@ -21750,13 +21309,10 @@ sort: by_weight
 啹	knd	1
 啹	kndg	1
 閰	uvd	1
-椇	shw	1
 侷	wnnk	1
 埧	fhw	1
 鐻	qha	1
 鐻	qhae	1
-跼	khn	1
-跼	khnk	1
 洰	ian	1
 颶	mtj	1
 颶	mtjw	1
@@ -21789,8 +21345,6 @@ sort: by_weight
 粷	oqoy	1
 巪	ann	1
 巪	annb	1
-粔	oan	1
-粔	oang	1
 艍	ten	1
 艍	tend	1
 椈	sqo	1
@@ -21899,8 +21453,6 @@ sort: by_weight
 揟	rnhe	1
 檋	saw	1
 檋	sawl	1
-毱	tfn	1
-毱	tfno	1
 毩	tfn	1
 毩	tfno	1
 繘	xcb	1
@@ -22213,18 +21765,12 @@ sort: by_weight
 𪈅	tqfo	1
 𪗖	whb	1
 𪗖	whbj	1
-劵	udl	1
-劵	udlb	1
 巻	udn	1
 巻	udnb	1
 捲	rud	1
 捲	rudb	1
-羂	lxk	1
-羂	lxke	1
 勬	udx	1
 勬	udxl	1
-罥	lke	1
-罥	lkef	1
 鎸	qwy	1
 鎸	qwye	1
 絹	xke	1
@@ -22289,8 +21835,6 @@ sort: by_weight
 奍	udjj	1
 弮	udx	1
 弮	udxb	1
-悁	nke	1
-悁	nkeg	1
 梋	ske	1
 梋	skeg	1
 椦	sud	1
@@ -22438,7 +21982,6 @@ sort: by_weight
 刔	nwjh	1
 貜	eeh	1
 貜	eehc	1
-泬	ipw	1
 捔	rqe	1
 捔	rqeh	1
 鐍	qcbk	1
@@ -22497,7 +22040,6 @@ sort: by_weight
 矡	cbtc	1
 觼	qeq	1
 疦	unwi	1
-䦆	qhh	1
 𨰜	qel	1
 灍	iuu	1
 灍	iuuw	1
@@ -22509,7 +22051,6 @@ sort: by_weight
 噊	kcbk	1
 妜	vnw	1
 妜	vnwy	1
-屫	nnh	1
 崫	mnbm	1
 璚	gcb	1
 璚	gcbk	1
@@ -22705,12 +22246,9 @@ sort: by_weight
 𪚅	hbe	1
 𪚅	hbef	1
 軍	plj	1
-埈	fcw	1
 儁	wwym	1
 駿	ccw	1
 鈞	qqug	1
-麕	ynj	1
-麕	ynjt	1
 箘	tlt	1
 箘	tltu	1
 燇	ous	1
@@ -22838,9 +22376,6 @@ sort: by_weight
 𪕞	vnut	1
 鉲	qhh	1
 鉲	qhhy	1
-佧	whh	1
-佧	whhy	1
-垰	fhg	1
 裃	puh	1
 䘔	tlp	1
 䘔	tlpk	1
@@ -22928,8 +22463,6 @@ sort: by_weight
 栞	gdf	1
 栞	gdfs	1
 冚	pmj	1
-偘	wkk	1
-偘	wkkk	1
 竷	ujt	1
 龕	wgk	1
 龕	wgkd	1
@@ -22938,9 +22471,6 @@ sort: by_weight
 欿	qvqw	1
 顑	dgk	1
 顑	dgkm	1
-歁	adww	1
-矙	hun	1
-矙	hunt	1
 惂	nqv	1
 惂	nqvg	1
 轗	ldg	1
@@ -23080,8 +22610,6 @@ sort: by_weight
 𨻷	byvi	1
 𪎵	amw	1
 𪎵	amwm	1
-攷	gnt	1
-攷	gnty	1
 丂	gnv	1
 鲓	qgf	1
 銬	qft	1
@@ -23131,13 +22659,11 @@ sort: by_weight
 尅	dqfi	1
 钶	qsk	1
 钶	qskg	1
-砢	dskg	1
 榼	sfc	1
 榼	sfcl	1
 渇	ijq	1
 渇	ijqx	1
 敤	jsh	1
-愙	ptkn	1
 薖	amn	1
 薖	amnp	1
 萪	atu	1
@@ -23179,8 +22705,6 @@ sort: by_weight
 牱	trs	1
 硞	dtf	1
 硞	dtfk	1
-蚵	jsk	1
-蚵	jskg	1
 衉	tlt	1
 衉	tltk	1
 錁	qjs	1
@@ -23410,8 +22934,6 @@ sort: by_weight
 唟	fckx	1
 厼	ciu	1
 鵼	pwao	1
-悾	npw	1
-悾	npwa	1
 鞚	afp	1
 鞚	afpa	1
 涳	ipw	1
@@ -23476,7 +22998,6 @@ sort: by_weight
 鷇	fpdc	1
 宼	pfq	1
 宼	pfqv	1
-滱	ipf	1
 敂	qkt	1
 窛	pwf	1
 窛	pwfv	1
@@ -23539,8 +23060,6 @@ sort: by_weight
 褲	puy	1
 褲	puyl	1
 跍	khd	1
-瘔	uad	1
-瘔	uadd	1
 嚳	wfq	1
 嚳	wfqk	1
 桍	sdf	1
@@ -23796,8 +23315,6 @@ sort: by_weight
 砿	dycy	1
 貺	mkq	1
 貺	mkqn	1
-恇	nag	1
-恇	nagg	1
 鄺	yam	1
 鄺	yamb	1
 壙	fya	1
@@ -23895,13 +23412,10 @@ sort: by_weight
 虧	haw	1
 饋	wyv	1
 饋	wyvm	1
-餽	wyv	1
 窺	pwf	1
 窺	pwfq	1
 鍨	qwg	1
 鍨	qwgd	1
-媿	vrq	1
-媿	vrqc	1
 鍷	qdf	1
 鍷	qdff	1
 巙	muh	1
@@ -24068,8 +23582,6 @@ sort: by_weight
 崑	mjxx	1
 壼	fpg	1
 壼	fpgg	1
-崐	mjx	1
-崐	mjxx	1
 梱	sls	1
 梱	slsy	1
 睏	hls	1
@@ -24369,8 +23881,6 @@ sort: by_weight
 賴	gki	1
 萊	asw	1
 萊	asww	1
-唻	ksw	1
-唻	ksww	1
 瀨	igk	1
 瀨	igkm	1
 睞	hsw	1
@@ -24585,12 +24095,9 @@ sort: by_weight
 顲	ooym	1
 繿	xah	1
 繿	xahl	1
-浨	ips	1
 燷	oyl	1
 燷	oyli	1
 讕	yug	1
-㳕	iuf	1
-㳕	iufg	1
 𨅬	khu	1
 𨅬	khui	1
 䍀	xjt	1
@@ -24709,14 +24216,9 @@ sort: by_weight
 𩟺	wyvl	1
 𪇖	ahn	1
 𪇖	ahno	1
-瑯	gyv	1
-瑯	gyvb	1
 閬	uyv	1
-郞	yveb	1
 鎯	qyv	1
 朤	eee	1
-嫏	vyv	1
-嫏	vyvb	1
 朖	eyv	1
 朖	eyve	1
 蜋	jyv	1
@@ -24808,12 +24310,8 @@ sort: by_weight
 𪁜	yvco	1
 勞	oop	1
 勞	oopl	1
-咾	kft	1
-咾	kftx	1
 撈	roo	1
 撈	rool	1
-労	ipl	1
-労	iplb	1
 蛯	jft	1
 蛯	jftx	1
 朥	eoo	1
@@ -24964,7 +24462,6 @@ sort: by_weight
 𪁔	prho	1
 楽	ris	1
 楽	risu	1
-砳	ddg	1
 玏	gln	1
 艻	alb	1
 扐	rln	1
@@ -25020,8 +24517,6 @@ sort: by_weight
 鑸	qllf	1
 纇	oxi	1
 纇	oxim	1
-櫑	sll	1
-櫑	slll	1
 傫	wlx	1
 傫	wlxi	1
 靁	fll	1
@@ -25089,8 +24584,6 @@ sort: by_weight
 𧒽	jfl	1
 𧒽	jflg	1
 㵢	ifl	1
-㶟	ill	1
-㶟	illi	1
 㙼	fll	1
 㙼	flll	1
 䍣	lfl	1
@@ -25249,7 +24742,6 @@ sort: by_weight
 𪑯	lfoh	1
 稜	tfw	1
 倰	wfw	1
-薐	atf	1
 睖	hfwt	1
 踜	khf	1
 碐	dfw	1
@@ -25276,21 +24768,13 @@ sort: by_weight
 裡	puj	1
 裏	yjf	1
 裏	yjfe	1
-嚟	ktq	1
-嚟	ktqi	1
 歷	dtt	1
 歷	dtth	1
 離	ybmy	1
-琍	gtj	1
-琍	gtjh	1
 禮	pym	1
 禮	pymu	1
-栃	srd	1
-栃	srdn	1
 麗	gmy	1
 麗	gmyx	1
-脷	etj	1
-脷	etjh	1
 曆	dtt	1
 曆	dttj	1
 隷	ffi	1
@@ -25307,8 +24791,6 @@ sort: by_weight
 貍	eejf	1
 暦	dss	1
 暦	dssj	1
-唎	ktj	1
-唎	ktjh	1
 糎	odj	1
 糎	odjf	1
 犂	tqt	1
@@ -25360,8 +24842,6 @@ sort: by_weight
 厤	dtt	1
 厤	dtti	1
 秝	tty	1
-剺	fit	1
-剺	fitv	1
 礪	dda	1
 礪	dday	1
 轣	ldt	1
@@ -25454,7 +24934,6 @@ sort: by_weight
 鵹	tqt	1
 蠇	jaj	1
 蠇	jajy	1
-菞	atq	1
 蟍	jtj	1
 蟍	jtjs	1
 靋	fid	1
@@ -25476,12 +24955,8 @@ sort: by_weight
 粴	ojf	1
 粴	ojfg	1
 禲	pyd	1
-巁	mda	1
-巁	mday	1
 穲	tgm	1
 穲	tgmx	1
-檪	sri	1
-檪	sris	1
 赲	fhl	1
 赲	fhlv	1
 鏫	qtj	1
@@ -25492,8 +24967,6 @@ sort: by_weight
 竰	udjf	1
 錅	tqt	1
 悡	tjn	1
-攭	rxe	1
-攭	rxej	1
 鯬	tqt	1
 孋	vgm	1
 孋	vgmx	1
@@ -26118,8 +25591,6 @@ sort: by_weight
 鍊	qgli	1
 煉	ogl	1
 煉	ogli	1
-臁	eyu	1
-臁	eyuo	1
 槤	slp	1
 槤	slpy	1
 簾	tyu	1
@@ -26401,8 +25872,6 @@ sort: by_weight
 喨	kypm	1
 魎	rqc	1
 魎	rqcy	1
-唡	kgm	1
-唡	kgmw	1
 湸	iyp	1
 湸	iypm	1
 蜽	jgm	1
@@ -26463,8 +25932,6 @@ sort: by_weight
 療	udui	1
 敹	hpt	1
 敹	hptt	1
-暸	jdu	1
-暸	jdui	1
 繚	xdu	1
 繚	xdui	1
 遼	duj	1
@@ -26791,6 +26258,8 @@ sort: by_weight
 臨	ahnk	1
 隣	boq	1
 隣	boqh	1
+燐	ooq	1
+燐	ooqh	1
 鄰	oqa	1
 鄰	oqab	1
 冧	pss	1
@@ -26819,8 +26288,6 @@ sort: by_weight
 廩	yyl	1
 獜	qto	1
 獜	qtoh	1
-澟	iyl	1
-澟	iylt	1
 躪	kha	1
 躪	khay	1
 悋	nyk	1
@@ -26851,8 +26318,6 @@ sort: by_weight
 甐	oqa	1
 甐	oqan	1
 焛	uoi	1
-撛	roq	1
-撛	roqh	1
 癛	uyl	1
 癛	uylt	1
 懍	nyl	1
@@ -26861,8 +26326,6 @@ sort: by_weight
 轔	loqh	1
 亃	oqa	1
 亃	oqan	1
-崊	mss	1
-崊	mssy	1
 閵	uwy	1
 閵	uwyd	1
 壣	fbx	1
@@ -27006,20 +26469,14 @@ sort: by_weight
 炩	owy	1
 炩	owyc	1
 琌	gmw	1
-醽	sgf	1
-醽	sgfk	1
 砱	dwy	1
 砱	dwyc	1
 軨	lwy	1
 軨	lwyc	1
 紷	xwy	1
 紷	xwyc	1
-衑	twy	1
-衑	twyh	1
 霝	fkk	1
 霝	fkkk	1
-燯	ofw	1
-燯	ofwc	1
 阾	bwyc	1
 霛	fxx	1
 霛	fxxx	1
@@ -27277,8 +26734,6 @@ sort: by_weight
 𪛈	fkkn	1
 劉	qyv	1
 瀏	iqy	1
-蹓	khq	1
-蹓	khql	1
 鏐	qnw	1
 鏐	qnwe	1
 餾	wyv	1
@@ -27303,7 +26758,6 @@ sort: by_weight
 翏	nwer	1
 懰	nqy	1
 懰	nqyj	1
-蓅	aiy	1
 塯	fqy	1
 蟉	jnw	1
 蟉	jnwe	1
@@ -27355,8 +26809,6 @@ sort: by_weight
 磂	dqyl	1
 嬼	vqy	1
 嬼	vqyj	1
-嵧	mqy	1
-嵧	mqyl	1
 飀	mtj	1
 飀	mtjl	1
 鐂	qga	1
@@ -27507,8 +26959,6 @@ sort: by_weight
 龍	ueg	1
 竜	ujn	1
 竜	ujnb	1
-垅	fdx	1
-垅	fdxn	1
 滝	iuj	1
 滝	iujn	1
 籠	tue	1
@@ -28388,8 +27838,6 @@ sort: by_weight
 囉	klxy	1
 騾	clx	1
 騾	clxi	1
-镙	qlx	1
-镙	qlxi	1
 鑼	qlx	1
 鑼	qlxy	1
 駱	ctk	1
@@ -28432,8 +27880,6 @@ sort: by_weight
 㑩	wlqy	1
 㼈	glx	1
 㼈	glxy	1
-捰	rjs	1
-捰	rjsy	1
 䇔	ynk	1
 䇔	ynky	1
 囖	ktl	1
@@ -28611,8 +28057,6 @@ sort: by_weight
 嵂	mtvh	1
 藘	aha	1
 藘	ahan	1
-郘	kkb	1
-郘	kkbh	1
 櫚	suk	1
 爈	oha	1
 爈	ohan	1
@@ -28777,8 +28221,6 @@ sort: by_weight
 碼	dcy	1
 瑪	gcy	1
 罵	lcu	1
-蔴	ays	1
-痲	usf	1
 蟇	ajd	1
 螞	jcy	1
 鎷	qcy	1
@@ -28806,8 +28248,6 @@ sort: by_weight
 䗫	jys	1
 䗫	jyss	1
 𨰾	qcg	1
-嫲	vys	1
-嫲	vyss	1
 庅	ytc	1
 庅	ytci	1
 獁	qtc	1
@@ -28872,7 +28312,6 @@ sort: by_weight
 麥	swwt	1
 脈	ere	1
 邁	ajm	1
-霡	feyi	1
 薶	aee	1
 薶	aeef	1
 佅	wfi	1
@@ -28939,13 +28378,10 @@ sort: by_weight
 滿	iamy	1
 蠻	xyx	1
 蠻	xyxj	1
-満	iam	1
 鰻	qoj	1
 鰻	qojc	1
 謾	yjl	1
 謾	yjlc	1
-熳	ojl	1
-熳	ojlc	1
 饅	wyv	1
 瞞	ham	1
 瞞	hamy	1
@@ -29094,8 +28530,6 @@ sort: by_weight
 𪑪	pfqo	1
 蠎	jad	1
 蠎	jada	1
-铓	qay	1
-铓	qayn	1
 茻	btb	1
 茻	btbh	1
 駹	cdn	1
@@ -29212,14 +28646,10 @@ sort: by_weight
 蝐	jjh	1
 貿	qyv	1
 貿	qyvm	1
-鄮	qyv	1
 氂	fit	1
 氂	fitn	1
-皃	rqb	1
 冃	mfd	1
 堥	cbt	1
-髳	dec	1
-髳	dect	1
 夘	qbh	1
 錨	qal	1
 錨	qalg	1
@@ -29385,7 +28815,6 @@ sort: by_weight
 𪃑	jhwo	1
 麼	yss	1
 麼	yssx	1
-嚒	kysx	1
 嚜	klf	1
 嚜	klff	1
 嚰	kysd	1
@@ -29393,8 +28822,6 @@ sort: by_weight
 濹	ijff	1
 沒	iqc	1
 沒	iqcy	1
-毎	txf	1
-毎	txfj	1
 蝞	jnh	1
 蝞	jnhg	1
 苺	axg	1
@@ -29405,12 +28832,8 @@ sort: by_weight
 楳	safs	1
 抺	rfi	1
 抺	rfiy	1
-眛	hfi	1
-眛	hfiy	1
 栂	sxg	1
 栂	sxgu	1
-禖	pya	1
-禖	pyas	1
 脢	etx	1
 脢	etxu	1
 鎂	qug	1
@@ -29549,7 +28972,6 @@ sort: by_weight
 玧	gcqn	1
 燜	oun	1
 燜	ouny	1
-椚	sug	1
 暪	jam	1
 暪	jamy	1
 鍆	qug	1
@@ -29557,14 +28979,10 @@ sort: by_weight
 璊	gamy	1
 捫	rug	1
 閅	usk	1
-虋	awf	1
-虋	awfv	1
 懣	iam	1
 懣	iamn	1
 菛	auf	1
 們	wug	1
-怋	nna	1
-怋	nnan	1
 斖	ywf	1
 㡈	mhq	1
 㡈	mhqq	1
@@ -29600,8 +29018,6 @@ sort: by_weight
 儚	walq	1
 鯭	qob	1
 鯭	qobl	1
-曚	jap	1
-曚	jape	1
 莔	alw	1
 莔	alwm	1
 甿	lyn	1
@@ -29823,16 +29239,8 @@ sort: by_weight
 𪇓	alpo	1
 𪈆	alp	1
 𪈆	alpo	1
-麿	yss	1
-麿	yssk	1
-蒾	aop	1
-蒾	aopu	1
 彌	xgw	1
 彌	xgwq	1
-沕	iqr	1
-沕	iqrt	1
-瞇	hop	1
-瞇	hopy	1
 謎	yop	1
 謎	yopy	1
 謐	ynt	1
@@ -29845,7 +29253,6 @@ sort: by_weight
 羋	gkg	1
 麊	oyn	1
 麊	oynx	1
-侎	woy	1
 冪	paj	1
 冪	pajh	1
 瀰	ixg	1
@@ -29862,8 +29269,6 @@ sort: by_weight
 禰	pygq	1
 濔	igw	1
 濔	igwq	1
-峚	mdf	1
-峚	mdff	1
 宻	pc,um	1
 宻	pcum	1
 粎	ony	1
@@ -29901,8 +29306,6 @@ sort: by_weight
 淧	ipn	1
 孊	vys	1
 孊	vysd	1
-熐	opj	1
-熐	opju	1
 幦	nkuh	1
 覛	reh	1
 覛	rehq	1
@@ -30153,7 +29556,6 @@ sort: by_weight
 綿	xrmh	1
 麺	gtd	1
 麺	gtdd	1
-宀	pyy	1
 杣	smh	1
 緬	xdmd	1
 蝒	jdm	1
@@ -30330,7 +29732,6 @@ sort: by_weight
 𪃦	hito	1
 滅	idg	1
 滅	idgt	1
-蠛	jal	1
 搣	rdgt	1
 孭	bmy	1
 烕	dgo	1
@@ -30342,8 +29743,6 @@ sort: by_weight
 薎	alpa	1
 覕	nth	1
 覕	nthq	1
-哶	kgj	1
-哶	kgjf	1
 鑖	qal	1
 鑖	qalt	1
 鴓	ntw	1
@@ -30358,7 +29757,6 @@ sort: by_weight
 𠺗	kopy	1
 瀎	ial	1
 瀎	ialt	1
-眜	hgs	1
 礣	dal	1
 㒝	wal	1
 䁾	hal	1
@@ -30425,8 +29823,6 @@ sort: by_weight
 瑉	gnaj	1
 笢	tna	1
 笢	tnab	1
-敃	nat	1
-敃	naty	1
 冺	una	1
 冺	unan	1
 鈱	qna	1
@@ -30443,8 +29839,6 @@ sort: by_weight
 錉	qqaj	1
 崏	mqa	1
 崏	mqaj	1
-惽	nna	1
-惽	nnaj	1
 蠠	dmjj	1
 姄	vna	1
 姄	vnan	1
@@ -30568,8 +29962,6 @@ sort: by_weight
 慏	npju	1
 榠	spj	1
 榠	spju	1
-嫇	vpj	1
-嫇	vpju	1
 鄍	pju	1
 鄍	pjub	1
 覭	pju	1
@@ -30628,8 +30020,6 @@ sort: by_weight
 銆	qdjg	1
 黙	jfd	1
 黙	jfdo	1
-妺	vgs	1
-妺	vgsy	1
 獏	qta	1
 獏	qtad	1
 謨	yaj	1
@@ -30645,8 +30035,6 @@ sort: by_weight
 鏌	qajd	1
 昩	jgs	1
 昩	jgsy	1
-魩	qoq	1
-魩	qoqr	1
 莈	aim	1
 莈	aimc	1
 眽	hre	1
@@ -30675,8 +30063,6 @@ sort: by_weight
 歿	gqqc	1
 歾	gqq	1
 歾	gqqr	1
-礳	dys	1
-礳	dysd	1
 圽	fqr	1
 圽	fqrt	1
 魹	qot	1
@@ -30944,16 +30330,11 @@ sort: by_weight
 踇	kht	1
 畝	ylq	1
 畝	ylqy	1
-坶	fxg	1
-坶	fxgu	1
-炑	osy	1
 楘	cbt	1
 楘	cbts	1
 牳	trx	1
 牳	trxu	1
 畮	ltx	1
-畞	flq	1
-畞	flqy	1
 莯	ais	1
 幙	mha	1
 鉬	qhg	1
@@ -30961,12 +30342,9 @@ sort: by_weight
 畒	ylwy	1
 鉧	qxg	1
 鉧	qxgu	1
-雮	ftf	1
 毣	ntf	1
 砪	dxg	1
 砪	dxgu	1
-畆	ylc	1
-畆	ylcy	1
 峔	mftx	1
 狇	qts	1
 狇	qtsy	1
@@ -31064,8 +30442,6 @@ sort: by_weight
 納	xmw	1
 雫	fgh	1
 雫	fghu	1
-拏	vcr	1
-拏	vcrj	1
 吶	kmt	1
 吶	kmty	1
 嗱	kwg	1
@@ -31215,7 +30591,6 @@ sort: by_weight
 𪗝	hbm	1
 𪗝	hbmy	1
 摨	rni	1
-廼	spd	1
 嬭	vgw	1
 嬭	vgwq	1
 倷	wdf	1
@@ -31239,8 +30614,6 @@ sort: by_weight
 㮈	sdfi	1
 䍲	udv	1
 䍲	udvq	1
-妳	vqi	1
-妳	vqiy	1
 搱	rnu	1
 搱	rnuh	1
 㮏	ssf	1
@@ -31298,9 +30671,6 @@ sort: by_weight
 枏	smf	1
 枏	smfg	1
 遖	fmup	1
-諵	yfm	1
-諵	yfmf	1
-娚	vlln	1
 煵	ofm	1
 煵	ofmf	1
 侽	wll	1
@@ -31432,8 +30802,6 @@ sort: by_weight
 悩	niqb	1
 惱	nvt	1
 惱	nvtq	1
-巎	mdh	1
-巎	mdht	1
 撓	rffq	1
 閙	uym	1
 閙	uymh	1
@@ -31442,8 +30810,6 @@ sort: by_weight
 嫐	vllv	1
 夒	dhh	1
 夒	dhht	1
-碯	dvt	1
-碯	dvtq	1
 怓	nvc	1
 怓	nvcy	1
 嶩	mma	1
@@ -31604,8 +30970,6 @@ sort: by_weight
 䲎	qont	1
 氞	rng	1
 氞	rngw	1
-浽	iev	1
-浽	ievg	1
 餧	wyv	1
 餧	wyvv	1
 㐻	wmw	1
@@ -31668,15 +31032,11 @@ sort: by_weight
 𨶙	ucex	1
 莻	aek	1
 莻	aekx	1
-暱	jaa	1
-暱	jaak	1
 膩	eaf	1
 膩	eafm	1
 擬	rxt	1
 擬	rxth	1
 伱	wwi	1
-籾	ovy	1
-籾	ovyy	1
 貎	eev	1
 貎	eevq	1
 郳	vqb	1
@@ -31895,6 +31255,8 @@ sort: by_weight
 𪙛	hbak	1
 唸	kwy	1
 唸	kwyn	1
+撚	rqd	1
+撚	rqdo	1
 哖	krhf	1
 鯰	qow	1
 鯰	qown	1
@@ -32121,8 +31483,6 @@ sort: by_weight
 籋	tgw	1
 隉	bva	1
 隉	bvag	1
-臲	ths	1
-臲	thsb	1
 篞	tij	1
 篞	tijf	1
 踙	khb	1
@@ -32139,7 +31499,6 @@ sort: by_weight
 㙞	fth	1
 㙞	fths	1
 䄒	pyw	1
-囐	kha	1
 攝	rbb	1
 攝	rbbb	1
 銸	qbn	1
@@ -32287,8 +31646,6 @@ sort: by_weight
 嚀	kpns	1
 薴	apn	1
 薴	apns	1
-侫	wyn	1
-侫	wynv	1
 儜	wpn	1
 儜	wpns	1
 寍	pnl	1
@@ -32424,8 +31781,6 @@ sort: by_weight
 膿	ema	1
 膿	emae	1
 穠	tma	1
-襛	pum	1
-襛	pume	1
 醲	sgm	1
 醲	sgme	1
 辳	ssd	1
@@ -32483,8 +31838,6 @@ sort: by_weight
 獳	qtfj	1
 槈	sdf	1
 槈	sdff	1
-鎒	qdf	1
-鎒	qdff	1
 羺	udf	1
 㝹	itq	1
 䅶	tdf	1
@@ -32549,8 +31902,6 @@ sort: by_weight
 𧉭	vcju	1
 𧪅	yvc	1
 𧿔	khn	1
-煖	oef	1
-煖	oefc	1
 奻	vvg	1
 渜	idm	1
 渜	idmd	1
@@ -32701,7 +32052,6 @@ sort: by_weight
 鴎	aqwo	1
 鷗	akk	1
 鷗	akko	1
-吘	ktf	1
 毆	akk	1
 毆	akkc	1
 謳	yak	1
@@ -32826,7 +32176,6 @@ sort: by_weight
 犤	trlx	1
 鎃	qir	1
 鎃	qire	1
-猅	qtd	1
 輫	ldj	1
 輫	ldjd	1
 㵺	itrf	1
@@ -33358,11 +32707,8 @@ sort: by_weight
 𩸀	qoee	1
 𪔍	fku	1
 𪔍	fkuh	1
-毘	lxx	1
-毘	lxxb	1
 魮	qox	1
 魮	qoxx	1
-庀	yxv	1
 狓	qth	1
 闢	unk	1
 闢	unku	1
@@ -33370,14 +32716,11 @@ sort: by_weight
 魾	qogg	1
 鉟	qgi	1
 鉟	qgig	1
-伓	wgi	1
 鸊	nkuo	1
 鈚	qxx	1
 鈚	qxxn	1
 駓	cgi	1
 駓	cgig	1
-豼	eex	1
-豼	eexx	1
 阰	bxxn	1
 潎	ium	1
 潎	iumt	1
@@ -33416,8 +32759,6 @@ sort: by_weight
 蚽	jgig	1
 鴄	aqw	1
 鴄	aqwo	1
-嫓	vqm	1
-嫓	vqmx	1
 疈	gkl	1
 疈	gkll	1
 錃	ihc	1
@@ -33442,8 +32783,6 @@ sort: by_weight
 䠘	khtx	1
 岯	mgi	1
 岯	mgig	1
-釽	qrh	1
-釽	qrhy	1
 鈹	qhc	1
 鈹	qhcy	1
 隦	bnk	1
@@ -33869,8 +33208,6 @@ sort: by_weight
 評	ygu	1
 評	yguh	1
 憑	ucn	1
-呯	kgu	1
-呯	kguh	1
 塀	fnua	1
 甁	tft	1
 甁	tftn	1
@@ -33975,7 +33312,6 @@ sort: by_weight
 岥	mhcy	1
 蔢	aih	1
 蔢	aihv	1
-敀	rty	1
 溌	iwf	1
 溌	iwfq	1
 烞	oshy	1
@@ -33992,8 +33328,6 @@ sort: by_weight
 㗶	kwx	1
 㗶	kwxc	1
 䞟	fhr	1
-嚩	kxg	1
-嚩	kxgf	1
 湐	isr	1
 狛	qtr	1
 箥	tih	1
@@ -34144,7 +33478,6 @@ sort: by_weight
 攵	ttgy	1
 贌	mog	1
 贌	mogy	1
-圑	lge	1
 獛	qto	1
 瞨	hog	1
 瞨	hogy	1
@@ -34251,9 +33584,6 @@ sort: by_weight
 𪔿	vnu	1
 𪔿	vnuc	1
 氣	rno	1
-気	rnq	1
-気	rnqu	1
-碁	adwd	1
 甈	ths	1
 甈	thsn	1
 棄	yca	1
@@ -34311,8 +33641,6 @@ sort: by_weight
 鰭	qof	1
 鰭	qofj	1
 邔	nbh	1
-魌	rqc	1
-魌	rqcw	1
 暣	jrn	1
 暣	jrno	1
 褄	pug	1
@@ -34339,6 +33667,7 @@ sort: by_weight
 騏	cadw	1
 蚚	jrh	1
 岓	mrh	1
+肵	erh	1
 磩	ddh	1
 磩	ddht	1
 諆	yad	1
@@ -34361,8 +33690,7 @@ sort: by_weight
 迉	npe	1
 亝	ccc	1
 夡	qqf	1
-盵	htn	1
-盵	htnn	1
+霋	fgv	1
 矵	djh	1
 軝	lqa	1
 軝	lqan	1
@@ -34945,8 +34273,6 @@ sort: by_weight
 鉛	qmkg	1
 刋	tdj	1
 刋	tdjh	1
-灊	iaq	1
-灊	iaqh	1
 譴	ykhp	1
 鑓	qkh	1
 鑓	qkhp	1
@@ -34978,8 +34304,6 @@ sort: by_weight
 縴	xyxh	1
 綪	xge	1
 綪	xgeg	1
-羬	udd	1
-羬	uddt	1
 粁	otf	1
 粁	otfh	1
 汘	itf	1
@@ -35077,8 +34401,6 @@ sort: by_weight
 嗛	kuvo	1
 掅	rge	1
 掅	rgeg	1
-撍	raq	1
-撍	raqj	1
 炶	ohkg	1
 煔	ooh	1
 煔	oohk	1
@@ -35431,7 +34753,6 @@ sort: by_weight
 蕎	atdk	1
 翹	fff	1
 翹	fffn	1
-鄡	wvg	1
 竅	pwr	1
 骹	meu	1
 骹	meuq	1
@@ -35450,8 +34771,6 @@ sort: by_weight
 蹺	khf	1
 鍫	toq	1
 鍫	toqf	1
-繑	xtd	1
-繑	xtdk	1
 犞	trt	1
 踍	khf	1
 鍬	qto	1
@@ -35621,7 +34940,6 @@ sort: by_weight
 苆	aav	1
 苆	aavb	1
 匧	adww	1
-穕	twy	1
 悏	ndw	1
 悏	ndww	1
 笡	teg	1
@@ -35719,8 +35037,6 @@ sort: by_weight
 𪙌	nieb	1
 親	ush	1
 親	ushq	1
-蠄	jwy	1
-蠄	jwyc	1
 琹	ggs	1
 懃	akgn	1
 欽	qqw	1
@@ -35914,13 +35230,7 @@ sort: by_weight
 靘	geq	1
 傾	wxd	1
 傾	wxdm	1
-淸	igm	1
-淸	igmg	1
 靑	gmh	1
-凊	uge	1
-凊	ugeg	1
-謦	fnm	1
-謦	fnmy	1
 頃	xdmy	1
 氫	rng	1
 埥	fge	1
@@ -36037,8 +35347,6 @@ sort: by_weight
 窮	pwt	1
 窮	pwtx	1
 憌	qqun	1
-跫	amy	1
-跫	amyh	1
 瓊	gqm	1
 瓊	gqmt	1
 睘	lgk	1
@@ -36245,8 +35553,6 @@ sort: by_weight
 厹	vcu	1
 恷	wsn	1
 恷	wsnu	1
-橚	svh	1
-橚	svhh	1
 芁	amb	1
 賕	mfi	1
 頄	vdm	1
@@ -36362,8 +35668,6 @@ sort: by_weight
 𪍗	swwo	1
 𪖛	thl	1
 𪖛	thlg	1
-佢	wan	1
-佢	wang	1
 敺	akk	1
 敺	akkc	1
 駆	caq	1
@@ -36376,8 +35680,6 @@ sort: by_weight
 闃	uhdi	1
 嶇	mak	1
 嶇	makk	1
-臞	ehh	1
-臞	ehhy	1
 髷	dem	1
 髷	dema	1
 軀	tmd	1
@@ -36407,14 +35709,10 @@ sort: by_weight
 蝺	jtky	1
 菃	aia	1
 菃	aian	1
-刞	egj	1
-刞	egjh	1
 麮	sww	1
 麮	swwc	1
 齲	hww	1
 齲	hwwy	1
-躣	khh	1
-躣	khhy	1
 厺	dcu	1
 斪	qkr	1
 欋	shh	1
@@ -36424,8 +35722,6 @@ sort: by_weight
 閴	umi	1
 詓	yfc	1
 詓	yfcy	1
-蠷	jhh	1
-蠷	jhhy	1
 浀	ima	1
 浀	imag	1
 鱋	qoh	1
@@ -36459,7 +35755,6 @@ sort: by_weight
 鼁	fcmv	1
 筁	tma	1
 筁	tmaf	1
-葋	aeq	1
 衐	tan	1
 衐	tanh	1
 鴝	qkw	1
@@ -36712,7 +36007,6 @@ sort: by_weight
 踡	khu	1
 銓	qwg	1
 銓	qwgg	1
-牷	trw	1
 顴	akk	1
 顴	akkm	1
 牶	udr	1
@@ -37098,7 +36392,6 @@ sort: by_weight
 讓	yyke	1
 譲	yuf	1
 譲	yufe	1
-勷	ykk	1
 穣	tuf	1
 穣	tufe	1
 壌	fuf	1
@@ -37375,8 +36668,6 @@ sort: by_weight
 爃	ooos	1
 穁	tab	1
 穁	tabg	1
-傛	wpw	1
-傛	wpwk	1
 槦	syv	1
 槦	syvh	1
 穃	tpw	1
@@ -37812,8 +37103,6 @@ sort: by_weight
 𨷎	dqq	1
 𨷎	dqqg	1
 𩀋	dmjy	1
-叒	ccc	1
-叒	cccu	1
 鶸	xux	1
 鶸	xuxo	1
 鰯	qox	1
@@ -38194,7 +37483,6 @@ sort: by_weight
 𩮚	dec	1
 𩮚	decj	1
 𪍻	kkk	1
-渋	ihi	1
 澁	ihh	1
 澀	ivy	1
 澀	ivyh	1
@@ -38326,8 +37614,6 @@ sort: by_weight
 𩰙	jggn	1
 椮	scd	1
 椮	scde	1
-襂	puc	1
-襂	puce	1
 槮	scc	1
 槮	scce	1
 㚞	dss	1
@@ -38351,14 +37637,10 @@ sort: by_weight
 紗	xitt	1
 鯊	iit	1
 鯊	iito	1
-唦	kii	1
-唦	kiit	1
 儍	wqo	1
 儍	wqot	1
 箑	tgv	1
 箑	tgvh	1
-萐	agv	1
-萐	agvh	1
 翣	nuv	1
 翜	ndw	1
 翜	ndww	1
@@ -38368,8 +37650,6 @@ sort: by_weight
 魦	qoi	1
 魦	qoit	1
 桬	iit	1
-硰	iit	1
-硰	iitd	1
 鯋	qoi	1
 鯋	qoit	1
 猀	qti	1
@@ -38549,8 +37829,6 @@ sort: by_weight
 蟺	jylg	1
 赸	fhm	1
 赸	fhmk	1
-脠	eth	1
-脠	ethp	1
 圸	fmh	1
 譱	udy	1
 譱	udyy	1
@@ -38703,7 +37981,6 @@ sort: by_weight
 傷	wtj	1
 傷	wtjr	1
 賞	ipk	1
-尙	imk	1
 丄	hgd	1
 殤	gqt	1
 殤	gqtr	1
@@ -38885,7 +38162,6 @@ sort: by_weight
 檨	sugw	1
 摂	rbi	1
 摂	rbiy	1
-虵	jbn	1
 韘	nhk	1
 韘	nhks	1
 蔎	aym	1
@@ -39007,8 +38283,6 @@ sort: by_weight
 𪋧	ynj	1
 𪋧	ynjd	1
 誰	ywyg	1
-榊	spy	1
-榊	spyh	1
 審	pto	1
 審	ptol	1
 鯓	qot	1
@@ -39023,8 +38297,6 @@ sort: by_weight
 愼	nxh	1
 愼	nxhw	1
 諗	ywyn	1
-渖	ipj	1
-渖	ipjh	1
 瀋	ipt	1
 鯵	qoc	1
 鯵	qoce	1
@@ -39075,7 +38347,6 @@ sort: by_weight
 訠	yxhh	1
 鋠	qdf	1
 鋠	qdfe	1
-峷	muj	1
 敒	wjh	1
 敒	wjht	1
 籶	omn	1
@@ -39246,7 +38517,6 @@ sort: by_weight
 泩	itg	1
 賸	eud	1
 墭	fdnl	1
-渻	iit	1
 鉎	qtg	1
 鍟	qjt	1
 珄	gtg	1
@@ -39278,8 +38548,6 @@ sort: by_weight
 竔	utah	1
 橳	seu	1
 橳	seul	1
-殅	gqt	1
-殅	gqtg	1
 琞	jegy	1
 鵿	wvg	1
 呏	kta	1
@@ -39289,8 +38557,6 @@ sort: by_weight
 阩	btah	1
 㗂	kith	1
 㾪	uit	1
-繉	xhi	1
-繉	xhiq	1
 㮐	sit	1
 㮐	sith	1
 㱡	gqt	1
@@ -39377,8 +38643,6 @@ sort: by_weight
 識	yuaj	1
 視	pyh	1
 視	pyhq	1
-実	pdw	1
-実	pdwu	1
 勢	fwf	1
 勢	fwfl	1
 釋	tol	1
@@ -39401,8 +38665,6 @@ sort: by_weight
 鍦	qyt	1
 鍦	qytb	1
 饣	qnb	1
-亊	guv	1
-亊	guvh	1
 諡	ywg	1
 諡	ywgl	1
 鰤	qow	1
@@ -39823,8 +39085,6 @@ sort: by_weight
 𪗧	hbk	1
 𪗧	hbkq	1
 壽	fna	1
-収	nhc	1
-収	nhcy	1
 獣	ilg	1
 獣	ilgd	1
 獸	kkl	1
@@ -39918,8 +39178,6 @@ sort: by_weight
 璹	gfn	1
 璹	gfnf	1
 捒	rgki	1
-疎	nhg	1
-疎	nhgi	1
 贖	mfl	1
 贖	mflm	1
 儵	wht	1
@@ -39928,8 +39186,6 @@ sort: by_weight
 樞	sakk	1
 竪	ahn	1
 竪	ahnu	1
-裋	pug	1
-裋	pugu	1
 荗	ady	1
 瑹	gaw	1
 瑹	gawt	1
@@ -40376,8 +39632,6 @@ sort: by_weight
 挩	rwk	1
 挩	rwkq	1
 捝	ruk	1
-氵	iyy	1
-氵	iyyg	1
 説	yuk	1
 説	yukq	1
 說	ywk	1
@@ -40440,8 +39694,6 @@ sort: by_weight
 獡	qtvo	1
 鎙	qub	1
 鎙	qube	1
-愬	ubt	1
-愬	ubtn	1
 洬	img	1
 䀥	hqi	1
 䀥	hqiy	1
@@ -40530,8 +39782,6 @@ sort: by_weight
 鐁	qad	1
 鐁	qadr	1
 泤	inyw	1
-恖	tlq	1
-恖	tlqn	1
 騦	clny	1
 肂	gqv	1
 肂	gqvh	1
@@ -40771,7 +40021,6 @@ sort: by_weight
 㩳	rwyc	1
 𡾼	mwy	1
 𡾼	mwyc	1
-吅	kkg	1
 揔	rqr	1
 摗	rgkw	1
 㕬	kwc	1
@@ -40840,7 +40089,6 @@ sort: by_weight
 捜	rjh	1
 捜	rjhc	1
 餿	wyv	1
-鄋	vhcb	1
 藪	akgt	1
 蓃	avh	1
 蓃	avhc	1
@@ -40994,6 +40242,7 @@ sort: by_weight
 樕	sgkw	1
 餗	wyv	1
 餗	wyvi	1
+遬	gki	1
 膆	egx	1
 膆	egxi	1
 趚	fhg	1
@@ -41030,7 +40279,6 @@ sort: by_weight
 𣿈	ipw	1
 埣	fyw	1
 埣	fywf	1
-稡	tyw	1
 縮	xpw	1
 縮	xpwj	1
 㑉	wmg	1
@@ -41264,8 +40512,6 @@ sort: by_weight
 繐	xgj	1
 瓍	gbd	1
 瓍	gbdp	1
-賥	myw	1
-賥	mywf	1
 鞖	afe	1
 鞖	afev	1
 嬘	vue	1
@@ -41630,8 +40876,6 @@ sort: by_weight
 𪍨	sww	1
 撻	rfu	1
 撻	rfup	1
-搨	rjn	1
-搨	rjng	1
 遝	lip	1
 遝	lipi	1
 鞜	afi	1
@@ -41866,7 +41110,6 @@ sort: by_weight
 儓	wfk	1
 儓	wfkf	1
 籉	tfk	1
-嬯	vfk	1
 鮐	qoc	1
 鮐	qock	1
 孡	bck	1
@@ -41975,7 +41218,6 @@ sort: by_weight
 壜	fjf	1
 墰	fsj	1
 墰	fsjh	1
-襢	puy	1
 墵	fff	1
 墵	fffc	1
 舑	tdm	1
@@ -42192,8 +41434,6 @@ sort: by_weight
 矘	hipo	1
 曭	jip	1
 曭	jipo	1
-㓥	ivj	1
-㓥	ivjh	1
 㑽	wipf	1
 鐋	qij	1
 鐋	qijr	1
@@ -42292,8 +41532,6 @@ sort: by_weight
 鞀	afvk	1
 鞱	afe	1
 鞱	afev	1
-咷	kiq	1
-咷	kiqn	1
 槄	sev	1
 槄	sevg	1
 謟	yev	1
@@ -42508,7 +41746,6 @@ sort: by_weight
 題	jghm	1
 體	mem	1
 體	memu	1
-禵	pyj	1
 戻	ynd	1
 戻	yndi	1
 軆	tmd	1
@@ -42523,10 +41760,10 @@ sort: by_weight
 褆	pujh	1
 躰	tmd	1
 偍	wjg	1
+逷	jqr	1
+逷	jqrp	1
 屜	nta	1
 屜	ntan	1
-稊	tux	1
-稊	tuxt	1
 殢	gqa	1
 殢	gqah	1
 鷉	rha	1
@@ -42544,7 +41781,6 @@ sort: by_weight
 綈	xuxt	1
 鵜	uxh	1
 鵜	uxho	1
-挮	rux	1
 骵	mes	1
 骵	mesg	1
 歒	umd	1
@@ -42586,8 +41822,6 @@ sort: by_weight
 屟	nans	1
 桋	sgx	1
 睼	hjgh	1
-穉	tni	1
-穉	tnih	1
 銻	qux	1
 銻	quxt	1
 㔸	arh	1
@@ -42754,7 +41988,6 @@ sort: by_weight
 𪖦	thl	1
 𠥶	aha	1
 𠥶	aham	1
-兲	gwu	1
 塡	fxh	1
 塡	fxhw	1
 琠	gma	1
@@ -42771,7 +42004,6 @@ sort: by_weight
 甛	aft	1
 餂	wyv	1
 餂	wyvd	1
-磌	dfh	1
 婖	vgd	1
 婖	vgdn	1
 覥	maw	1
@@ -42901,12 +42133,6 @@ sort: by_weight
 條	wht	1
 條	whts	1
 斢	amw	1
-鯈	wht	1
-鯈	whto	1
-岧	mvk	1
-岧	mvkf	1
-脁	mui	1
-脁	muiq	1
 庣	yiq	1
 蓚	awh	1
 蓚	awhe	1
@@ -43017,7 +42243,6 @@ sort: by_weight
 飻	wyv	1
 䥫	qfa	1
 䥫	qfay	1
-鉄	qrwy	1
 䵿	fku	1
 䵿	fkuk	1
 𢶋	rfa	1
@@ -43064,8 +42289,6 @@ sort: by_weight
 娗	vtf	1
 娗	vtfp	1
 嵉	myp	1
-聤	byp	1
-聤	byps	1
 鞓	afk	1
 鞓	afkg	1
 楟	syp	1
@@ -43168,7 +42391,6 @@ sort: by_weight
 炵	otu	1
 炵	otuy	1
 鉖	qtu	1
-秱	tmg	1
 獞	qtu	1
 獞	qtuf	1
 蓪	ace	1
@@ -43217,7 +42439,6 @@ sort: by_weight
 㮔	stgf	1
 㸗	wqm	1
 㸗	wqmk	1
-㼧	ceg	1
 㼿	ujf	1
 䂈	cbt	1
 䂈	cbtj	1
@@ -43357,8 +42578,6 @@ sort: by_weight
 𪎨	wge	1
 圖	lkf	1
 圖	lkfk	1
-図	luq	1
-図	luqi	1
 兎	tkq	1
 兎	tkqy	1
 圡	fyi	1
@@ -43422,8 +42641,6 @@ sort: by_weight
 鵚	tmwo	1
 㭸	sqk	1
 㭸	sqky	1
-唋	kwt	1
-唋	kwty	1
 墿	flf	1
 墿	flff	1
 㐋	fnb	1
@@ -43522,7 +42739,6 @@ sort: by_weight
 𪉍	tmq	1
 𪑏	lfo	1
 𪑏	lfot	1
-団	lfi	1
 團	lgj	1
 漙	igj	1
 糰	olg	1
@@ -43703,7 +42919,6 @@ sort: by_weight
 𩘺	mtjm	1
 𩙬	mqk	1
 𩙬	mqkm	1
-氽	wiu	1
 飩	wyv	1
 飩	wyvn	1
 旽	jgb	1
@@ -43789,8 +43004,6 @@ sort: by_weight
 騨	cijf	1
 讬	yta	1
 乇	tav	1
-饦	qnt	1
-陁	btb	1
 鮀	qop	1
 鮀	qopx	1
 鵎	evw	1
@@ -43818,8 +43031,6 @@ sort: by_weight
 紽	xpxn	1
 鴕	wvg	1
 鴕	wvgx	1
-杔	sta	1
-杔	stan	1
 鼉	kkl	1
 鼉	kklv	1
 岮	mpx	1
@@ -44089,7 +43300,6 @@ sort: by_weight
 喎	kmnk	1
 竵	ugk	1
 顡	ued	1
-㖞	kkm	1
 㗏	kgi	1
 𠨃	llq	1
 𠨃	llqh	1
@@ -44134,16 +43344,12 @@ sort: by_weight
 晥	jpfq	1
 琓	gpf	1
 琓	gpfq	1
-汍	ivy	1
-汍	ivyy	1
 輓	lqk	1
 輓	lqkq	1
 刓	fqj	1
 刓	fqjh	1
 岏	mfq	1
 貦	mfq	1
-晼	jpq	1
-晼	jpqb	1
 紈	xvy	1
 紈	xvyy	1
 蟃	jjl	1
@@ -44442,8 +43648,6 @@ sort: by_weight
 𪁘	igwo	1
 為	ytn	1
 為	ytno	1
-衞	tnh	1
-衞	tnhh	1
 爲	etno	1
 維	xwy	1
 維	xwyg	1
@@ -44501,8 +43705,6 @@ sort: by_weight
 煒	onhh	1
 緭	xle	1
 緭	xleg	1
-痏	ude	1
-痏	uded	1
 蜼	jwy	1
 蜼	jwyg	1
 濰	ixw	1
@@ -44567,8 +43769,6 @@ sort: by_weight
 葨	alge	1
 讆	tnh	1
 讆	tnhy	1
-蜲	jtv	1
-蜲	jtvg	1
 韙	jgh	1
 諉	ytv	1
 揻	rdgt	1
@@ -44948,7 +44148,6 @@ sort: by_weight
 溫	ilw	1
 溫	ilwl	1
 聞	ubd	1
-揾	rjl	1
 搵	rlw	1
 搵	rlwl	1
 穩	tea	1
@@ -44961,14 +44160,11 @@ sort: by_weight
 瑥	gjlg	1
 妏	vyy	1
 彣	yee	1
-脗	eqr	1
-脗	eqrk	1
 闅	uhh	1
 闅	uhhc	1
 昷	jlf	1
 閿	uep	1
 閿	uepc	1
-抆	ryy	1
 饂	wyv	1
 饂	wyvl	1
 鎾	qjl	1
@@ -45027,8 +44223,6 @@ sort: by_weight
 緼	xjl	1
 縕	xlw	1
 縕	xlwl	1
-繧	xff	1
-繧	xffc	1
 蘊	axl	1
 蘊	axll	1
 㐎	ynb	1
@@ -45307,8 +44501,6 @@ sort: by_weight
 烏	wngo	1
 嗚	kwn	1
 嗚	kwno	1
-禑	pyj	1
-禑	pyjy	1
 呉	kng	1
 呉	kngw	1
 汚	ifn	1
@@ -45353,7 +44545,6 @@ sort: by_weight
 騖	cbtc	1
 隖	bwn	1
 隖	bwno	1
-碔	dga	1
 娬	vga	1
 娬	vgah	1
 扤	rgq	1
@@ -45436,8 +44627,6 @@ sort: by_weight
 俉	wgk	1
 墲	frl	1
 墲	frlo	1
-扜	rgf	1
-杅	sgf	1
 橆	rlg	1
 橆	rlgs	1
 逜	gkp	1
@@ -45648,22 +44837,15 @@ sort: by_weight
 𩻚	qoro	1
 𪄝	wvg	1
 𪄝	wvgo	1
-喺	kwt	1
-喺	kwti	1
 習	nrf	1
 細	xlg	1
-瘜	uth	1
-瘜	uthn	1
 襲	ueg	1
 襲	uege	1
 錫	qjq	1
 錫	qjqr	1
-蠵	jmw	1
-蠵	jmwk	1
 渓	iefw	1
 噏	kwg	1
 噏	kwgn	1
-熺	ofk	1
 煕	ahh	1
 煕	ahho	1
 犧	tru	1
@@ -45679,9 +44861,6 @@ sort: by_weight
 觽	qemm	1
 壐	gwm	1
 壐	gwmf	1
-霫	fnr	1
-霫	fnrf	1
-徆	tsg	1
 蓆	aya	1
 蓆	ayah	1
 璽	gwm	1
@@ -45699,8 +44878,6 @@ sort: by_weight
 澙	ivgo	1
 墍	rxa	1
 墍	rxaf	1
-悕	nqd	1
-悕	nqdh	1
 莃	aqd	1
 莃	aqdh	1
 徯	tex	1
@@ -45735,7 +44912,6 @@ sort: by_weight
 橀	sycl	1
 鈢	qsy	1
 躧	khg	1
-蟢	jfk	1
 鱚	qof	1
 鱚	qofk	1
 肹	ewgn	1
@@ -45767,8 +44943,6 @@ sort: by_weight
 焬	ojqr	1
 桸	sqd	1
 桸	sqdh	1
-郋	thb	1
-郋	thbh	1
 覤	ham	1
 糦	ofk	1
 謑	yex	1
@@ -45828,14 +45002,11 @@ sort: by_weight
 飁	nrm	1
 飁	nrmj	1
 邜	qbh	1
-磶	dvq	1
-磶	dvqo	1
 綌	xww	1
 餏	wyv	1
 驨	cmw	1
 驨	cmwk	1
 釸	qqy	1
-橲	sfk	1
 屖	nuk	1
 慀	nex	1
 慀	nexd	1
@@ -45867,7 +45038,6 @@ sort: by_weight
 𧐔	jnrg	1
 嚱	kha	1
 屓	nmi	1
-矽	dqy	1
 縘	xex	1
 縘	xexd	1
 羛	ugx	1
@@ -46350,7 +45520,6 @@ sort: by_weight
 狹	qtd	1
 峽	mdw	1
 峽	mdww	1
-陜	bdw	1
 丅	ghk	1
 轄	lpd	1
 轄	lpdk	1
@@ -46371,8 +45540,6 @@ sort: by_weight
 鎼	qhar	1
 圷	fgh	1
 圷	fghy	1
-敮	tfv	1
-敮	tfvc	1
 陿	bad	1
 陿	badw	1
 虲	jhy	1
@@ -46532,8 +45699,6 @@ sort: by_weight
 𪘘	dwwb	1
 現	ghq	1
 鮮	qoud	1
-県	hni	1
-県	hniu	1
 線	xri	1
 線	xriy	1
 顯	jxxm	1
@@ -46583,8 +45748,6 @@ sort: by_weight
 陥	bqhj	1
 嫻	vus	1
 嫻	vusy	1
-癎	uuj	1
-癎	uujd	1
 尠	adwt	1
 睍	hhq	1
 佡	wwm	1
@@ -46614,7 +45777,6 @@ sort: by_weight
 蚿	jyxy	1
 垷	fhq	1
 垷	fhqn	1
-臽	qvf	1
 毨	tfn	1
 毨	tfnq	1
 灦	ijx	1
@@ -46670,8 +45832,6 @@ sort: by_weight
 獫	qtw	1
 礥	dah	1
 礥	dahm	1
-妶	vyx	1
-妶	vyxy	1
 娊	vhq	1
 娊	vhqn	1
 鼸	vnu	1
@@ -46728,7 +45888,6 @@ sort: by_weight
 䲗	qoth	1
 𤞤	qtg	1
 𤞤	qtgd	1
-攇	rpd	1
 㳄	iqw	1
 㳄	iqwy	1
 䧟	bev	1
@@ -47130,8 +46289,6 @@ sort: by_weight
 鄊	xtbb	1
 鐌	qqj	1
 鐌	qqje	1
-膷	ext	1
-膷	extb	1
 襐	puq	1
 襐	puqe	1
 跭	kht	1
@@ -47261,10 +46418,7 @@ sort: by_weight
 獢	qttk	1
 曉	jff	1
 曉	jffq	1
-効	uql	1
-効	uqln	1
 暁	jfa	1
-傚	wuq	1
 蕭	avh	1
 蕭	avhh	1
 篠	twh	1
@@ -47287,9 +46441,6 @@ sort: by_weight
 梟	wvg	1
 梟	wvgs	1
 簫	tvh	1
-歊	ymkw	1
-痟	uie	1
-痟	uied	1
 斅	wfq	1
 斅	wfqc	1
 侾	wft	1
@@ -47301,8 +46452,6 @@ sort: by_weight
 蠨	javh	1
 簘	tvo	1
 簘	tvoj	1
-焇	oie	1
-焇	oieg	1
 髇	mey	1
 髇	meyk	1
 誟	yft	1
@@ -47531,8 +46680,6 @@ sort: by_weight
 寫	pvqo	1
 謝	ytm	1
 謝	ytmf	1
-脇	ell	1
-脇	elll	1
 協	fll	1
 協	flll	1
 蝢	jdm	1
@@ -47593,7 +46740,6 @@ sort: by_weight
 衺	yahe	1
 鞵	afe	1
 鞵	afed	1
-旪	jfh	1
 炧	otb	1
 絏	xjx	1
 絏	xjxt	1
@@ -47634,8 +46780,6 @@ sort: by_weight
 暬	fwfj	1
 綊	xdw	1
 綊	xdww	1
-藛	apv	1
-藛	apvo	1
 齛	hww	1
 齛	hwwn	1
 齘	hww	1
@@ -47987,8 +47131,6 @@ sort: by_weight
 訫	yny	1
 鋅	quh	1
 杺	sny	1
-焮	orq	1
-焮	orqw	1
 釁	wfm	1
 釁	wfmv	1
 廞	yqq	1
@@ -48016,8 +47158,6 @@ sort: by_weight
 阠	bnf	1
 襑	puv	1
 襑	puvf	1
-忄	nyh	1
-忄	nyhy	1
 興	wfm	1
 興	wfmw	1
 㐰	wkg	1
@@ -48153,8 +47293,6 @@ sort: by_weight
 䛭	yfu	1
 䛭	yfuf	1
 哘	ktf	1
-葕	ati	1
-葕	atih	1
 蛵	jgv	1
 蛵	jgva	1
 餳	wyv	1
@@ -48314,13 +47452,10 @@ sort: by_weight
 繡	xvh	1
 鏅	qwh	1
 鏅	qwhe	1
-俢	wte	1
 鏽	qvhh	1
 繍	xvo	1
 繍	xvoj	1
 銹	qte	1
-褎	yqg	1
-褎	yqge	1
 鮴	qow	1
 鮴	qows	1
 烌	ows	1
@@ -48451,8 +47586,6 @@ sort: by_weight
 芧	acbj	1
 頊	gdm	1
 頊	gdmy	1
-鑐	qfd	1
-鑐	qfdj	1
 侐	wtl	1
 魖	rqc	1
 魖	rqcg	1
@@ -48491,8 +47624,6 @@ sort: by_weight
 瞁	hhd	1
 瞁	hhdy	1
 蕦	aed	1
-沀	icb	1
-沀	icbh	1
 漵	iwt	1
 漵	iwtt	1
 聓	amy	1
@@ -48796,16 +47927,12 @@ sort: by_weight
 譞	ylg	1
 譞	ylge	1
 諠	ypg	1
-镟	qyt	1
-镟	qyth	1
 璿	ghp	1
 璿	ghph	1
 絢	xqj	1
 昍	jjg	1
 媗	vpg	1
 媗	vpgg	1
-揎	rpg	1
-揎	rpgg	1
 鉉	qyx	1
 鉉	qyxy	1
 鏇	qyt	1
@@ -48828,8 +47955,6 @@ sort: by_weight
 嫙	vyt	1
 嫙	vyth	1
 萲	aef	1
-袨	puy	1
-袨	puyx	1
 楥	sef	1
 楥	sefc	1
 縼	xyt	1
@@ -48837,8 +47962,6 @@ sort: by_weight
 諼	yefc	1
 藼	apg	1
 藼	apgn	1
-蠉	jlg	1
-蠉	jlge	1
 箮	tpg	1
 箮	tpgg	1
 愋	nef	1
@@ -49021,8 +48144,6 @@ sort: by_weight
 𪍧	ytn	1
 鱈	qof	1
 鱈	qofv	1
-桖	stl	1
-桖	stlg	1
 泶	ipi	1
 泶	ipiu	1
 謔	yha	1
@@ -49217,8 +48338,6 @@ sort: by_weight
 毥	tfnj	1
 奞	dwy	1
 奞	dwyf	1
-燅	fwf	1
-燅	fwfo	1
 攳	fcv	1
 矄	htgo	1
 㖊	kvfy	1
@@ -49344,8 +48463,6 @@ sort: by_weight
 鐚	qgh	1
 鐚	qghn	1
 漄	imd	1
-窫	pwd	1
-窫	pwdd	1
 枒	sah	1
 枒	saht	1
 婭	vgh	1
@@ -49388,8 +48505,6 @@ sort: by_weight
 䦪	ujqn	1
 𡶦	mrg	1
 𡶦	mrgf	1
-冴	uah	1
-冴	uaht	1
 埡	fgh	1
 埡	fghg	1
 椻	saj	1
@@ -49523,7 +48638,6 @@ sort: by_weight
 鹽	ahnl	1
 厭	dje	1
 厭	djed	1
-硏	dft	1
 燄	qvo	1
 燄	qvoo	1
 顔	utem	1
@@ -49577,8 +48691,6 @@ sort: by_weight
 嚥	kauo	1
 曮	jkk	1
 曮	jkkt	1
-匽	ajv	1
-匽	ajvd	1
 嵓	mkk	1
 嵓	mkkk	1
 硯	dhq	1
@@ -49632,17 +48744,11 @@ sort: by_weight
 醼	sgao	1
 喭	kut	1
 喭	kute	1
-鬳	hag	1
-鬳	hagh	1
-嵃	mut	1
-嵃	mute	1
 娮	vyg	1
 渷	iuk	1
 渷	iukq	1
 魘	dje	1
 魘	djec	1
-揅	dga	1
-揅	dgar	1
 遃	utep	1
 騴	cjp	1
 騴	cjpv	1
@@ -50357,8 +49463,6 @@ sort: by_weight
 苭	axlb	1
 窯	pwu	1
 窯	pwuo	1
-喓	ksv	1
-喓	ksvg	1
 烑	oiq	1
 愮	ner	1
 愮	nerm	1
@@ -50372,8 +49476,6 @@ sort: by_weight
 嶤	mff	1
 宎	ptd	1
 宎	ptdu	1
-騕	csv	1
-騕	csvg	1
 訞	ytd	1
 訞	ytdy	1
 穾	pwt	1
@@ -50405,8 +49507,6 @@ sort: by_weight
 颻	ermj	1
 鰩	qoe	1
 鰩	qoem	1
-詏	yxl	1
-詏	yxln	1
 顤	fff	1
 顤	fffm	1
 摿	rwu	1
@@ -50652,17 +49752,11 @@ sort: by_weight
 𪐯	lfo	1
 𪐯	lfoc	1
 業	ogu	1
-嘢	kjf	1
-嘢	kjfb	1
 爺	wqb	1
 曄	jagf	1
-埜	ssf	1
-埜	ssff	1
 鵺	ywt	1
 鍱	qan	1
 鍱	qans	1
-暍	jjq	1
-暍	jjqn	1
 枼	ans	1
 曅	jagf	1
 謁	yjq	1
@@ -50690,8 +49784,6 @@ sort: by_weight
 僷	waa	1
 僷	waas	1
 亱	ywj	1
-蠮	jat	1
-蠮	jatn	1
 瞱	hag	1
 瞱	hagf	1
 鋣	qah	1
@@ -50740,7 +49832,6 @@ sort: by_weight
 䥺	qah	1
 㸣	thg	1
 㸣	thgw	1
-吔	kbn	1
 擨	rrhw	1
 歋	rha	1
 煠	oan	1
@@ -50987,7 +50078,6 @@ sort: by_weight
 貽	mck	1
 貽	mckg	1
 熼	ola	1
-焲	oyw	1
 獈	qtu	1
 伇	wmc	1
 伇	wmcy	1
@@ -50999,8 +50089,6 @@ sort: by_weight
 豷	efpu	1
 肊	enn	1
 觺	xtd	1
-瑿	atd	1
-瑿	atdy	1
 旑	yds	1
 旑	ydsk	1
 冝	peg	1
@@ -51013,8 +50101,6 @@ sort: by_weight
 黓	lfoa	1
 勩	anm	1
 勩	anml	1
-殹	atd	1
-殹	atdc	1
 螔	jrh	1
 螔	jrhm	1
 蛜	jwv	1
@@ -51037,7 +50123,6 @@ sort: by_weight
 螘	jmgu	1
 澺	iuj	1
 澺	iujn	1
-乊	tur	1
 欥	jqw	1
 渏	ids	1
 渏	idsk	1
@@ -51180,16 +50265,13 @@ sort: by_weight
 頥	hahm	1
 巸	ahk	1
 巸	ahkn	1
-耴	bnn	1
 鶃	wvg	1
-伿	wkw	1
 殔	gqv	1
 殔	gqvi	1
 黳	atd	1
 黳	atdo	1
 輢	lds	1
 輢	ldsk	1
-籎	txt	1
 詍	yan	1
 嬄	vfp	1
 嬄	vfpu	1
@@ -51267,11 +50349,8 @@ sort: by_weight
 弬	xahh	1
 撎	rfp	1
 撎	rfpu	1
-洟	igx	1
-洟	igxw	1
 篒	twy	1
 篒	twye	1
-衪	pub	1
 迱	pxp	1
 迱	pxpv	1
 鄓	thd	1
@@ -51908,8 +50987,6 @@ sort: by_weight
 飮	wyvw	1
 噾	kpw	1
 噾	kpwj	1
-瘖	uuj	1
-瘖	uujd	1
 烎	gao	1
 烎	gaou	1
 隂	bwd	1
@@ -51967,10 +51044,8 @@ sort: by_weight
 癊	ubwc	1
 靷	afx	1
 靷	afxh	1
-斦	rrh	1
 憗	sww	1
 憗	swwn	1
-圁	lyd	1
 栶	sld	1
 栶	sldy	1
 碒	dqg	1
@@ -51979,16 +51054,12 @@ sort: by_weight
 輑	lvtk	1
 憖	sww	1
 憖	swwn	1
-櫽	bea	1
-櫽	beas	1
 趛	fhq	1
 廕	ybw	1
 廕	ybwc	1
 淾	qiu	1
 荶	akw	1
 荶	akwn	1
-洕	iwe	1
-洕	iweg	1
 猌	sww	1
 猌	swwd	1
 銦	qldy	1
@@ -52241,8 +51312,6 @@ sort: by_weight
 營	oopk	1
 甇	oop	1
 甇	oopn	1
-営	ipk	1
-営	ipkk	1
 応	yni	1
 贏	ynk	1
 贏	ynky	1
@@ -52367,8 +51436,6 @@ sort: by_weight
 攖	rmmv	1
 鐛	qjy	1
 鐛	qjyi	1
-梬	smg	1
-梬	smgn	1
 矨	tdt	1
 濚	ioos	1
 愥	nam	1
@@ -52574,8 +51641,6 @@ sort: by_weight
 滽	iyv	1
 滽	iyvh	1
 顒	jmhm	1
-雝	vkc	1
-雝	vkcy	1
 灉	ivk	1
 灉	ivky	1
 鏞	qyv	1
@@ -52614,15 +51679,11 @@ sort: by_weight
 惥	vwnu	1
 砽	deh	1
 柡	sfi	1
-嫞	vyv	1
-嫞	vyvh	1
 鷛	yveo	1
 勈	cel	1
 勈	celn	1
 鰫	qop	1
 鰫	qopk	1
-愑	nce	1
-愑	ncel	1
 鯒	qoc	1
 鯒	qoce	1
 㦷	cea	1
@@ -52738,13 +51799,10 @@ sort: by_weight
 優	wde	1
 誘	yte	1
 誘	yten	1
-楢	sus	1
 憂	dep	1
 憂	dept	1
 魷	qod	1
 魷	qodn	1
-逌	hln	1
-逌	hlnp	1
 櫌	sde	1
 櫌	sdet	1
 懮	nde	1
@@ -52767,8 +51825,6 @@ sort: by_weight
 湵	iugy	1
 櫾	ser	1
 櫾	seri	1
-怣	rwn	1
-怣	rwnu	1
 苃	adc	1
 苃	adcu	1
 哊	kde	1
@@ -53133,8 +52189,6 @@ sort: by_weight
 霱	fcb	1
 棜	syw	1
 棜	sywu	1
-欝	sqq	1
-欝	sqqf	1
 偊	wtk	1
 偊	wtky	1
 硲	dww	1
@@ -53177,7 +52231,6 @@ sort: by_weight
 茟	avfh	1
 琙	gak	1
 諛	yvw	1
-礜	wfg	1
 迃	fnp	1
 鸆	hak	1
 鸆	hako	1
@@ -53228,13 +52281,9 @@ sort: by_weight
 稢	tak	1
 楰	svw	1
 牏	thg	1
-斔	yjv	1
-斔	yjvw	1
 酑	sgg	1
 袬	yck	1
 袬	ycke	1
-芌	afn	1
-芌	afnb	1
 嫗	vak	1
 嫗	vakk	1
 庽	yjm	1
@@ -53766,17 +52815,13 @@ sort: by_weight
 遠	fke	1
 園	lfk	1
 園	lfke	1
-円	mhg	1
-円	mhgd	1
 願	drim	1
 圓	lkm	1
 圓	lkmi	1
 緣	xxe	1
 緣	xxey	1
-渕	iudj	1
 縁	xve	1
 縁	xvey	1
-贠	cmu	1
 蝝	jxe	1
 蝝	jxey	1
 淵	ith	1
@@ -54007,7 +53052,6 @@ sort: by_weight
 躍	khn	1
 閲	uuk	1
 閲	uukq	1
-曱	jhk	1
 嶽	mqt	1
 嶽	mqtd	1
 戉	any	1
@@ -54162,7 +53206,6 @@ sort: by_weight
 𪒥	lfot	1
 𪘳	hbn	1
 𪘳	hbnm	1
-伝	wfcy	1
 運	plp	1
 運	plpk	1
 雲	ffc	1
@@ -54366,7 +53409,6 @@ sort: by_weight
 𪏚	amw	1
 𪏚	amwm	1
 雜	yww	1
-雑	vsw	1
 襍	puw	1
 紮	snx	1
 紮	snxi	1
@@ -54443,8 +53485,6 @@ sort: by_weight
 載	fal	1
 載	falk	1
 災	vou	1
-渽	ifa	1
-渽	ifak	1
 縡	xpu	1
 縡	xpuh	1
 洅	igm	1
@@ -54452,8 +53492,6 @@ sort: by_weight
 傤	wfa	1
 傤	wfal	1
 扗	rfg	1
-烖	fao	1
-烖	faoi	1
 溨	ifa	1
 溨	ifas	1
 酨	fas	1
@@ -54610,8 +53648,6 @@ sort: by_weight
 駔	ceg	1
 駔	cegg	1
 贜	mad	1
-蔵	ada	1
-蔵	adat	1
 㘸	gqx	1
 㘸	gqxf	1
 㮜	san	1
@@ -54731,6 +53767,7 @@ sort: by_weight
 𨠷	gmag	1
 𪙡	hbg	1
 𪙡	hbgj	1
+沢	inyy	1
 則	mjh	1
 擇	rlf	1
 擇	rlff	1
@@ -54865,8 +53902,6 @@ sort: by_weight
 𧒿	jma	1
 𧒿	jmad	1
 𨆎	khm	1
-増	ful	1
-増	fulj	1
 贈	mul	1
 贈	mulj	1
 磳	dul	1
@@ -54912,8 +53947,6 @@ sort: by_weight
 閘	ulk	1
 鍘	qmj	1
 鍘	qmjh	1
-柤	seg	1
-柤	segg	1
 牐	thg	1
 牐	thgv	1
 醡	sgp	1
@@ -55174,8 +54207,6 @@ sort: by_weight
 𪘨	hbsw	1
 𪚎	yvu	1
 𪚎	yvub	1
-戦	ijf	1
-戦	ijfa	1
 戰	kkj	1
 戰	kkja	1
 霑	fih	1
@@ -55196,8 +54227,6 @@ sort: by_weight
 氊	tfn	1
 氈	ylk	1
 氈	ylkn	1
-邅	ylk	1
-邅	ylkp	1
 魙	ilrc	1
 琖	gaa	1
 琖	gaat	1
@@ -55219,8 +54248,6 @@ sort: by_weight
 菚	aaa	1
 惉	ihk	1
 惉	ihkn	1
-虥	ham	1
-虥	hama	1
 轏	lnb	1
 轏	lnbb	1
 閚	uud	1
@@ -55478,8 +54505,6 @@ sort: by_weight
 𪅂	ujwo	1
 趙	fhi	1
 趙	fhie	1
-炤	ovk	1
-炤	ovkg	1
 詔	yvk	1
 詔	yvkg	1
 瞾	hhp	1
@@ -55602,14 +54627,10 @@ sort: by_weight
 摺	rnrg	1
 蟄	fuf	1
 悊	rrn	1
-淛	irm	1
-淛	irmj	1
 粍	otf	1
 粍	otfn	1
 輒	lbn	1
 輒	lbnn	1
-嗻	kya	1
-嗻	kyao	1
 轍	lyc	1
 轍	lyct	1
 嚞	fkfk	1
@@ -55796,7 +54817,6 @@ sort: by_weight
 遉	hmpi	1
 嫃	vfh	1
 嫃	vfhw	1
-甽	lkh	1
 珎	gqi	1
 禎	pyh	1
 禎	pyhm	1
@@ -55825,8 +54845,6 @@ sort: by_weight
 挋	rah	1
 挋	rahh	1
 裖	pud	1
-獉	qtd	1
-獉	qtdt	1
 抮	rwe	1
 抮	rwet	1
 殝	gqd	1
@@ -55834,8 +54852,6 @@ sort: by_weight
 眹	hud	1
 眹	hudy	1
 酙	sgu	1
-侲	wdf	1
-侲	wdfe	1
 薽	asf	1
 薽	asfn	1
 鉁	qwe	1
@@ -55881,8 +54897,6 @@ sort: by_weight
 幀	mhhm	1
 縝	xfh	1
 縝	xfhw	1
-覙	qih	1
-覙	qihq	1
 辴	kkj	1
 㓄	ccc	1
 㓄	cccq	1
@@ -56195,15 +55209,10 @@ sort: by_weight
 製	rmh	1
 製	rmhe	1
 紙	xqa	1
-姪	vgc	1
-姪	vgcf	1
-凪	mhd	1
 職	bua	1
 職	buaj	1
 隻	wyc	1
 隻	wycu	1
-値	wfh	1
-値	wfhn	1
 誌	yfn	1
 誌	yfny	1
 織	xua	1
@@ -56211,11 +55220,8 @@ sort: by_weight
 緻	xgct	1
 執	fuf	1
 執	fufy	1
-阯	bhg	1
 滯	iaq	1
 滯	iaqh	1
-夂	ttn	1
-夂	ttny	1
 摯	fuf	1
 摯	fufr	1
 膣	epw	1
@@ -56224,14 +55230,8 @@ sort: by_weight
 樴	suaj	1
 廌	ynj	1
 廌	ynjo	1
-娡	vfn	1
-娡	vfny	1
-椥	std	1
-椥	stdk	1
 鋕	qfn	1
 鋕	qfny	1
-庢	ygc	1
-庢	ygcf	1
 幟	mhu	1
 幟	mhuj	1
 蹠	khy	1
@@ -56250,8 +55250,6 @@ sort: by_weight
 巵	rgcv	1
 懥	nfp	1
 懥	nfph	1
-礩	drr	1
-礩	drrm	1
 袠	yrw	1
 袠	yrwe	1
 淔	ifh	1
@@ -56266,7 +55264,6 @@ sort: by_weight
 劧	rln	1
 帋	qam	1
 帋	qamh	1
-猘	qtr	1
 徏	thit	1
 櫛	stv	1
 櫛	stvb	1
@@ -56278,8 +55275,6 @@ sort: by_weight
 紩	xrwy	1
 洔	iff	1
 洔	iffy	1
-瓆	grr	1
-瓆	grrm	1
 鴙	tdw	1
 鴙	tdwo	1
 俧	wfn	1
@@ -56310,8 +55305,6 @@ sort: by_weight
 袟	pur	1
 洷	igc	1
 洷	igcf	1
-豑	mag	1
-豑	magt	1
 潌	ipw	1
 胑	ekw	1
 胑	ekwy	1
@@ -56390,7 +55383,6 @@ sort: by_weight
 鴲	xjwo	1
 𡌴	fhn	1
 𨑨	jpd	1
-坧	fdg	1
 戠	uajd	1
 潪	itd	1
 潪	itdj	1
@@ -56880,8 +55872,6 @@ sort: by_weight
 汷	ity	1
 衳	puw	1
 衳	puwc	1
-蚛	jkh	1
-蚛	jkhh	1
 泈	itu	1
 堹	ftg	1
 妕	vkh	1
@@ -56989,8 +55979,6 @@ sort: by_weight
 箒	tvph	1
 淍	imf	1
 淍	imfk	1
-甃	tog	1
-甃	togn	1
 晝	vfj	1
 冑	mmf	1
 喌	kky	1
@@ -57188,8 +56176,6 @@ sort: by_weight
 𪆀	xox	1
 𪆀	xoxo	1
 𪇞	fku	1
-丶	yyl	1
-丶	yyll	1
 豬	eft	1
 豬	eftj	1
 築	tam	1
@@ -57301,8 +56287,6 @@ sort: by_weight
 爥	oni	1
 爥	onij	1
 㝉	pgf	1
-笜	tbm	1
-笜	tbmj	1
 罜	lyg	1
 𧏿	jep	1
 𧏿	jepy	1
@@ -57324,8 +56308,6 @@ sort: by_weight
 蓫	aep	1
 蓫	aepu	1
 蕏	aqt	1
-逫	ccc	1
-逫	cccp	1
 鸀	lqj	1
 鸀	lqjo	1
 㑏	wpf	1
@@ -57522,7 +56504,6 @@ sort: by_weight
 轉	lgj	1
 專	gjh	1
 專	gjhf	1
-専	gmf	1
 転	lfc	1
 転	lfcy	1
 賺	muv	1
@@ -57613,8 +56594,6 @@ sort: by_weight
 狀	nhdd	1
 莊	anh	1
 莊	anhf	1
-粧	oyf	1
-粧	oyfg	1
 妝	nhd	1
 妝	nhdv	1
 荘	auf	1
@@ -57673,8 +56652,6 @@ sort: by_weight
 錣	qcc	1
 錣	qccc	1
 沝	iiy	1
-醊	sgc	1
-醊	sgcc	1
 甀	tga	1
 甀	tgan	1
 縋	xwn	1
@@ -57685,8 +56662,6 @@ sort: by_weight
 鑆	qog	1
 鑆	qogf	1
 騅	cwyg	1
-礈	due	1
-礈	duep	1
 腏	ecc	1
 腏	eccc	1
 㗓	kwn	1
@@ -57731,7 +56706,6 @@ sort: by_weight
 埻	fybg	1
 諄	yyb	1
 諄	yybg	1
-迍	gbnp	1
 稕	tyb	1
 宒	ptf	1
 訰	ygb	1
@@ -57743,10 +56717,6 @@ sort: by_weight
 𥚠	pyyb	1
 濁	ilq	1
 濁	ilqj	1
-斱	ftj	1
-斱	ftjr	1
-斲	nng	1
-斲	nngr	1
 圴	fqy	1
 鷟	ytt	1
 鷟	ytto	1
@@ -57911,7 +56881,6 @@ sort: by_weight
 胔	hxmw	1
 眥	hxh	1
 眥	hxhf	1
-芓	abf	1
 緇	xvl	1
 緇	xvlg	1
 榟	spu	1
@@ -57946,8 +56915,6 @@ sort: by_weight
 輺	lgvl	1
 秶	uqw	1
 秶	uqwt	1
-荢	apg	1
-荢	apgf	1
 橴	shx	1
 橴	shxi	1
 澬	iuq	1
@@ -58142,8 +57109,6 @@ sort: by_weight
 縂	xukn	1
 摠	rtl	1
 摠	rtln	1
-嵕	mqb	1
-嵕	mqbt	1
 鯮	qop	1
 鯮	qopi	1
 糭	oqo	1
@@ -58208,8 +57173,6 @@ sort: by_weight
 㚇	qbw	1
 㚇	qbwt	1
 倊	wwc	1
-緫	xqr	1
-緫	xqrn	1
 繌	xtl	1
 㢔	ytw	1
 㣭	tqb	1
@@ -58474,10 +57437,6 @@ sort: by_weight
 𩎑	afw	1
 𩎑	afwo	1
 酔	sgv	1
-檇	swy	1
-檇	swym	1
-晬	jyw	1
-晬	jywf	1
 栬	sqcn	1
 厜	dtg	1
 厜	dtgf	1
@@ -58491,8 +57450,6 @@ sort: by_weight
 酻	sge	1
 絊	xsg	1
 絊	xsgg	1
-噿	kny	1
-噿	knyf	1
 檌	sld	1
 檌	sldd	1
 蟕	jhx	1
@@ -58505,8 +57462,6 @@ sort: by_weight
 纗	xmw	1
 纗	xmwk	1
 䘹	puy	1
-冣	pbc	1
-冣	pbcu	1
 嶵	mld	1
 嶵	mldd	1
 㠑	mld	1
@@ -58595,8 +57550,6 @@ sort: by_weight
 𦪚	teu	1
 𩯄	deu	1
 𩯄	deuf	1
-咗	kda	1
-咗	kdag	1
 筰	twt	1
 筰	twtf	1
 莋	awt	1
@@ -58704,7 +57657,6 @@ sort: by_weight
 叾	bkf	1
 唜	gsk	1
 唜	gskx	1
-虄	ajt	1
 襨	puo	1
 襨	puof	1
 乥	tun	1
@@ -58714,8 +57666,6 @@ sort: by_weight
 𥩟	upg	1
 瓧	gny	1
 瓧	gnyf	1
-兙	dqf	1
-兙	dqfk	1
 嗧	lkw	1
 嗧	lkwa	1
 兡	dqd	1
@@ -58914,14 +57864,10 @@ sort: by_weight
 𪕅	vnun	1
 𪚿	qkn	1
 𪚿	qknl	1
-旕	ywu	1
-旕	ywux	1
 兝	dqw	1
 兝	dqwv	1
 兣	dqd	1
 兣	dqdf	1
-兞	dqt	1
-兞	dqtn	1
 穒	twv	1
 穒	twvo	1
 瓱	gny	1
@@ -58933,8 +57879,6 @@ sort: by_weight
 喸	geh	1
 兛	dqt	1
 兛	dqtf	1
-瓩	gny	1
-瓩	gnyf	1
 囕	kah	1
 囕	kahq	1
 瓲	gny	1
@@ -59198,6 +58142,7 @@ sort: by_weight
 㢹	xuh	1
 㢿	xwn	1
 㢿	xwnd	1
+㣉	aet	1
 㣊	ter	1
 㣗	tyn	1
 㣗	tynt	1
@@ -106428,7 +105373,6 @@ sort: by_weight
 丗	gmk	1
 丮	nfhk	1
 丵	oguf	1
-丶	zzpp	1
 丿	ttll	1
 丿	zzpp	1
 乕	rfmh	1
@@ -106444,7 +105388,6 @@ sort: by_weight
 亞	gfgd	1
 亞	ghgg	1
 亠	zzpp	1
-亰	yjiu	1
 亱	ywjg	1
 亻	zzpp	1
 仛	wtan	1
@@ -106453,15 +105396,12 @@ sort: by_weight
 伂	wgmh	1
 伅	wgbn	1
 伌	wdbn	1
-伓	wgiy	1
-伕	wfwy	1
 伜	wvfh	1
 伬	wnyy	1
 伮	wvcy	1
 伱	wwiy	1
 伳	wann	1
 伻	wguh	1
-伿	wkwy	1
 佂	wghg	1
 佋	wvkg	1
 佨	wqnn	1
@@ -106484,21 +105424,17 @@ sort: by_weight
 俓	wgva	1
 俔	whqn	1
 俠	wdww	1
-俢	wtet	1
 俧	wfny	1
 俰	wtkg	1
 俹	wgfg	1
 俹	wghg	1
 俻	wtlg	1
 俼	wyce	1
-倂	wtff	1
 倄	wqde	1
-倅	wywf	1
 倈	wsww	1
 倊	wwcn	1
 倛	wadw	1
 倝	fjwy	1
-倣	wyty	1
 倫	wwga	1
 倰	wfwt	1
 倱	wjxx	1
@@ -106515,7 +105451,6 @@ sort: by_weight
 傋	wfjf	1
 傓	wynn	1
 傘	wwwf	1
-傚	wuqt	1
 傟	wwcn	1
 傪	wcce	1
 傱	wtwh	1
@@ -106525,7 +105460,6 @@ sort: by_weight
 傹	wujq	1
 僅	wakg	1
 僛	wadw	1
-僟	wxxt	1
 僪	wcbk	1
 僫	wgfn	1
 僱	wyny	1
@@ -106579,7 +105513,6 @@ sort: by_weight
 勣	gmln	1
 勫	toll	1
 勳	tgll	1
-勷	ykkl	1
 勹	zzpp	1
 匁	qtyi	1
 匚	zzpp	1
@@ -106602,9 +105535,6 @@ sort: by_weight
 叝	fcbc	1
 吀	ktfh	1
 吂	ynkf	1
-吘	ktfh	1
-吷	knwy	1
-吿	rhkf	1
 呂	ktkf	1
 呪	kkqn	1
 呮	kkwy	1
@@ -106612,7 +105542,6 @@ sort: by_weight
 咃	kwbn	1
 咓	kgnn	1
 咞	kgah	1
-哋	kfbn	1
 哘	ktfh	1
 哛	kxwv	1
 哬	kwsk	1
@@ -106640,9 +105569,7 @@ sort: by_weight
 嘋	kftt	1
 嘍	klvg	1
 嘑	khah	1
-嘒	kdhv	1
 嘗	ipkj	1
-嘦	kwsv	1
 嘯	kvfj	1
 嘽	kkkf	1
 噁	kgfn	1
@@ -106663,10 +105590,7 @@ sort: by_weight
 囀	klgf	1
 囅	kkje	1
 囋	ktfm	1
-囐	khad	1
-囗	zzpp	1
 囬	ljfd	1
-圑	lgef	1
 園	lfky	1
 團	lgjf	1
 圛	llff	1
@@ -106684,12 +105608,10 @@ sort: by_weight
 垗	fiqn	1
 垘	fwdy	1
 垥	fwgk	1
-垰	fhgh	1
 垳	ftfh	1
 埀	tfuf	1
 埀	tguf	1
 埄	ftdh	1
-埈	fcwt	1
 埉	fdww	1
 埑	rrff	1
 埖	fawx	1
@@ -106719,7 +105641,6 @@ sort: by_weight
 塺	yssf	1
 塼	fgjf	1
 塿	flvg	1
-墆	faqh	1
 墋	fcce	1
 墔	fmwy	1
 墖	fwgl	1
@@ -106729,7 +105650,6 @@ sort: by_weight
 墷	fagf	1
 墹	fujg	1
 壂	nawf	1
-壆	vqqf	1
 壌	fufe	1
 壎	ftgo	1
 壘	lllf	1
@@ -106747,15 +105667,12 @@ sort: by_weight
 壽	fnaf	1
 壿	fusf	1
 夁	flld	1
-夂	zzpp	1
 夅	tahj	1
 夎	wwft	1
 夝	qtgg	1
 夠	qqqk	1
 夡	qqfk	1
-奀	gidu	1
 奜	djdd	1
-奝	dmfk	1
 奣	gdje	1
 奤	ddmd	1
 奦	cbtd	1
@@ -106765,7 +105682,6 @@ sort: by_weight
 奲	dftf	1
 奷	vtfh	1
 奼	vtan	1
-妋	vfwy	1
 妿	lkvf	1
 姏	vafg	1
 姡	vtdg	1
@@ -106789,24 +105705,17 @@ sort: by_weight
 嬈	vffq	1
 嬦	vfnf	1
 嬩	vvgw	1
-嬯	vfkf	1
 嬹	vvmw	1
 孲	bgfg	1
 學	vqqb	1
-宀	pyyn	1
-宀	zzpp	1
 宐	pqyg	1
 宒	ptfn	1
 宯	pftb	1
 宱	pwtf	1
 寍	pnlf	1
-寚	pgrm	1
 寠	plvf	1
-寳	pgqm	1
 寶	pgrm	1
-専	gmfu	1
 對	oguf	1
-尙	imkf	1
 尰	dntf	1
 尵	dnkm	1
 尷	dnal	1
@@ -106817,7 +105726,6 @@ sort: by_weight
 屢	pkgv	1
 屨	ntlv	1
 屩	nttk	1
-屫	nnhk	1
 岉	mqrt	1
 岏	mfqn	1
 峈	mtkg	1
@@ -106866,7 +105774,6 @@ sort: by_weight
 幙	mhad	1
 幤	imkh	1
 幬	mhff	1
-幵	ftfh	1
 幷	tftf	1
 幾	xxdt	1
 庉	ygbn	1
@@ -106901,13 +105808,11 @@ sort: by_weight
 徺	tffq	1
 徾	tmyt	1
 忁	tjbi	1
-忄	zzpp	1
 忎	tfnu	1
 忥	rnnu	1
 怑	nufh	1
 怤	wfnu	1
 怰	nyxy	1
-怱	qryn	1
 怲	ngmw	1
 怴	nant	1
 怷	fqyn	1
@@ -106970,7 +105875,6 @@ sort: by_weight
 扌	rghg	1
 扌	zzpp	1
 扙	rdyy	1
-扜	rgfh	1
 扟	rnfh	1
 扠	rcyy	1
 扢	rtnn	1
@@ -106994,7 +105898,6 @@ sort: by_weight
 挊	rhgh	1
 挘	ritl	1
 挢	rtdj	1
-挮	ruxt	1
 挸	rhqn	1
 挾	rdww	1
 挿	rtfj	1
@@ -107015,8 +105918,6 @@ sort: by_weight
 掗	rgfg	1
 掗	rghg	1
 掜	rvqn	1
-掟	rpgh	1
-掤	reeg	1
 掹	rblg	1
 揂	rusg	1
 揈	rqyg	1
@@ -107026,7 +105927,6 @@ sort: by_weight
 揜	rwga	1
 揧	gkir	1
 揷	rtgh	1
-揾	rjlg	1
 搉	rpwy	1
 搖	rqrm	1
 搲	rpwy	1
@@ -107062,7 +105962,6 @@ sort: by_weight
 擵	rysr	1
 擶	rtuj	1
 擻	rlvt	1
-攇	rpdn	1
 攈	rynt	1
 攊	rdth	1
 攏	rued	1
@@ -107091,7 +105990,6 @@ sort: by_weight
 敶	bgjt	1
 數	lvty	1
 敻	qmwt	1
-斁	lfut	1
 斂	wgkt	1
 斃	umix	1
 斅	vqqc	1
@@ -107105,7 +106003,6 @@ sort: by_weight
 斢	amwf	1
 斪	qkrh	1
 斮	ajrh	1
-斲	anjr	1
 斾	ytmh	1
 旀	yciy	1
 旂	ytrh	1
@@ -107124,7 +106021,6 @@ sort: by_weight
 晎	jawy	1
 晛	jhqn	1
 晝	vfjg	1
-晩	jqjq	1
 晵	yntj	1
 暀	jtyg	1
 暁	jfaq	1
@@ -107138,7 +106034,6 @@ sort: by_weight
 曕	jqdy	1
 曤	jfwy	1
 曪	jlxy	1
-曶	qrjf	1
 書	vfjf	1
 曺	gjhj	1
 曺	gmjf	1
@@ -107152,15 +106047,11 @@ sort: by_weight
 朮	fqyi	1
 朿	gmii	1
 杁	styy	1
-杅	sgfh	1
 杇	sfnn	1
 杋	smyy	1
 杚	stnn	1
-杮	sgmh	1
 杶	sgbn	1
-枌	swvn	1
 枑	sgxg	1
-枓	sufh	1
 枙	sdbn	1
 枦	synt	1
 枬	smyg	1
@@ -107172,7 +106063,6 @@ sort: by_weight
 栆	gkwu	1
 栤	suiy	1
 栦	syth	1
-栱	sawy	1
 桋	sgxw	1
 桚	svqy	1
 桟	sdny	1
@@ -107191,7 +106081,6 @@ sort: by_weight
 棩	sjgg	1
 棶	ssww	1
 棸	bcsu	1
-椇	shwy	1
 椏	sgfg	1
 椏	sghg	1
 椖	syny	1
@@ -107200,7 +106089,6 @@ sort: by_weight
 椫	sujf	1
 楆	ssvg	1
 楍	skkk	1
-楢	susg	1
 業	oguw	1
 楰	svwy	1
 楾	sriy	1
@@ -107223,13 +106111,9 @@ sort: by_weight
 樰	sfvg	1
 樹	sfkf	1
 樼	snbb	1
-橚	svfj	1
 橮	sqym	1
-橲	sfkk	1
 橷	surq	1
-橿	sglg	1
 檅	shdt	1
-檇	swyn	1
 檊	sfjf	1
 檓	svac	1
 檚	sssh	1
@@ -107238,7 +106122,6 @@ sort: by_weight
 檯	sfkf	1
 檱	staw	1
 櫃	sakm	1
-櫄	stgo	1
 櫅	syjg	1
 櫏	ssdp	1
 櫚	sukk	1
@@ -107295,12 +106178,10 @@ sort: by_weight
 氜	rnjf	1
 氣	rnou	1
 氫	rnga	1
-氵	zzpp	1
 氺	ihyy	1
 汒	iynn	1
 汘	itfh	1
 汙	igfh	1
-汳	ircy	1
 汵	iwyn	1
 汻	itfh	1
 沍	igxg	1
@@ -107309,11 +106190,10 @@ sort: by_weight
 沲	itbn	1
 沶	ifiy	1
 泈	ituy	1
-泒	ircy	1
 泟	ighg	1
 泧	iant	1
 泩	itgg	1
-泬	ipwy	1
+泲	itnt	1
 洀	itey	1
 洍	iahh	1
 洐	itfh	1
@@ -107323,7 +106203,6 @@ sort: by_weight
 洰	iang	1
 浗	ifiy	1
 浤	ipdc	1
-浨	ipsy	1
 浫	ipwf	1
 浶	iprh	1
 浹	idww	1
@@ -107349,12 +106228,10 @@ sort: by_weight
 淽	iahg	1
 済	iyjg	1
 渉	ihit	1
-渋	ihiy	1
 渢	imtj	1
 渮	iask	1
 渵	ialg	1
 渶	iamd	1
-渻	iith	1
 渾	iplh	1
 湇	iueg	1
 湌	iwye	1
@@ -107368,9 +106245,7 @@ sort: by_weight
 湶	iriy	1
 湹	idjf	1
 湻	iyjg	1
-満	iamm	1
 溂	igkj	1
-溄	imth	1
 溈	iyto	1
 溎	isff	1
 溕	ipge	1
@@ -107380,7 +106255,6 @@ sort: by_weight
 滒	iskk	1
 滙	iawy	1
 滮	ihae	1
-滱	ipfc	1
 滲	icce	1
 滸	iytf	1
 滻	iutg	1
@@ -107406,7 +106280,6 @@ sort: by_weight
 潯	ivaf	1
 澁	ihhh	1
 澐	iffc	1
-澒	iadm	1
 澞	ihad	1
 澠	ixg	1
 澢	iipl	1
@@ -107461,7 +106334,6 @@ sort: by_weight
 焃	ofoy	1
 焪	opwx	1
 焫	oamw	1
-焲	oywy	1
 焸	jjou	1
 煍	otoy	1
 煐	oamd	1
@@ -107470,7 +106342,6 @@ sort: by_weight
 熕	oamy	1
 熡	olvg	1
 熲	xodm	1
-熺	ofkk	1
 熼	olaw	1
 熽	ovfj	1
 熽	ovhh	1
@@ -107488,7 +106359,6 @@ sort: by_weight
 爺	wqbb	1
 牅	nhdh	1
 牉	thgf	1
-牊	thgk	1
 牋	thga	1
 牏	thgj	1
 牑	thga	1
@@ -107503,7 +106373,6 @@ sort: by_weight
 牰	trmg	1
 牱	trsk	1
 牶	udrh	1
-牷	trwg	1
 牼	trga	1
 犃	truk	1
 犆	trfh	1
@@ -107523,7 +106392,6 @@ sort: by_weight
 犲	qtft	1
 犳	qtqy	1
 犻	qtgh	1
-犼	qtbn	1
 犽	qtat	1
 犾	qtdy	1
 狅	qttf	1
@@ -107539,10 +106407,8 @@ sort: by_weight
 狹	qtdw	1
 狾	qtrr	1
 猂	qtjf	1
-猅	qtdd	1
 猆	djdd	1
 猍	qtsw	1
-猘	qtrj	1
 猚	qtwy	1
 猟	qtih	1
 猠	qtmw	1
@@ -107588,7 +106454,6 @@ sort: by_weight
 琷	gudn	1
 琹	ggsu	1
 琺	gifc	1
-琽	gftj	1
 瑣	gimy	1
 瑤	gqrm	1
 瑩	oopy	1
@@ -107625,11 +106490,9 @@ sort: by_weight
 畭	lwty	1
 畮	ltxu	1
 畾	lllf	1
-疅	lglg	1
 疒	zzpp	1
 痌	umgk	1
 痙	ugva	1
-痲	usfq	1
 痶	umaw	1
 痻	uqaj	1
 痾	ubsk	1
@@ -107666,7 +106529,6 @@ sort: by_weight
 眐	hghg	1
 眓	hant	1
 眖	hkqn	1
-眜	hgsy	1
 眝	hpsh	1
 眾	lwwu	1
 眾	lwww	1
@@ -107691,7 +106553,6 @@ sort: by_weight
 砨	dynn	1
 硂	dwgg	1
 硆	dwgk	1
-硏	dftf	1
 硤	ddww	1
 硦	dgah	1
 硩	rrdf	1
@@ -107699,7 +106560,6 @@ sort: by_weight
 硳	dfoy	1
 硴	dawx	1
 硺	deyy	1
-碔	dgah	1
 碕	ddsk	1
 碝	ddmd	1
 碢	dmnk	1
@@ -107710,7 +106570,6 @@ sort: by_weight
 碸	dmtj	1
 磆	dmeg	1
 磈	drqc	1
-磌	dfhw	1
 磑	dmgu	1
 磚	dgjf	1
 磝	dgqt	1
@@ -107720,12 +106579,9 @@ sort: by_weight
 磪	dmwy	1
 磮	dmwa	1
 礂	dfkk	1
-礉	dryt	1
 礐	vqqd	1
 礐	wfqd	1
 礖	dvgw	1
-礜	vgnd	1
-礜	wfgd	1
 礣	dalt	1
 礦	dyaw	1
 礭	dfwy	1
@@ -107742,22 +106598,18 @@ sort: by_weight
 祱	pyuq	1
 祴	pyaa	1
 祶	pyut	1
-禆	pyrf	1
 禉	pyug	1
 禝	pylt	1
 禠	pyrm	1
 禥	pyaf	1
 禦	trhi	1
-禫	pysj	1
 禲	pydy	1
-禵	pyjm	1
 秅	ttan	1
 秇	tvyy	1
 秐	tfcy	1
 秓	tfcy	1
 秚	tufh	1
 秥	thkg	1
-秱	tmgk	1
 秲	tffy	1
 秼	triy	1
 稈	tjfh	1
@@ -107765,7 +106617,6 @@ sort: by_weight
 稕	tybg	1
 稘	tadw	1
 稜	tfwt	1
-稡	tywf	1
 稢	takg	1
 稪	ttjt	1
 稵	tuxx	1
@@ -107774,7 +106625,6 @@ sort: by_weight
 穃	tpwk	1
 穇	tcce	1
 穔	tamw	1
-穕	twys	1
 穖	txxt	1
 穘	tffq	1
 穠	tmae	1
@@ -107788,7 +106638,6 @@ sort: by_weight
 穽	pwfj	1
 穾	pwtd	1
 窂	pwrh	1
-窆	pwtp	1
 窋	pwbm	1
 窏	pwif	1
 窐	pwff	1
@@ -107829,7 +106678,6 @@ sort: by_weight
 箉	trkl	1
 箎	tham	1
 箟	tjxx	1
-箣	tgmj	1
 箤	tywf	1
 篂	tjtg	1
 篈	tfff	1
@@ -107858,7 +106706,6 @@ sort: by_weight
 籊	tnwy	1
 籋	tgwq	1
 籌	tfnf	1
-籎	txth	1
 籑	thde	1
 籔	tlvt	1
 籖	tfag	1
@@ -107874,7 +106721,6 @@ sort: by_weight
 籱	tfwy	1
 粅	oqrt	1
 粎	onyy	1
-粚	otbn	1
 粠	oawy	1
 粵	tmtn	1
 糀	oawx	1
@@ -107981,7 +106827,6 @@ sort: by_weight
 翉	sgng	1
 翗	qqng	1
 翣	nuvf	1
-耉	fttk	1
 耊	ftgf	1
 耬	dilv	1
 耮	diol	1
@@ -107998,7 +106843,6 @@ sort: by_weight
 胵	egcf	1
 胻	etfh	1
 胾	famw	1
-脁	eiqn	1
 脈	erey	1
 脋	vvve	1
 脕	eqkq	1
@@ -108055,7 +106899,6 @@ sort: by_weight
 茥	afff	1
 茮	ahiu	1
 荅	awgk	1
-荌	apvf	1
 荗	adyt	1
 荲	ajff	1
 荵	avyn	1
@@ -108070,8 +106913,6 @@ sort: by_weight
 菋	akfi	1
 菕	awga	1
 菚	aaar	1
-菞	atqt	1
-菧	ayqy	1
 菫	agkg	1
 華	agaf	1
 菾	agdn	1
@@ -108084,7 +106925,6 @@ sort: by_weight
 葂	aqkl	1
 葅	awwg	1
 葊	awga	1
-葋	aeqk	1
 葓	aiaw	1
 葢	adyl	1
 葮	awdc	1
@@ -108097,7 +106937,6 @@ sort: by_weight
 蒦	awyc	1
 蒮	apwy	1
 蒼	awyk	1
-蓅	aiyq	1
 蓔	augo	1
 蓗	atfh	1
 蓳	aakg	1
@@ -108108,7 +106947,6 @@ sort: by_weight
 蔜	agqt	1
 蔞	alvf	1
 蔧	adhv	1
-蔴	ayss	1
 蕌	ajjj	1
 蕏	aqtj	1
 蕐	agwh	1
@@ -108119,7 +106957,6 @@ sort: by_weight
 蕽	amae	1
 薆	aept	1
 薊	aqoj	1
-薐	atft	1
 薑	aglg	1
 薗	alfy	1
 薡	ahnn	1
@@ -108140,12 +106977,9 @@ sort: by_weight
 虁	auht	1
 虁	gjgt	1
 虃	aiwg	1
-虄	ajtg	1
-虋	avmv	1
 虌	aumx	1
 虍	zzpp	1
 虗	harg	1
-虙	hant	1
 虧	hawn	1
 虶	jgfh	1
 蚗	jnwy	1
@@ -108172,12 +107006,10 @@ sort: by_weight
 蟄	fufj	1
 蟇	ajdj	1
 蟓	jqje	1
-蟢	jfkk	1
 蟰	jvfj	1
 蠅	jxg	1
 蠐	jyjg	1
 蠗	jnwy	1
-蠛	jalt	1
 蠧	fpdj	1
 蠨	javj	1
 蠶	aqaj	1
@@ -108190,7 +107022,6 @@ sort: by_weight
 衟	tvdh	1
 衤	zzpp	1
 衦	pufh	1
-衪	pubn	1
 衯	puwv	1
 衱	puey	1
 衶	pukh	1
@@ -108213,7 +107044,6 @@ sort: by_weight
 袺	pufk	1
 袿	puff	1
 裃	puhh	1
-裄	puth	1
 裇	putl	1
 裌	pudw	1
 裍	puls	1
@@ -108249,13 +107079,11 @@ sort: by_weight
 襇	puuj	1
 襊	pujc	1
 襋	pugi	1
-襌	pukf	1
 襍	puws	1
 襎	putl	1
 襖	putd	1
 襗	pulf	1
 襝	puww	1
-襢	puyg	1
 襥	puwy	1
 襯	puuq	1
 襰	pugm	1
@@ -108312,7 +107140,6 @@ sort: by_weight
 詫	ypta	1
 詯	ythg	1
 詳	yudh	1
-詶	yyth	1
 詷	ymgk	1
 詻	ytkg	1
 詽	yftf	1
@@ -108359,7 +107186,6 @@ sort: by_weight
 謻	ytqq	1
 謿	yfje	1
 譁	yagf	1
-譌	yeto	1
 譍	ywwy	1
 譗	ytwk	1
 譝	yxg	1
@@ -108432,7 +107258,6 @@ sort: by_weight
 趒	fhiq	1
 趕	fhjf	1
 趖	fhwf	1
-趗	fhkh	1
 趘	fhnn	1
 趚	fhgi	1
 趛	fhqd	1
@@ -108471,13 +107296,11 @@ sort: by_weight
 踁	khga	1
 踂	khbn	1
 踄	khhi	1
-踆	khct	1
 踇	khtu	1
 踋	khfb	1
 踍	khfb	1
 踎	khgk	1
 踐	khaa	1
-踑	khaw	1
 踓	khwy	1
 踕	khgh	1
 踙	khbc	1
@@ -108490,10 +107313,8 @@ sort: by_weight
 踭	khqh	1
 踰	khwj	1
 踲	khrh	1
-踳	khdj	1
 踷	khfj	1
 踸	khan	1
-踿	khto	1
 蹎	khfw	1
 蹏	khrm	1
 蹕	khjf	1
@@ -108580,6 +107401,7 @@ sort: by_weight
 遠	fkep	1
 遠	fkwp	1
 遫	gkip	1
+遬	gkip	1
 遱	lvpd	1
 選	nnap	1
 邁	ajmp	1
@@ -108588,9 +107410,7 @@ sort: by_weight
 郣	fpbb	1
 郵	tgab	1
 郺	qqvc	1
-鄡	wvgb	1
 鄥	wvgb	1
-鄮	qyvb	1
 鄳	xbh	1
 鄵	kkkb	1
 鄾	depb	1
@@ -108616,7 +107436,6 @@ sort: by_weight
 醜	sgrc	1
 醞	sgll	1
 醡	sgpf	1
-醤	uefg	1
 醦	sgce	1
 醳	sglf	1
 醶	sgww	1
@@ -108632,7 +107451,6 @@ sort: by_weight
 釣	qqyy	1
 釩	qmyy	1
 釯	qynn	1
-釰	qvyy	1
 釻	qvyy	1
 釼	qvyy	1
 釾	qaht	1
@@ -108705,7 +107523,6 @@ sort: by_weight
 鍜	qnhc	1
 鍟	qjtg	1
 鍡	qlge	1
-鍧	qqyg	1
 鍬	qtoy	1
 鍯	qqrn	1
 鍰	qefc	1
@@ -108750,7 +107567,6 @@ sort: by_weight
 閐	utfn	1
 閝	uwyc	1
 閥	uwae	1
-閦	uwww	1
 閬	uyve	1
 閸	ugfg	1
 閸	ughg	1
@@ -108766,9 +107582,7 @@ sort: by_weight
 阠	bnfh	1
 阢	bgqn	1
 阨	bdbn	1
-陁	btbn	1
 陃	bgmw	1
-陜	bdww	1
 陝	bdty	1
 陦	bdtf	1
 陯	bwga	1
@@ -108779,7 +107593,6 @@ sort: by_weight
 雃	gawy	1
 雋	wymm	1
 雐	hawy	1
-雑	vswy	1
 雓	wtwy	1
 雔	wywy	1
 雗	fjwy	1
@@ -108789,9 +107602,9 @@ sort: by_weight
 雥	wywy	1
 雦	wywy	1
 雧	wyws	1
-雮	ftfn	1
 雰	fwvb	1
 雺	fcbt	1
+霋	fgvv	1
 霌	fmfk	1
 霐	fixc	1
 霔	fiyg	1
@@ -108987,8 +107800,6 @@ sort: by_weight
 餺	wyvf	1
 餻	wpuo	1
 餼	wpro	1
-餽	wprc	1
-餽	wyvc	1
 餾	wpql	1
 餿	wpvc	1
 餿	wyvc	1
@@ -109037,8 +107848,6 @@ sort: by_weight
 饢	wpge	1
 饢	wyve	1
 饣	zzpp	1
-饦	qnta	1
-饾	qngu	1
 馚	tjwv	1
 馢	tjaa	1
 馫	tjtj	1
@@ -109059,7 +107868,6 @@ sort: by_weight
 驑	cgjl	1
 驙	cylg	1
 髏	melv	1
-髙	yjfk	1
 髥	demf	1
 髨	defq	1
 髬	degg	1

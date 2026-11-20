@@ -45,7 +45,7 @@ mkdir -p "$LOG"
 #     要重做必须整链重标定 + 用 make test 标定，见 docs/PROGRESS.md
 # CHAR_SHIFT    配合 log1000 的字表下移量（log*1000 尺度）
 TIER="${TIER:-base}"
-REWEIGHT="${REWEIGHT:-off}"
+REWEIGHT="${REWEIGHT:-log1000}"   # §4.92 联合标定后默认开（词/字/码表同 log 尺度；黄金 52/52）
 CHAR_SHIFT="${CHAR_SHIFT:-0}"
 LM_TOPK_2="${LM_TOPK_2:-600000}"
 LM_TOPK_3="${LM_TOPK_3:-600000}"

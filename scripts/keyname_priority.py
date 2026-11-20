@@ -74,6 +74,16 @@ def caps(dicts_dir, word_srcs=None):
         if code in KEYNAME_4 and text == KEYNAME_4[code] and weight > 1:
             out[code] = weight - 1
 
+    # 用户手工词组优先（§4.92）：词组是人工维护的刻意覆盖，必须压过同码词。
+    up = os.path.join(dicts_dir, "egret_wubi_py_user_phrases.dict.yaml")
+    if os.path.exists(up):
+        for text, code, weight in _rows(up):
+            code = code.strip().lower()
+            if len(code) == 4 and code.isalpha():
+                limit = weight - 1
+                if code not in out or limit < out[code]:
+                    out[code] = limit
+
     if word_srcs:
         char_full = {}
         for text, code, weight in _rows(path):

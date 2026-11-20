@@ -246,7 +246,10 @@ def main():
             if len(k) == 1 and v.isdigit():
                 lm[k] = int(v)
         print(f"\n字表 log 重标定（shift={args.char_shift}，unigram {len(lm)} 字）")
-        for path in (CHAR_DICTS + [os.path.join(OUT, "egret_wubi_py_chars.dict.yaml")]):
+        # 传统库五笔字表也必须一起重标：否则词权升到 log 尺度(0~16000)、字权仍是
+        # 知频(0~1000) ⇒ 词全面压字（tffu「等 780」输给「徒增 log 值」）——§4.92
+        for path in (CHAR_DICTS + [os.path.join(OUT, "egret_wubi_py_chars.dict.yaml"),
+                                   os.path.join(OUT, "egret_wubi_chars.dict.yaml")]):
             if not os.path.exists(path):
                 continue
             lines = open(path, encoding="utf-8").read().split("\n")
