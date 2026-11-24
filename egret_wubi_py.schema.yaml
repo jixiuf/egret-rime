@@ -133,7 +133,10 @@ dynamic_translator:
   lm_compose_inject: false    # 无条件注入：**开着会伤黄金**（§4.40），保持关
   compose_inject_mixed: true  # 只对「混打」输入（含非拼音音节的形码片段）注入搜索器结果（§4.83）
   lm_compose_translator: false
-  compose_beam: 8
+  # 必须与 mix_segmentor.beam 一致！两者共用 py_composer 的模块级增量缓存，
+  # beam 不同会让缓存每次互相失效 ⇒ 每键跑两遍全量搜索（§4.93 实测：
+  # 78/113/117ms → 59/74/54ms，且与"关掉搜索器"等同）
+  compose_beam: 4
   compose_log_n: 0            # >0 时覆盖一元 LM 的 log N（标定用）
   compose_want: 2
   lm_keep_sentences: 1        # 首屏只留 1 个整句，其余挪到尾部
@@ -248,7 +251,7 @@ mix_segmentor:
   min_len: 4
   # 判读法只需要"哪个读法更像"，不需要精确整句 —— beam 从 8 降到 2 实测
   # 每键 118/161/209ms → 78/113/117ms，质量无回归（§4.93）
-  beam: 2
+  beam: 4
 wubi_route:                 # 绑定 tag=wubi 的内建 table_translator（内建组件认 tag，lua 的不认）
   tag: wubi
   dictionary: egret_wubi
