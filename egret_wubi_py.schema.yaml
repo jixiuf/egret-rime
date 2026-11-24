@@ -191,7 +191,9 @@ custom_phrase:
 # ---- 混合库 script：五笔+拼音混合分词 + LM 组句（混流核心）----
 translator:
   # LM 重排需要多个“按权重排序”的整句候选；这两个值越大候选越多（也越慢）
-  max_sentences: 100           # librime 内部 clamp 到 [1,100]，写更大无效
+  # 100 → 20：整句候选只需足够让 grammar 裁决；实测每键再降 ~15ms，
+  # 长句/混打评测无回归（§4.93）。clamp [1,100]。
+  max_sentences: 20
   sentence_cutoff_threshold: 0.5
   dictionary: egret_wubi_py
   prism: egret_wubi_py
@@ -244,6 +246,9 @@ mix_segmentor:
   enabled: true
   debug: false
   min_len: 4
+  # 判读法只需要"哪个读法更像"，不需要精确整句 —— beam 从 8 降到 2 实测
+  # 每键 118/161/209ms → 78/113/117ms，质量无回归（§4.93）
+  beam: 2
 wubi_route:                 # 绑定 tag=wubi 的内建 table_translator（内建组件认 tag，lua 的不认）
   tag: wubi
   dictionary: egret_wubi

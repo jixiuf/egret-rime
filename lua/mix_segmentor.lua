@@ -19,6 +19,7 @@ function M.init(env)
     M.enabled = cfg:get_bool("mix_segmentor/enabled")
     M.debug = cfg:get_bool("mix_segmentor/debug")
     M.min_len = cfg:get_int("mix_segmentor/min_len") or 4
+    M.beam = cfg:get_int("mix_segmentor/beam") or 8
     if not M.enabled then return end
     local ok1, lm = pcall(require, "lm_rerank")
     local ok2, cp = pcall(require, "py_composer")
@@ -42,7 +43,7 @@ function M.func(seg, env)
             log.error(string.format("[MIXSEG] enter inp=%s s=%s e=%s", tostring(inp), tostring(s), tostring(e)))
         end
         if not inp or e - s < M.min_len or not inp:match("^[a-z]+$") then return end
-        local res = M.composer.compose(inp, M.lm, 8, 1)
+        local res = M.composer.compose(inp, M.lm, M.beam or 8, 1)
         local best = res and res[1]
         if not best or not best.pieces or #best.pieces == 0 then return end
         -- 结论（实测）：rime 里**段就是组字/上屏的单位**，段与段是顺序确认的，
