@@ -165,7 +165,9 @@ def main():
             c = code.replace(" ", "")
             # 与 py_composer 的 MAX_CODE_LEN(16) 契约一致（scripts/check_compose_table.lua
             # 会在 make lint 里断言最长码；超长的长句词条对组句也没用）
-            if len(c) <= 16:
+            # 长尾/挖掘表只收 **3 字以上**：2 字长尾词在码表里是噪音
+            # （实测去掉后混打 248→269，每键还快 ~25%——§4.94）
+            if len(c) <= 16 and len(w) >= 3:
                 add(w, c, kind)
 
     out.sort(key=lambda x: (x[1], -x[2]))
